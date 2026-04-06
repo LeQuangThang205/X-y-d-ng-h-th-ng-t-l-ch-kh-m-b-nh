@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Đặt lịch khám</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><span class="logo">🏥 Admin</span></div>
+        <nav class="sidebar-nav">
+            <a href="/admin/trangquantri.html" class="active"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
+            <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
+            <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
+            <a href="/admin/phongkham.html"><span class="icon">🏥</span> Quản lý phòng khám</a>
+            <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
+            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
+        </nav>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <h2>Dashboard</h2>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <span class="badge badge-info" id="user-role"></span>
+                <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
+            </div>
+        </header>
+        <div class="content">
+            <h1 class="page-title">Bảng điều khiển</h1>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="value" id="stat-patients">0</div>
+                    <div class="label">Tổng khách hàng</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="stat-bookings">0</div>
+                    <div class="label">Tong luot dat</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="stat-cancel-rate">0%</div>
+                    <div class="label">Ty le huy</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = requireAuth(['admin']);
+            if (user) {
+                document.getElementById('user-name').textContent = user.name || user.email;
+                document.getElementById('user-role').textContent = getRoleLabel(user.role);
+            }
+
+            Promise.all([
+                apiJson('/api/admin/reports/overview'),
+                apiJson('/api/admin/patients')
+            ]).then(function(results) {
+                var report = results[0] || {};
+                var patients = results[1] || [];
+                document.getElementById('stat-patients').textContent = String(patients.length || 0);
+                document.getElementById('stat-bookings').textContent = String(report.tongLuotDat || 0);
+                var rate = Number(report.tiLeHuy || 0).toFixed(1);
+                document.getElementById('stat-cancel-rate').textContent = rate + '%';
+            }).catch(function(err) {
+                console.error(err);
+            });
+        })();
+    </script>
+</body>
+</html>

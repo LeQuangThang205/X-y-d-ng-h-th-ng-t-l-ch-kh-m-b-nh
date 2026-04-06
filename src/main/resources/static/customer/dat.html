@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khách hàng - Đặt lịch khám</title>
+    <link rel="stylesheet" href="/css/kieu.css" />
+  </head>
+  <body class="customer-layout">
+    <header class="customer-header">
+      <a href="/customer/trangkhach.html" class="brand">PHÒNG KHÁM PHENIKAA UNI</a>
+      <nav>
+        <a href="/trangchu.html">Trang chủ</a>
+        <a href="/customer/khoa.html">Chuyên khoa</a>
+        <a href="/customer/bacsi.html">Bác sĩ</a>
+        <a href="/customer/datlich.html">Đặt lịch</a>
+        <a href="/customer/lichcuatoi.html">Lịch khám</a>
+        <a href="/customer/hoso.html">Thông tin cá nhân</a>
+        <span class="text-muted" id="user-name"></span>
+        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
+      </nav>
+    </header>
+    <div class="customer-content profile-page">
+      <div class="profile-layout">
+        <aside class="profile-sidebar">
+          <nav class="profile-menu">
+            <a href="/customer/hoso.html">Thông tin cá nhân</a>
+            <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="#">Đánh giá</a>
+            <a href="#" onclick="logout(); return false;">Đăng xuất</a>
+          </nav>
+        </aside>
+        <main class="profile-main">
+          <h1 class="page-title">Đặt lịch khám</h1>
+          <div class="card booking-card">
+            <div class="card-header">Thông tin đặt lịch</div>
+            <div class="card-body">
+              <form id="book-form">
+            <div class="form-group">
+              <label>Chọn khoa / dịch vụ *</label>
+              <select id="department" required>
+                <option value="">-- Chọn khoa --</option>
+                <option value="K01">Nội tổng quát</option>
+                <option value="K02">Tai mũi họng</option>
+                <option value="K03">Da liễu</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ngày khám *</label>
+                <input type="date" id="date" required min="" />
+              </div>
+              <div class="form-group">
+                <label>Khung giờ *</label>
+                <select id="time" required>
+                  <option value="">-- Chọn giờ --</option>
+                  <option value="08:00">08:00 - 08:30</option>
+                  <option value="08:30">08:30 - 09:00</option>
+                  <option value="09:00">09:00 - 09:30</option>
+                  <option value="09:30">09:30 - 10:00</option>
+                  <option value="10:00">10:00 - 10:30</option>
+                  <option value="10:30">10:30 - 11:00</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Triệu chứng / Ghi chú</label>
+              <textarea
+                id="note"
+                rows="3"
+                placeholder="Mô tả ngắn (không bắt buộc)"
+              ></textarea>
+            </div>
+            <div class="booking-summary" id="summary" style="display: none">
+              <p><strong>Khoa:</strong> <span id="sum-dept"></span></p>
+              <p><strong>Ngày giờ:</strong> <span id="sum-datetime"></span></p>
+            </div>
+                <button type="submit" class="btn btn-primary">
+                  Xác nhận đặt lịch
+                </button>
+              </form>
+            </div>
+          </div>
+      </main>
+      </div>
+    </div>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+      (function () {
+        var user = requireAuth(["patient"]);
+        if (user)
+          document.getElementById("user-name").textContent =
+            user.name || user.email;
+
+        var today = new Date().toISOString().slice(0, 10);
+        document.getElementById("date").setAttribute("min", today);
+
+        var deptNames = {
+          K01: "Nội tổng quát",
+          K02: "Tai mũi họng",
+          K03: "Da liễu",
+        };
+        function updateSummary() {
+          var dept = document.getElementById("department").value;
+          var date = document.getElementById("date").value;
+          var time = document.getElementById("time").value;
+          var sum = document.getElementById("summary");
+          if (!dept || !date || !time) {
+            sum.style.display = "none";
+            return;
+          }
+          sum.style.display = "block";
+          document.getElementById("sum-dept").textContent =
+            deptNames[dept] || dept;
+          document.getElementById("sum-datetime").textContent =
+            date + " " + time;
+        }
+        document
+          .getElementById("department")
+          .addEventListener("change", updateSummary);
+        document
+          .getElementById("date")
+          .addEventListener("change", updateSummary);
+        document
+          .getElementById("time")
+          .addEventListener("change", updateSummary);
+
+        document
+          .getElementById("book-form")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            alert(
+              'Đặt lịch thành công! Lịch hẹn đang chờ xác nhận. Bạn có thể xem tại "Lịch của tôi".'
+            );
+            window.location.href = "/customer/lichcuatoi.html";
+          });
+      })();
+    </script>
+  </body>
+</html>

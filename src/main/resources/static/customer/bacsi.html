@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bác sĩ - Đặt lịch khám</title>
+    <link rel="stylesheet" href="/css/kieu.css" />
+  </head>
+  <body class="customer-layout">
+    <header class="customer-header">
+      <a href="/customer/trangkhach.html" class="brand">PHÒNG KHÁM PHENIKAA UNI</a>
+      <nav>
+        <a href="/trangchu.html">Trang chủ</a>
+        <a href="/customer/khoa.html">Chuyên khoa</a>
+        <a href="/customer/bacsi.html">Bác sĩ</a>
+        <a href="/customer/datlich.html">Đặt lịch</a>
+        <a href="/customer/lichcuatoi.html">Lịch khám</a>
+        <a href="/customer/hoso.html">Thông tin cá nhân</a>
+        <span class="text-muted" id="user-name"></span>
+        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
+      </nav>
+    </header>
+    <div class="customer-content profile-page">
+      <div class="profile-layout">
+        <aside class="profile-sidebar">
+          <nav class="profile-menu">
+            <a href="/customer/hoso.html">Trang chủ</a>
+            <a href="/customer/hoso.html">Chuyên khoa</a>
+
+            <a href="/customer/hoso.html">Thông tin cá nhân</a>
+            <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="#">Đánh giá</a>
+            <a href="#" onclick="logout(); return false;">Đăng xuất</a>
+          </nav>
+        </aside>
+        <main class="profile-main">
+          <h1 class="page-title">Danh sách Bác sĩ</h1>
+          <div class="filter-bar">
+            <div class="form-group">
+              <label>Chuyên khoa</label>
+              <select id="filter-spec">
+                <option value="">Tất cả chuyên khoa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Thời gian làm việc</label>
+              <select id="filter-time">
+                <option value="">Tất cả</option>
+                <option>Sáng (7h - 12h)</option>
+                <option>Chiều (13h - 17h)</option>
+              </select>
+            </div>
+          </div>
+          <div class="doctor-list-grid">
+            <div class="text-muted">Dang tai danh sach bac si...</div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+      (function () {
+        var user = requireAuth(["patient"]);
+        if (user && document.getElementById("user-name")) {
+          document.getElementById("user-name").textContent = user.name || user.email;
+        }
+
+        var specSelect = document.getElementById("filter-spec");
+        var grid = document.querySelector(".doctor-list-grid");
+
+        function renderDoctors(list) {
+          if (!list || !list.length) {
+            grid.innerHTML = '<div class="text-muted">Khong co bac si phu hop.</div>';
+            return;
+          }
+
+          grid.innerHTML = list.map(function (doc) {
+            var initials = (doc.hoTen || "BS")
+              .split(" ")
+              .slice(-2)
+              .map(function (w) { return w[0] || ""; })
+              .join("")
+              .toUpperCase();
+
+            return (
+              '<a href="/customer/datlich.html" class="doctor-card">' +
+                '<div class="doctor-avatar">' + initials + '</div>' +
+                '<h3 class="doctor-name">' + (doc.hoTen || "-") + '</h3>' +
+                '<p class="doctor-spec">Chuyen khoa ' + (doc.chuyenKhoa ? doc.chuyenKhoa.ten : "-") + '</p>' +
+                '<p class="doctor-title">' + (doc.chucDanh || "Bac si") + '</p>' +
+              '</a>'
+            );
+          }).join("");
+        }
+
+        function loadDoctors() {
+          var url = "/api/patient/doctors";
+          if (specSelect.value) {
+            url += "?specialtyId=" + encodeURIComponent(specSelect.value);
+          }
+
+          return apiJson(url).then(function (list) {
+            renderDoctors(list);
+          }).catch(function (err) {
+            grid.innerHTML = '<div class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</div>';
+          });
+        }
+
+        apiJson("/api/patient/specialties").then(function (specialties) {
+          specialties.forEach(function (sp) {
+            var option = document.createElement("option");
+            option.value = sp.id;
+            option.textContent = sp.ten;
+            specSelect.appendChild(option);
+          });
+        }).then(loadDoctors)
+          .catch(function (err) {
+            grid.innerHTML = '<div class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</div>';
+          });
+
+        specSelect.addEventListener("change", loadDoctors);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập / Đăng ký - Đặt lịch khám</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="auth-page">
+    <header class="public-header public-header-mini">
+        <a href="/trangchu.html" class="brand">Bệnh viện Đa khoa</a>
+        <nav class="header-nav">
+            <a href="/trangchu.html" class="btn btn-outline">Trang chu</a>
+        </nav>
+    </header>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-hero">
+                <div class="auth-hero-inner">
+                    <h2 class="auth-hero-title">Dat lich kham benh truc tuyen</h2>
+                    <p class="auth-hero-subtitle">Dang nhap hoac dang ky tai khoan de dat lich kham nhanh chong, theo doi lich va thong tin suc khoe cua ban.</p>
+                    <div class="auth-hero-highlights">
+                        <div class="auth-hero-item">
+                            <div class="auth-hero-icon">⚡</div>
+                            <div>
+                                <strong>Dat lich nhanh</strong>
+                                <span>Chon chuyen khoa, bac si, khung gio chi trong vai buoc.</span>
+                            </div>
+                        </div>
+                        <div class="auth-hero-item">
+                            <div class="auth-hero-icon">📅</div>
+                            <div>
+                                <strong>Theo doi lich</strong>
+                                <span>Quan ly lich kham da dat theo thoi gian thuc.</span>
+                            </div>
+                        </div>
+                        <div class="auth-hero-item">
+                            <div class="auth-hero-icon">🔒</div>
+                            <div>
+                                <strong>Thong tin bao mat</strong>
+                                <span>Du lieu ca nhan va lich kham duoc bao mat an toan.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="auth-hero-footer">Ban la nhan vien / admin? Su dung trang dang nhap theo vai tro rieng.</p>
+                </div>
+            </div>
+            <div class="auth-main">
+                <div id="panel-login" class="auth-panel active">
+                    <form id="form-login" class="auth-form">
+                        <div class="form-group">
+                            <label>Email / So dien thoai</label>
+                            <input type="text" id="login-email" placeholder="Email hoac SDT" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mat khau</label>
+                            <input type="password" id="login-password" placeholder="••••••••" required>
+                        </div>
+                        <div class="form-row-inline">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="login-remember"> Ghi nho dang nhap
+                            </label>
+                            <a href="#" class="link-forgot">Quen mat khau?</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Dang nhap</button>
+                    </form>
+                    <p class="auth-hint">
+                        Chua co tai khoan? <a href="/dangky.html" class="link-register">Dang ky tai day</a> | 
+                        Demo Admin / Staff: chon vai tro tai <a href="/dangnhap-demo.html">trang dang nhap theo vai tro</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = getCurrentUser();
+            if (user) window.location.href = '/trangchu.html';
+
+            document.getElementById('form-login').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var email = document.getElementById('login-email').value.trim();
+                var password = document.getElementById('login-password').value;
+                try {
+                    var res = await authLogin(email, password);
+                    if (!res.success) {
+                        alert(res.message || 'Dang nhap that bai');
+                        return;
+                    }
+                    var role = normalizeRole(res.role);
+                    var name = email.indexOf('@') > 0 ? email.split('@')[0] : email;
+                    var userObj = { name: name, email: email, username: res.user, role: role };
+                    
+                    // If patient, load fullname from database
+                    if (role === 'patient') {
+                        try {
+                            var account = res.user || email;
+                            var profile = await apiJson('/api/patients/by-account?account=' + encodeURIComponent(account));
+                            if (profile && profile.fullname) {
+                                userObj.name = profile.fullname;
+                                if (profile.id) userObj.patientId = profile.id;
+                                if (profile.phone) userObj.phone = profile.phone;
+                            }
+                        } catch (err) {
+                            // If profile not found, just use default name from email/phone
+                            console.log('Profile not found, using email/phone as name');
+                        }
+                    }
+                    
+                    setCurrentUser(userObj);
+                    window.location.href = '/trangchu.html';
+                } catch (err) {
+                    alert(err.message || 'Dang nhap that bai');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chuyên khoa - Đặt lịch khám</title>
+    <link rel="stylesheet" href="/css/kieu.css" />
+  </head>
+  <body class="customer-layout">
+    <header class="customer-header">
+      <a href="/customer/trangkhach.html" class="brand">PHÒNG KHÁM PHENIKAA UNI</a>
+      <nav>
+        <a href="/trangchu.html">Trang chủ</a>
+        <a href="/customer/khoa.html">Chuyên khoa</a>
+        <a href="/customer/bacsi.html">Bác sĩ</a>
+        <a href="/customer/datlich.html">Đặt lịch</a>
+        <a href="/customer/lichcuatoi.html">Lịch khám</a>
+        <a href="/customer/hoso.html">Thông tin cá nhân</a>
+        <span class="text-muted" id="user-name"></span>
+        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
+      </nav>
+    </header>
+    <div class="customer-content profile-page">
+      <div class="profile-layout">
+        <aside class="profile-sidebar">
+          <nav class="profile-menu">
+            <a href="/customer/hoso.html">Thông tin cá nhân</a>
+            <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="#">Đánh giá</a>
+            <a href="#" onclick="logout(); return false;">Đăng xuất</a>
+          </nav>
+        </aside>
+        <main class="profile-main">
+          <h1 class="page-title" style="text-align: center">Chuyên khoa</h1>
+          <p style="text-align: center; color: #64748b; margin-bottom: 2rem">
+            Đội ngũ bác sĩ chuyên môn cao, trang thiết bị hiện đại phục vụ đa dạng
+            các chuyên khoa
+          </p>
+          <div class="dept-grid" style="justify-content: center" id="specialty-grid">
+            <div class="text-muted">Dang tai chuyen khoa...</div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+      (function () {
+        var user = requireAuth(["patient"]);
+        if (user && document.getElementById("user-name")) {
+          document.getElementById("user-name").textContent = user.name || user.email;
+        }
+        var grid = document.getElementById("specialty-grid");
+        apiJson("/api/patient/specialties").then(function (list) {
+          if (!list || !list.length) {
+            grid.innerHTML = '<div class="text-muted">Chua co chuyen khoa.</div>';
+            return;
+          }
+
+          grid.innerHTML = list.map(function (item) {
+            return '<div class="dept-card">'
+              + '<span class="dept-icon" style="font-size: 2.5rem">🏥</span>'
+              + '<div class="dept-name" style="font-weight: 600; font-size: 1.1rem">' + (item.ten || '-') + '</div>'
+              + '<div style="color: #64748b; font-size: 0.95rem">' + (item.moTa || 'Chuyen khoa tong hop') + '</div>'
+              + '<a href="/customer/datlich.html" class="btn btn-link" style="margin-top: 0.5rem; color: #2563eb">Dat lich kham →</a>'
+              + '</div>';
+          }).join('');
+        }).catch(function (err) {
+          grid.innerHTML = '<div class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</div>';
+        });
+      })();
+    </script>
+  </body>
+</html>

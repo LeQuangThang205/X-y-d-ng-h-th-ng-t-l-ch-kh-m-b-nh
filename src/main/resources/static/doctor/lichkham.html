@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bac si - Lich kham</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><span class="logo">Bac si</span></div>
+        <nav class="sidebar-nav">
+            <a href="/doctor/lichkham.html" class="active"><span class="icon">📅</span> Lich kham</a>
+        </nav>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <h2>Lich kham ca nhan</h2>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <button type="button" class="btn" onclick="logout()">Dang xuat</button>
+            </div>
+        </header>
+        <div class="content">
+            <div class="card mb-1">
+                <div class="card-body">
+                    <form id="doctor-picker" class="form-row">
+                        <div class="form-group">
+                            <label>Doctor ID</label>
+                            <input type="number" id="doctor-id" min="1" required>
+                        </div>
+                        <div class="form-group" style="align-self:end;">
+                            <button type="submit" class="btn btn-primary">Tai lich kham</button>
+                        </div>
+                    </form>
+                    <p class="text-muted">Nhap doctor ID cua ban lan dau, he thong se luu trong localStorage.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Benh nhan</th>
+                                    <th>Ngay gio</th>
+                                    <th>Trang thai</th>
+                                    <th>Cap nhat</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctor-appointments">
+                                <tr><td colspan="5" class="text-muted">Chua tai du lieu.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = requireAuth(['doctor']);
+            if (!user) return;
+
+            document.getElementById('user-name').textContent = user.name || user.email;
+            var input = document.getElementById('doctor-id');
+            var tbody = document.getElementById('doctor-appointments');
+            if (user.doctorId) input.value = user.doctorId;
+
+            function statusOptions(current) {
+                var statuses = ['CHO_XAC_NHAN', 'DA_XAC_NHAN', 'DA_HUY', 'DANG_KHAM', 'DA_KHAM', 'BO_LO'];
+                return '<select data-status-select>' + statuses.map(function(s) {
+                    return '<option value="' + s + '"' + (s === current ? ' selected' : '') + '>' + s + '</option>';
+                }).join('') + '</select>';
+            }
+
+            function loadAppointments(doctorId) {
+                apiJson('/api/doctor/' + encodeURIComponent(doctorId) + '/appointments').then(function(list) {
+                    if (!list || !list.length) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-muted">Khong co lich kham.</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = list.map(function(item) {
+                        return '<tr data-row-id="' + item.id + '">'
+                            + '<td>#' + item.id + '</td>'
+                            + '<td>' + (item.benhNhan ? item.benhNhan.fullname : '-') + '</td>'
+                            + '<td>' + (item.ngayKham || '-') + ' ' + (item.gioKham || '') + '</td>'
+                            + '<td><span class="badge badge-info">' + (item.trangThai || '-') + '</span></td>'
+                            + '<td>' + statusOptions(item.trangThai) + ' <button type="button" class="btn-sm btn-outline" data-save-btn>Luu</button></td>'
+                            + '</tr>';
+                    }).join('');
+                }).catch(function(err) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</td></tr>';
+                });
+            }
+
+            document.getElementById('doctor-picker').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var doctorId = input.value;
+                if (!doctorId) return;
+                user.doctorId = doctorId;
+                setCurrentUser(user);
+                loadAppointments(doctorId);
+            });
+
+            tbody.addEventListener('click', function(e) {
+                var target = e.target;
+                if (!target || !target.matches('[data-save-btn]')) return;
+
+                var row = target.closest('tr');
+                var appointmentId = row.getAttribute('data-row-id');
+                var select = row.querySelector('[data-status-select]');
+                var status = select.value;
+
+                apiJson('/api/doctor/appointments/' + encodeURIComponent(appointmentId) + '/status', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status })
+                }).then(function(res) {
+                    if (!res.success) {
+                        throw new Error(res.message || 'Cap nhat that bai');
+                    }
+                    alert('Da cap nhat trang thai lich hen');
+                    if (user.doctorId) loadAppointments(user.doctorId);
+                }).catch(function(err) {
+                    alert(err.message || 'Cap nhat that bai');
+                });
+            });
+
+            if (user.doctorId) {
+                loadAppointments(user.doctorId);
+            }
+        })();
+    </script>
+</body>
+</html>

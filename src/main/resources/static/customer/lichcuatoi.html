@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khách hàng - Lịch của tôi</title>
+    <link rel="stylesheet" href="/css/kieu.css" />
+  </head>
+  <body class="customer-layout">
+    <header class="customer-header">
+      <a href="/customer/trangkhach.html" class="brand">PHÒNG KHÁM PHENIKAA UNI</a>
+      <nav>
+        <a href="/trangchu.html">Trang chủ</a>
+        <a href="/customer/khoa.html">Chuyên khoa</a>
+        <a href="/customer/bacsi.html">Bác sĩ</a>
+        <a href="/customer/datlich.html">Đặt lịch</a>
+        <a href="/customer/lichcuatoi.html">Lịch khám</a>
+        <a href="/customer/hoso.html">Thông tin cá nhân</a>
+        <span class="text-muted" id="user-name"></span>
+        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
+      </nav>
+    </header>
+    <div class="customer-content profile-page">
+      <div class="profile-layout">
+        <aside class="profile-sidebar">
+          <nav class="profile-menu">
+            <a href="/customer/hoso.html">Thông tin cá nhân</a>
+            <a href="/customer/lichcuatoi.html" class="active">Lịch khám</a>
+            <a href="#">Đánh giá</a>
+            <a href="#" onclick="logout(); return false;">Đăng xuất</a>
+          </nav>
+        </aside>
+        <main class="profile-main">
+          <h1 class="page-title">Lịch hẹn của tôi</h1>
+          <div class="card">
+            <div class="card-header">Lịch sắp tới &amp; đã khám</div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Khoa</th>
+                      <th>Ngày giờ</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="5" class="text-muted">Dang tai du lieu...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-1" id="reminder-list"></div>
+              <p class="text-muted mt-1">
+                Khi có lịch, bạn sẽ thấy danh sách tại đây. Lịch "Chờ xác nhận" sẽ
+                được phòng khám xác nhận qua SĐT/email.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+      (function () {
+        var user = requireAuth(["patient"]);
+        if (!user) return;
+
+        document.getElementById("user-name").textContent = user.name || user.email;
+
+        var tbody = document.querySelector("tbody");
+        var reminderList = document.getElementById("reminder-list");
+
+        var badgeClass = {
+          CHO_XAC_NHAN: "badge-warning",
+          DA_XAC_NHAN: "badge-success",
+          DA_HUY: "badge-danger",
+          DANG_KHAM: "badge-info",
+          DA_KHAM: "badge-success",
+          BO_LO: "badge-outline",
+        };
+
+        var statusLabel = {
+          CHO_XAC_NHAN: "Cho xac nhan",
+          DA_XAC_NHAN: "Da xac nhan",
+          DA_HUY: "Da huy",
+          DANG_KHAM: "Dang kham",
+          DA_KHAM: "Da kham",
+          BO_LO: "Bo lo",
+        };
+
+        function formatDateTime(item) {
+          return (item.ngayKham || "") + " " + (item.gioKham || "");
+        }
+
+        function renderAppointments(list) {
+          if (!list || !list.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-muted">Ban chua co lich hen nao.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = list.map(function (item) {
+            var st = item.trangThai || "CHO_XAC_NHAN";
+            return (
+              "<tr>" +
+              "<td>#" + item.id + "</td>" +
+              "<td>" + (item.chuyenKhoa ? item.chuyenKhoa.ten : "-") + "</td>" +
+              "<td>" + formatDateTime(item) + "</td>" +
+              "<td><span class=\"badge " + (badgeClass[st] || "badge-info") + "\">" + (statusLabel[st] || st) + "</span></td>" +
+              "<td>" + (item.bacSi ? item.bacSi.hoTen : "-") + "</td>" +
+              "</tr>"
+            );
+          }).join("");
+        }
+
+        function renderReminders(list) {
+          if (!list || !list.length) {
+            reminderList.innerHTML = '<p class="text-muted">Khong co thong bao nhac lich.</p>';
+            return;
+          }
+
+          reminderList.innerHTML = '<h3 class="mt-1">Thong bao nhac lich</h3>' +
+            list.slice(0, 5).map(function (item) {
+              return '<p class="text-muted">- ' + item.noiDung + ' (' + item.thoiDiemNhac + ')</p>';
+            }).join('');
+        }
+
+        if (!user.patientId) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-muted">Chua tim thay ho so benh nhan. Hay dat lich lan dau tai trang Dat lich.</td></tr>';
+          reminderList.innerHTML = '';
+          return;
+        }
+
+        Promise.all([
+          apiJson('/api/patient/' + encodeURIComponent(user.patientId) + '/appointments'),
+          apiJson('/api/patient/' + encodeURIComponent(user.patientId) + '/reminders')
+        ]).then(function (results) {
+          renderAppointments(results[0]);
+          renderReminders(results[1]);
+        }).catch(function (err) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</td></tr>';
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý bác sĩ - Admin</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><span class="logo">🏥 Admin</span></div>
+        <nav class="sidebar-nav">
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
+            <a href="/admin/bacsi.html" class="active"><span class="icon">🩺</span> Quản lý bác sĩ</a>
+            <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
+            <a href="/admin/phongkham.html"><span class="icon">🏥</span> Quản lý phòng khám</a>
+            <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
+            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
+        </nav>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <h2>Quản lý bác sĩ</h2>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
+            </div>
+        </header>
+        <div class="content">
+            <h1 class="page-title">Danh sach bac si</h1>
+
+            <div class="card mb-1">
+                <div class="card-header">Them phong kham</div>
+                <div class="card-body">
+                    <form id="room-form" class="form-row">
+                        <div class="form-group">
+                            <label>Ten phong</label>
+                            <input type="text" id="room-name" required />
+                        </div>
+                        <div class="form-group" style="align-self:end;">
+                            <button type="submit" class="btn btn-outline">Them phong</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-1">
+                <div class="card-header">Them bac si</div>
+                <div class="card-body">
+                    <form id="doctor-form">
+                        <div class="form-row">
+                            <div class="form-group"><label>Ho ten</label><input type="text" id="d-name" required /></div>
+                            <div class="form-group"><label>Chuc danh</label><input type="text" id="d-title" /></div>
+                            <div class="form-group"><label>Email</label><input type="email" id="d-email" /></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>So dien thoai</label><input type="text" id="d-phone" /></div>
+                            <div class="form-group"><label>Chuyen khoa</label><select id="d-specialty" required></select></div>
+                            <div class="form-group"><label>Phong kham</label><select id="d-room" required></select></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Them bac si</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-1">
+                <div class="card-header">Tao lich lam viec</div>
+                <div class="card-body">
+                    <form id="schedule-form" class="form-row">
+                        <div class="form-group"><label>Bac si</label><select id="s-doctor" required></select></div>
+                        <div class="form-group"><label>Ngay</label><input type="date" id="s-date" required /></div>
+                        <div class="form-group"><label>Bat dau</label><input type="time" id="s-start" required /></div>
+                        <div class="form-group"><label>Ket thuc</label><input type="time" id="s-end" required /></div>
+                        <div class="form-group"><label>Phi</label><input type="number" id="s-fee" min="0" step="1000" /></div>
+                        <div class="form-group" style="align-self:end;"><button type="submit" class="btn btn-outline">Tao lich</button></div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>ID</th><th>Bac si</th><th>Chuyen khoa</th><th>Phong</th><th>Email</th></tr></thead>
+                            <tbody id="doctor-body"><tr><td colspan="5" class="text-muted">Dang tai...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = requireAuth(['admin']);
+            if (user) document.getElementById('user-name').textContent = user.name || user.email;
+
+            var specialtySelect = document.getElementById('d-specialty');
+            var roomSelect = document.getElementById('d-room');
+            var doctorSelect = document.getElementById('s-doctor');
+            var doctorBody = document.getElementById('doctor-body');
+
+            function fillSelect(el, list, textFn) {
+                el.innerHTML = '';
+                list.forEach(function(item) {
+                    var opt = document.createElement('option');
+                    opt.value = item.id;
+                    opt.textContent = textFn(item);
+                    el.appendChild(opt);
+                });
+            }
+
+            function loadAll() {
+                return Promise.all([
+                    apiJson('/api/admin/specialties'),
+                    apiJson('/api/admin/rooms'),
+                    apiJson('/api/admin/doctors')
+                ]).then(function(results) {
+                    var specialties = results[0] || [];
+                    var rooms = results[1] || [];
+                    var doctors = results[2] || [];
+
+                    fillSelect(specialtySelect, specialties, function(s) { return s.ten; });
+                    fillSelect(roomSelect, rooms, function(r) { return r.ten; });
+                    fillSelect(doctorSelect, doctors, function(d) { return d.hoTen; });
+
+                    if (!doctors.length) {
+                        doctorBody.innerHTML = '<tr><td colspan="5" class="text-muted">Chua co bac si.</td></tr>';
+                        return;
+                    }
+
+                    doctorBody.innerHTML = doctors.map(function(d) {
+                        return '<tr>'
+                            + '<td>' + d.id + '</td>'
+                            + '<td>' + (d.hoTen || '-') + '</td>'
+                            + '<td>' + (d.chuyenKhoa ? d.chuyenKhoa.ten : '-') + '</td>'
+                            + '<td>' + (d.phongKham ? d.phongKham.ten : '-') + '</td>'
+                            + '<td>' + (d.email || '-') + '</td>'
+                            + '</tr>';
+                    }).join('');
+                }).catch(function(err) {
+                    doctorBody.innerHTML = '<tr><td colspan="5" class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</td></tr>';
+                });
+            }
+
+            document.getElementById('room-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var roomName = document.getElementById('room-name').value.trim();
+                apiJson('/api/admin/rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ten: roomName })
+                }).then(function() {
+                    document.getElementById('room-form').reset();
+                    return loadAll();
+                }).catch(function(err) {
+                    alert(err.message || 'Them phong that bai');
+                });
+            });
+
+            document.getElementById('doctor-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var payload = {
+                    hoTen: document.getElementById('d-name').value.trim(),
+                    chucDanh: document.getElementById('d-title').value.trim(),
+                    email: document.getElementById('d-email').value.trim(),
+                    soDienThoai: document.getElementById('d-phone').value.trim(),
+                    chuyenKhoaId: specialtySelect.value,
+                    phongKhamId: roomSelect.value,
+                };
+
+                apiJson('/api/admin/doctors', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(function() {
+                    document.getElementById('doctor-form').reset();
+                    return loadAll();
+                }).catch(function(err) {
+                    alert(err.message || 'Them bac si that bai');
+                });
+            });
+
+            document.getElementById('schedule-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var params = new URLSearchParams({
+                    doctorId: doctorSelect.value,
+                    date: document.getElementById('s-date').value,
+                    start: document.getElementById('s-start').value,
+                    end: document.getElementById('s-end').value,
+                });
+                var fee = document.getElementById('s-fee').value;
+                if (fee) params.set('fee', fee);
+
+                apiJson('/api/admin/work-schedules?' + params.toString(), {
+                    method: 'POST'
+                }).then(function(res) {
+                    if (!res.success) throw new Error(res.message || 'Tao lich that bai');
+                    alert('Da tao lich lam viec');
+                    document.getElementById('schedule-form').reset();
+                }).catch(function(err) {
+                    alert(err.message || 'Tao lich that bai');
+                });
+            });
+
+            loadAll();
+        })();
+    </script>
+</body>
+</html>

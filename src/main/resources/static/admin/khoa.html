@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý chuyên khoa - Admin</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><span class="logo">🏥 Admin</span></div>
+        <nav class="sidebar-nav">
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
+            <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
+            <a href="/admin/khoa.html" class="active"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
+            <a href="/admin/phongkham.html"><span class="icon">🏥</span> Quản lý phòng khám</a>
+            <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
+            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
+        </nav>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <h2>Quản lý chuyên khoa</h2>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
+            </div>
+        </header>
+        <div class="content">
+            <h1 class="page-title">Chuyen khoa</h1>
+            <div class="card mb-1">
+                <div class="card-body">
+                    <form id="specialty-form" class="form-row">
+                        <div class="form-group">
+                            <label>Ten chuyen khoa</label>
+                            <input type="text" id="sp-ten" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Phi mac dinh</label>
+                            <input type="number" id="sp-fee" min="0" step="1000" />
+                        </div>
+                        <div class="form-group" style="align-self:end;">
+                            <button type="submit" class="btn btn-primary">Them chuyen khoa</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ten</th>
+                                    <th>Phi mac dinh</th>
+                                </tr>
+                            </thead>
+                            <tbody id="specialty-body">
+                                <tr><td colspan="3" class="text-muted">Dang tai...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = requireAuth(['admin']);
+            if (user) document.getElementById('user-name').textContent = user.name || user.email;
+
+            var body = document.getElementById('specialty-body');
+            var form = document.getElementById('specialty-form');
+
+            function render(list) {
+                if (!list || !list.length) {
+                    body.innerHTML = '<tr><td colspan="3" class="text-muted">Chua co du lieu.</td></tr>';
+                    return;
+                }
+                body.innerHTML = list.map(function(item) {
+                    return '<tr><td>' + item.id + '</td><td>' + (item.ten || '-') + '</td><td>' + (item.phiKhamMacDinh || 0) + '</td></tr>';
+                }).join('');
+            }
+
+            function load() {
+                return apiJson('/api/admin/specialties').then(render).catch(function(err) {
+                    body.innerHTML = '<tr><td colspan="3" class="text-danger">' + (err.message || 'Tai that bai') + '</td></tr>';
+                });
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var ten = document.getElementById('sp-ten').value.trim();
+                var fee = document.getElementById('sp-fee').value;
+                apiJson('/api/admin/specialties', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ten: ten, phiKhamMacDinh: fee ? Number(fee) : 0 })
+                }).then(function() {
+                    form.reset();
+                    return load();
+                }).catch(function(err) {
+                    alert(err.message || 'Them chuyen khoa that bai');
+                });
+            });
+
+            load();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý phòng khám - Admin</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><span class="logo">🏥 Admin</span></div>
+        <nav class="sidebar-nav">
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
+            <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
+            <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
+            <a href="/admin/phongkham.html" class="active"><span class="icon">🏥</span> Quản lý phòng khám</a>
+            <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
+            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
+        </nav>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <h2>Quản lý phòng khám</h2>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
+            </div>
+        </header>
+        <div class="content">
+            <h1 class="page-title">Danh sách phòng khám</h1>
+
+            <div class="card mb-1">
+                <div class="card-body">
+                    <form id="room-form" class="form-row" style="align-items: end;">
+                        <div class="form-group">
+                            <label>Tên phòng khám</label>
+                            <input type="text" id="room-name" placeholder="Ví dụ: Phòng 101" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Thêm phòng khám</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="toolbar" style="margin-bottom: 12px;">
+                        <input type="search" id="search-room" class="search-input" placeholder="Tìm theo tên phòng..." style="max-width: 280px;">
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên phòng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="room-body">
+                                <tr><td colspan="2" class="text-muted">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = requireAuth(['admin']);
+            if (user) {
+                document.getElementById('user-name').textContent = user.name || user.email;
+            }
+
+            var allRooms = [];
+            var roomBody = document.getElementById('room-body');
+            var roomForm = document.getElementById('room-form');
+            var roomNameInput = document.getElementById('room-name');
+            var searchInput = document.getElementById('search-room');
+
+            function renderRooms(list) {
+                if (!list || !list.length) {
+                    roomBody.innerHTML = '<tr><td colspan="2" class="text-muted">Chưa có phòng khám.</td></tr>';
+                    return;
+                }
+
+                roomBody.innerHTML = list.map(function(item) {
+                    return '<tr>'
+                        + '<td>' + (item.id || '-') + '</td>'
+                        + '<td>' + (item.ten || '-') + '</td>'
+                        + '</tr>';
+                }).join('');
+            }
+
+            function loadRooms() {
+                return apiJson('/api/admin/rooms').then(function(list) {
+                    allRooms = list || [];
+                    renderRooms(allRooms);
+                }).catch(function(err) {
+                    roomBody.innerHTML = '<tr><td colspan="2" class="text-danger">' + (err.message || 'Tải dữ liệu thất bại') + '</td></tr>';
+                });
+            }
+
+            roomForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var ten = roomNameInput.value.trim();
+                if (!ten) return;
+
+                apiJson('/api/admin/rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ten: ten })
+                }).then(function() {
+                    roomForm.reset();
+                    return loadRooms();
+                }).catch(function(err) {
+                    alert(err.message || 'Thêm phòng khám thất bại');
+                });
+            });
+
+            searchInput.addEventListener('input', function() {
+                var keyword = (searchInput.value || '').trim().toLowerCase();
+                if (!keyword) {
+                    renderRooms(allRooms);
+                    return;
+                }
+                var filtered = allRooms.filter(function(room) {
+                    var name = (room.ten || '').toLowerCase();
+                    return name.indexOf(keyword) !== -1;
+                });
+                renderRooms(filtered);
+            });
+
+            loadRooms();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý khách hàng - Admin</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><span class="logo">🏥 Admin</span></div>
+        <nav class="sidebar-nav">
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/khachhang.html" class="active"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
+            <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
+            <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
+            <a href="/admin/phongkham.html"><span class="icon">🏥</span> Quản lý phòng khám</a>
+            <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
+            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
+        </nav>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <h2>Quản lý khách hàng</h2>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
+            </div>
+        </header>
+        <div class="content">
+            <h1 class="page-title">Danh sách khách hàng</h1>
+            <div class="toolbar">
+                <input type="search" id="search-customer" placeholder="Tìm theo tên, CCCD, SĐT, tài khoản..." class="search-input" style="max-width: 320px;">
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Họ tên</th>
+                                    <th>Tuổi</th>
+                                    <th>Giới tính</th>
+                                    <th>CCCD</th>
+                                    <th>SĐT</th>
+                                    <th>Địa chỉ</th>
+                                    <th>Tài khoản</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" class="text-muted">Dang tai du lieu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = requireAuth(['admin']);
+            if (user) document.getElementById('user-name').textContent = user.name || user.email;
+
+            var allPatients = [];
+            var tbody = document.querySelector('tbody');
+            var searchInput = document.getElementById('search-customer');
+
+            function renderRows(list) {
+                if (!list || !list.length) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-muted">Chua co benh nhan.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = list.map(function(item) {
+                    return '<tr>'
+                        + '<td>' + (item.id || '-') + '</td>'
+                        + '<td>' + (item.fullname || '-') + '</td>'
+                        + '<td>' + (item.age || '-') + '</td>'
+                        + '<td>' + (item.gender || '-') + '</td>'
+                        + '<td>' + (item.cccd || '-') + '</td>'
+                        + '<td>' + (item.phone || '-') + '</td>'
+                        + '<td>' + (item.address || '-') + '</td>'
+                        + '<td>' + (item.taiKhoan || '-') + '</td>'
+                        + '</tr>';
+                }).join('');
+            }
+
+            apiJson('/api/admin/patients').then(function(data) {
+                allPatients = data || [];
+                renderRows(allPatients);
+            }).catch(function(err) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</td></tr>';
+            });
+
+            searchInput.addEventListener('input', function() {
+                var q = searchInput.value.trim().toLowerCase();
+                if (!q) {
+                    renderRows(allPatients);
+                    return;
+                }
+                var filtered = allPatients.filter(function(item) {
+                    var name = (item.fullname || '').toLowerCase();
+                    var cccd = (item.cccd || '').toLowerCase();
+                    var phone = (item.phone || '').toLowerCase();
+                    var account = (item.taiKhoan || '').toLowerCase();
+                    return name.includes(q) || cccd.includes(q) || phone.includes(q) || account.includes(q);
+                });
+                renderRows(filtered);
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<svg width="960" height="660" viewBox="0 0 960 660" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="70" y1="40" x2="900" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="0.48" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="220" y1="90" x2="740" y2="570" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#93C5FD" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="12" y="12" width="936" height="636" rx="68" fill="url(#bg)"/>
+  <rect x="12" y="12" width="936" height="636" rx="68" stroke="#38BDF8" stroke-opacity="0.22" stroke-width="8"/>
+
+  <circle cx="260" cy="180" r="120" fill="url(#ring)"/>
+  <circle cx="720" cy="520" r="150" fill="#0EA5E9" fill-opacity="0.16"/>
+
+  <g opacity="0.95">
+    <circle cx="480" cy="256" r="84" fill="#E2E8F0"/>
+    <path d="M396 478C396 426.1 438.1 384 490 384H470C521.9 384 564 426.1 564 478V524H396V478Z" fill="#F8FAFC"/>
+    <path d="M434 214C434 188.6 454.6 168 480 168C505.4 168 526 188.6 526 214V244H434V214Z" fill="#1E293B"/>
+    <rect x="468" y="424" width="24" height="94" rx="10" fill="#0EA5E9"/>
+    <rect x="434" y="458" width="92" height="24" rx="10" fill="#0EA5E9"/>
+  </g>
+
+  <text x="480" y="590" text-anchor="middle" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="36" font-weight="700">
+    Online Clinic Booking
+  </text>
+</svg>
