@@ -43,6 +43,18 @@ public class LichHen {
     @Column(length = 2000)
     private String trieuChung;
 
+    @Column(length = 2000)
+    private String chanDoan;
+
+    @Column(length = 4000)
+    private String huongDieuTri;
+
+    @Column(length = 4000)
+    private String donThuoc;
+
+    @Column(length = 2000)
+    private String ghiChuTaiKham;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TrangThaiLichHen trangThai = TrangThaiLichHen.CHO_XAC_NHAN;
@@ -130,6 +142,38 @@ public class LichHen {
 
     public void setTrieuChung(String trieuChung) {
         this.trieuChung = trieuChung;
+    }
+
+    public String getChanDoan() {
+        return chanDoan;
+    }
+
+    public void setChanDoan(String chanDoan) {
+        this.chanDoan = chanDoan;
+    }
+
+    public String getHuongDieuTri() {
+        return huongDieuTri;
+    }
+
+    public void setHuongDieuTri(String huongDieuTri) {
+        this.huongDieuTri = huongDieuTri;
+    }
+
+    public String getDonThuoc() {
+        return donThuoc;
+    }
+
+    public void setDonThuoc(String donThuoc) {
+        this.donThuoc = donThuoc;
+    }
+
+    public String getGhiChuTaiKham() {
+        return ghiChuTaiKham;
+    }
+
+    public void setGhiChuTaiKham(String ghiChuTaiKham) {
+        this.ghiChuTaiKham = ghiChuTaiKham;
     }
 
     public TrangThaiLichHen getTrangThai() {

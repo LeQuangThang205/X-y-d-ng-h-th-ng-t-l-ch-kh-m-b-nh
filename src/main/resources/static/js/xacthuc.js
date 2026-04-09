@@ -1,13 +1,12 @@
-/**
+﻿/**
  * Auth + helper API cho frontend static.
- * Luu session tam bang localStorage, chuan hoa role ve patient/doctor/admin.
+ * Luu session tam bang localStorage, chuan hoa role ve customer/doctor/admin.
  */
 const STORAGE_KEY = "booking_currentUser";
 
 function normalizeRole(role) {
     var v = (role || "").toLowerCase();
-    if (v === "customer") return "patient";
-    if (v === "staff") return "doctor";
+    if (v === "patient") return "customer";
     return v;
 }
 
@@ -44,7 +43,7 @@ function setCurrentUser(user) {
 
 function logout() {
     var onCustomerPage = window.location.pathname.indexOf("/customer/") === 0;
-    if (onCustomerPage && !window.confirm("Bạn có chắc muốn đăng xuất ?")) {
+    if (onCustomerPage && !window.confirm("Báº¡n cĂ³ cháº¯c muá»‘n Ä‘Äƒng xuáº¥t ?")) {
         return;
     }
     localStorage.removeItem(STORAGE_KEY);
@@ -73,7 +72,7 @@ function redirectByRole(role) {
     var base = {
         admin: "/admin/trangquantri.html",
         doctor: "/doctor/lichkham.html",
-        patient: "/customer/trangkhach.html",
+        customer: "/customer/trangchu.html",
     };
     window.location.href = base[v] || "/dangnhap.html";
 }
@@ -82,7 +81,7 @@ function getRoleLabel(role) {
     var labels = {
         admin: "Quan tri vien",
         doctor: "Bac si",
-        patient: "Benh nhan",
+        customer: "Khach hang",
     };
     return labels[normalizeRole(role)] || role;
 }
@@ -102,3 +101,4 @@ function authLogin(username, password) {
         body: JSON.stringify({ username: username, password: password }),
     });
 }
+

@@ -37,4 +37,25 @@ public class BacSiPortalController {
         }
         return res;
     }
+
+    @PatchMapping("/appointments/{appointmentId}/clinical-note")
+    public Map<String, Object> updateClinicalNote(
+            @PathVariable Long appointmentId,
+            @RequestBody Map<String, String> req) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            LichHen lichHen = datLichKhamService.capNhatKetQuaKham(
+                    appointmentId,
+                    req.getOrDefault("chanDoan", ""),
+                    req.getOrDefault("huongDieuTri", ""),
+                    req.getOrDefault("donThuoc", ""),
+                    req.getOrDefault("ghiChuTaiKham", ""));
+            res.put("success", true);
+            res.put("appointment", lichHen);
+        } catch (Exception ex) {
+            res.put("success", false);
+            res.put("message", ex.getMessage());
+        }
+        return res;
+    }
 }

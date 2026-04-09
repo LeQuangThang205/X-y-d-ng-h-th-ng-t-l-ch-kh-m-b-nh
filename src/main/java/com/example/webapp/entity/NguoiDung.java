@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "users")
 public class NguoiDung {
     @Column(nullable = false)
-    private String role; // 'admin', 'staff', hoặc 'customer'
+    private String role; // 'admin', 'doctor', hoặc 'customer'
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

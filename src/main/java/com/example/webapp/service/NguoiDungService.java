@@ -34,15 +34,15 @@ public class NguoiDungService {
 
     public String normalizeRole(String role) {
         if (role == null || role.isBlank()) {
-            return "patient";
+            return "customer";
         }
 
         String lower = role.trim().toLowerCase();
         return switch (lower) {
-            case "patient", "customer" -> "patient";
-            case "doctor", "staff" -> "doctor";
+            case "customer", "patient" -> "customer";
+            case "doctor" -> "doctor";
             case "admin" -> "admin";
-            default -> throw new IllegalArgumentException("Role phai la patient/doctor/admin (hoac customer/staff)");
+            default -> throw new IllegalArgumentException("Role phai la customer/doctor/admin");
         };
     }
 }

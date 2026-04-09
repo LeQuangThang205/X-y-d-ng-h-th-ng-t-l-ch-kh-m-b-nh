@@ -19,7 +19,7 @@ public class XacThucController {
     public Map<String, Object> register(@RequestBody Map<String, String> req) {
         String username = req.get("username");
         String password = req.get("password");
-        String role = req.getOrDefault("role", "patient");
+        String role = req.getOrDefault("role", "customer");
         Map<String, Object> res = new HashMap<>();
 
         if (userService.findByUsername(username).isPresent()) {

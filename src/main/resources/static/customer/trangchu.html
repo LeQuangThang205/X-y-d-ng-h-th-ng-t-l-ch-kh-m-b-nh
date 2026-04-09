@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ - Phòng khám Phenikaa Uni</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="landing-page">
+    <header class="landing-header">
+        <a href="/customer/trangchu.html" class="logo">
+            <span class="logo-icon">🏥</span>
+            <span class="logo-text">PHÒNG KHÁM PHENIKAA UNI</span>
+        </a>
+        <nav class="landing-nav">
+            <a href="/customer/trangchu.html">Trang chủ</a>
+            <a href="/customer/khoa.html">Chuyên khoa</a>
+            <a href="/customer/bacsi.html">Bác sĩ</a>
+            <a href="/customer/datlich.html">Đặt lịch</a>
+            <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="#lien-he">Liên hệ</a>
+        </nav>
+        <div class="header-actions">
+            <a href="/dangnhap.html" class="btn btn-outline" id="header-auth-link">Đăng nhập</a>
+            <a href="/customer/datlich.html" class="btn btn-primary">Đặt lịch khám</a>
+        </div>
+    </header>
+
+    <section class="hero-section" id="trang-chu">
+        <div class="hero-inner">
+            <div class="hero-left">
+                <h1 class="hero-heading">ĐẶT LỊCH KHÁM NHANH, TIỆN, CHỦ ĐỘNG</h1>
+                <p class="hero-desc">Chọn chuyên khoa, bác sĩ và khung giờ phù hợp chỉ trong vài bước. Theo dõi lịch khám trực tuyến ngay trên tài khoản của bạn.</p>
+                <a href="/customer/datlich.html" class="btn btn-primary btn-lg">Đặt lịch ngay</a>
+            </div>
+            <div class="hero-right">
+                <div class="hero-image">
+                    <img src="/images/trangchubenhnhan.webp" alt="Khám bệnh" class="hero-image-photo" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-departments" id="chuyen-khoa">
+        <div class="container">
+            <h2 class="section-heading">Chuyên khoa nổi bật</h2>
+            <div class="dept-grid">
+                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">❤️</span><span class="dept-name">Tim mạch</span></a>
+                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">🩺</span><span class="dept-name">Nội khoa</span></a>
+                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">🦴</span><span class="dept-name">Ngoại khoa</span></a>
+                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">👶</span><span class="dept-name">Nhi khoa</span></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-doctors" id="bac-si">
+        <div class="container">
+            <h2 class="section-heading">Bác sĩ tiêu biểu</h2>
+            <div class="doctor-grid">
+                <a href="/customer/bacsi.html" class="doctor-card"><div class="doctor-avatar">BS</div><h3 class="doctor-name">BS. Nguyễn Văn Minh</h3><p class="doctor-spec">Chuyên khoa Tim mạch</p></a>
+                <a href="/customer/bacsi.html" class="doctor-card"><div class="doctor-avatar">TL</div><h3 class="doctor-name">BS. Trần Thị Lan</h3><p class="doctor-spec">Chuyên khoa Nội tổng quát</p></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-hotline" id="lien-he">
+        <div class="container hotline-inner">
+            <div class="hotline-content">
+                <h2 class="hotline-title">Hotline hỗ trợ</h2>
+                <p class="hotline-phone">📞 1900 1234</p>
+                <p class="hotline-time">Giờ làm việc: 7:00 - 17:00 (T2 - CN)</p>
+                <a href="tel:19001234" class="btn btn-white">Liên hệ nhanh</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <h4>Phòng khám Phenikaa Uni</h4>
+                <p>Yên Nghĩa, Hà Đông, Hà Nội</p>
+            </div>
+            <div class="footer-col">
+                <h4>Liên kết nhanh</h4>
+                <a href="/customer/trangchu.html">Trang chủ</a>
+                <a href="/customer/khoa.html">Chuyên khoa</a>
+                <a href="/customer/datlich.html">Đặt lịch</a>
+                <a href="/dangnhap.html">Đăng nhập</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = getCurrentUser();
+            var authLink = document.getElementById("header-auth-link");
+            if (user && user.role !== "customer") {
+                redirectByRole(user.role);
+                return;
+            }
+            if (user && authLink) {
+                authLink.textContent = user.name || user.email || "Tài khoản";
+                authLink.href = "/customer/hoso.html";
+            }
+        })();
+    </script>
+</body>
+</html>

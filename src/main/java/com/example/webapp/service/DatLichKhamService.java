@@ -127,6 +127,24 @@ public class DatLichKhamService {
         return lichHenRepository.save(lichHen);
     }
 
+    @Transactional
+    public LichHen capNhatKetQuaKham(Long lichHenId, String chanDoan, String huongDieuTri,
+            String donThuoc, String ghiChuTaiKham) {
+        LichHen lichHen = lichHenRepository.findById(lichHenId)
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay lich hen"));
+
+        lichHen.setChanDoan(chanDoan);
+        lichHen.setHuongDieuTri(huongDieuTri);
+        lichHen.setDonThuoc(donThuoc);
+        lichHen.setGhiChuTaiKham(ghiChuTaiKham);
+
+        if (lichHen.getTrangThai() != TrangThaiLichHen.DA_HUY) {
+            lichHen.setTrangThai(TrangThaiLichHen.DA_KHAM);
+        }
+
+        return lichHenRepository.save(lichHen);
+    }
+
     public ChuyenKhoa luuChuyenKhoa(ChuyenKhoa chuyenKhoa) {
         if (chuyenKhoa.getPhiKhamMacDinh() == null) {
             chuyenKhoa.setPhiKhamMacDinh(BigDecimal.ZERO);
