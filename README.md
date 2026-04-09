@@ -99,7 +99,7 @@ File style chinh: `src/main/resources/static/css/kieu.css`.
    - Mac dinh ung dung chay tai `http://localhost:8080/`.
 3. Cac duong dan chinh:
    - Trang chu landing: `http://localhost:8080/trangchu.html`
-   - Dang nhap / dang ky: `http://localhost:8080/dangnhap.html`
+  - Dang nhap / dang ky: `http://localhost:8080/admin/dangnhap.html`
    - Sau khi dang nhap voi vai tro customer: `http://localhost:8080/customer/trangkhach.html`
    - Dashboard admin: `http://localhost:8080/admin/trangquantri.html`
 

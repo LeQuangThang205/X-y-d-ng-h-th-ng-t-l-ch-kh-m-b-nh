@@ -47,13 +47,13 @@ function logout() {
         return;
     }
     localStorage.removeItem(STORAGE_KEY);
-    window.location.href = "/dangnhap.html";
+    window.location.href = "/admin/dangnhap.html";
 }
 
 function requireAuth(allowedRoles) {
     var user = getCurrentUser();
     if (!user) {
-        window.location.href = "/dangnhap.html";
+        window.location.href = "/admin/dangnhap.html";
         return null;
     }
     if (allowedRoles && allowedRoles.length) {
@@ -74,7 +74,7 @@ function redirectByRole(role) {
         doctor: "/doctor/lichkham.html",
         customer: "/customer/trangchu.html",
     };
-    window.location.href = base[v] || "/dangnhap.html";
+    window.location.href = base[v] || "/admin/dangnhap.html";
 }
 
 function getRoleLabel(role) {
