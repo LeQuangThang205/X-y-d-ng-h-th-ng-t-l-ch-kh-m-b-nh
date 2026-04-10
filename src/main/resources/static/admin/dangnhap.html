@@ -1,75 +1,132 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập hệ thống</title>
-    <link rel="stylesheet" href="/css/kieu.css">
-</head>
-<body class="auth-page">
-    <header class="public-header public-header-mini">
-        <a href="/customer/trangchu.html" class="brand">Bệnh viện Đa khoa</a>
-        <nav class="header-nav">
-            <a href="/customer/trangchu.html" class="btn btn-outline">Trang chủ</a>
-        </nav>
-    </header>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Đăng nhập - PHÒNG KHÁM PHENIKAAMEC</title>
+        <link rel="stylesheet" href="/css/kieu.css" />
+        <style>
+            :root { --primary: #0d6efd; }
+            html,body{height:100%;margin:0;font-family: Inter, Arial, Helvetica, sans-serif;background:#e3f2fd}
+            .frame{width:calc(100% - 40px);max-width:1440px;height:calc(100vh - 40px);max-height:900px;margin:20px auto;background:#fff;border-radius:20px;box-shadow:0 20px 40px rgba(2,6,23,0.15);display:flex;overflow:hidden}
+            .left{width:50%;padding:48px;display:flex;align-items:center;justify-content:center;position:relative}
+            .logo{position:absolute;left:28px;top:24px;display:flex;gap:12px;align-items:center}
+            .logo .icon{width:48px;height:48px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+            .card-modern{width:100%;max-width:520px;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,0.08);overflow:hidden}
+            .card-header{padding:36px 40px;background:transparent}
+            .card-title{font-size:28px;margin:0 0 6px;color:#111;font-weight:700}
+            .card-desc{margin:0;color:#6b7280}
+            .card-body{padding:20px 40px 40px;background:#fff}
+            label{display:block;font-size:13px;color:#495057;margin-bottom:6px}
+            input[type="email"], input[type="password"]{width:100%;height:48px;padding:10px 14px;border-radius:10px;border:1px solid #e6e9ef;font-size:15px}
+            .btn-primary{display:inline-block;background:var(--primary);color:#fff;padding:12px 18px;border-radius:10px;border:0;font-weight:600;cursor:pointer}
+            .link-btn{background:none;border:0;color:var(--primary);cursor:pointer;font-weight:600}
+            .right{width:50%;position:relative;display:block}
+            .hero-img{width:100%;height:100%;object-fit:cover}
+            .overlay{position:absolute;inset:0;background:linear-gradient(135deg, rgba(13,110,253,0.78) 0%, rgba(13,110,253,0.55) 100%);display:flex;align-items:center;justify-content:center;color:#fff;padding:32px}
+            .overlay h2{font-size:34px;margin:0 0 12px}
+            .stats{display:flex;gap:24px;margin-top:16px}
+            .stat{ text-align:center }
+            .stat .n{font-size:28px;font-weight:700}
+            .small{font-size:14px;color:rgba(255,255,255,0.9)}
+            @media (max-width:900px){.frame{flex-direction:column;height:auto;max-height:none}.left,.right{width:100%;height:50vh}.overlay{padding:18px}}
+        </style>
+    </head>
+    <body>
+        <div class="frame">
+            <div class="left">
+                <div class="logo">
+                    <img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC" style="height:36px;vertical-align:middle;margin-right:8px">
+                    <div style="font-weight:700;font-size:20px;color:#111">PHÒNG KHÁM PHENIKAAMEC</div>
+                </div>
 
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-main" style="width: 100%;">
-                <h2>Đăng nhập</h2>
-                <form id="form-login" class="auth-form">
-                    <div class="form-group">
-                        <label>Email / Số điện thoại</label>
-                        <input type="text" id="login-email" placeholder="Email hoặc số điện thoại" required>
+                <div class="card-modern">
+                    <div class="card-header">
+                        <h3 class="card-title">Chào mừng quay lại!</h3>
+                        <p class="card-desc">Đăng nhập để tiếp tục đến PHÒNG KHÁM PHENIKAAMEC</p>
                     </div>
-                    <div class="form-group">
-                        <label>Mật khẩu</label>
-                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    <div class="card-body">
+                        <form id="modern-login-form">
+                            <div style="margin-bottom:14px">
+                                <label for="email">Email đăng nhập</label>
+                                <input id="email" type="email" placeholder="Nhập email" required />
+                            </div>
+                            <div style="margin-bottom:8px">
+                                <label for="password">Mật khẩu</label>
+                                <input id="password" type="password" placeholder="Nhập mật khẩu" required />
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0">
+                                <button type="button" id="forgot-btn" class="link-btn">Quên mật khẩu?</button>
+                            </div>
+                            <div style="margin-top:8px">
+                                <button type="submit" class="btn-primary" style="width:100%;height:48px">Đăng nhập</button>
+                            </div>
+                            <div style="text-align:center;padding-top:12px;color:#6b7280">
+                                Chưa có tài khoản? <button type="button" id="register-btn" class="link-btn">Đăng ký ngay</button>
+                            </div>
+                        </form>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
-                </form>
-                <p class="auth-hint">Chưa có tài khoản? <a href="/admin/dangky.html">Đăng ký</a></p>
+                </div>
+            </div>
+
+            <div class="right">
+                <img class="hero-img" src="https://images.unsplash.com/photo-1550831106-f8d5b6f1abe9?q=80&w=1600&auto=format&fit=crop" alt="Healthcare" />
+                <div class="overlay">
+                    <div style="max-width:520px;text-align:center">
+                        <h2>Quản lý phòng khám hiện đại</h2>
+                        <p class="small">Quản lý bệnh nhân, lịch hẹn và đội ngũ nhân sự trên một nền tảng duy nhất.</p>
+                        <div class="stats" role="list" style="justify-content:center">
+                            <div class="stat"><div class="n">24/7</div><div class="small">Hỗ trợ</div></div>
+                            <div class="stat"><div class="n">100%</div><div class="small">Bảo mật</div></div>
+                            <div class="stat"><div class="n">500+</div><div class="small">Phòng khám</div></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script src="/js/xacthuc.js"></script>
-    <script>
-        (function () {
-            var user = getCurrentUser();
-            if (user) {
-                redirectByRole(user.role);
-                return;
-            }
+        <script src="/js/xacthuc.js"></script>
+        <script>
+            (function(){
+                var current = getCurrentUser();
+                if (current) { redirectByRole(current.role); return; }
 
-            document.getElementById("form-login").addEventListener("submit", async function (e) {
-                e.preventDefault();
-                var email = document.getElementById("login-email").value.trim();
-                var password = document.getElementById("login-password").value;
+                document.getElementById('modern-login-form').addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    var email = document.getElementById('email').value.trim();
+                    var password = document.getElementById('password').value;
+                    try {
+                        var res = await authLogin(email, password);
+                        if (!res.success) { alert(res.message || 'Đăng nhập thất bại'); return; }
+                        var role = normalizeRole(res.role);
+                        var sessionUser = {
+                            name: res.user || email,
+                            email: email,
+                            username: res.user || email,
+                            role: role
+                        };
 
-                try {
-                    var res = await authLogin(email, password);
-                    if (!res.success) {
-                        alert(res.message || "Đăng nhập thất bại");
-                        return;
-                    }
+                        if (role === 'customer' && sessionUser.username) {
+                            try {
+                                var profile = await apiJson('/api/patients/by-account?account=' + encodeURIComponent(sessionUser.username));
+                                if (profile) {
+                                    if (profile.fullname) sessionUser.name = profile.fullname;
+                                    if (profile.id) sessionUser.patientId = profile.id;
+                                    if (profile.phone) sessionUser.phone = profile.phone;
+                                }
+                            } catch (ignored) {
+                                // Khong co ho so benh nhan ngay luc login thi giu ten tai khoan.
+                            }
+                        }
 
-                    var role = normalizeRole(res.role);
-                    var userObj = {
-                        name: email.indexOf("@") > 0 ? email.split("@")[0] : email,
-                        email: email,
-                        username: res.user,
-                        role: role
-                    };
+                        setCurrentUser(sessionUser);
+                        redirectByRole(role);
+                    } catch(err) { alert(err.message || 'Đăng nhập thất bại'); }
+                });
 
-                    setCurrentUser(userObj);
-                    redirectByRole(role);
-                } catch (err) {
-                    alert(err.message || "Đăng nhập thất bại");
-                }
-            });
-        })();
-    </script>
-</body>
+                document.getElementById('register-btn').addEventListener('click', function(){ window.location.href = '/admin/dangky.html'; });
+                document.getElementById('forgot-btn').addEventListener('click', function(){ alert('Chức năng quên mật khẩu sẽ được cập nhật sau.'); });
+            })();
+        </script>
+    </body>
 </html>

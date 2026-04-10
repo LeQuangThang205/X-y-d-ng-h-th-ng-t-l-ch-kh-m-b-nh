@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chuyên khoa - Đặt lịch khám</title>
+    <title>Chuyên khoa - PHÒNG KHÁM PHENIKAAMEC</title>
     <link rel="stylesheet" href="/css/kieu.css" />
   </head>
   <body class="customer-layout">
     <header class="customer-header">
-      <a href="/customer/trangkhach.html" class="brand">PHÒNG KHÁM PHENIKAA UNI</a>
+      <a href="/customer/trangchu.html" class="brand"><img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC" style="height:36px;vertical-align:middle;margin-right:8px">PHÒNG KHÁM PHENIKAAMEC</a>
       <nav>
         <a href="/customer/trangchu.html">Trang chủ</a>
         <a href="/customer/khoa.html">Chuyên khoa</a>
@@ -17,7 +17,7 @@
         <a href="/customer/lichcuatoi.html">Lịch khám</a>
         <a href="/customer/hoso.html">Thông tin cá nhân</a>
         <span class="text-muted" id="user-name"></span>
-        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
+        <a href="/admin/dangnhap.html" class="btn btn-sm" id="header-auth-link">Đăng nhập</a>
       </nav>
     </header>
     <div class="customer-content profile-page">
@@ -45,9 +45,23 @@
     <script src="/js/xacthuc.js"></script>
     <script>
       (function () {
-        var user = requireAuth(["patient"]);
-        if (user && document.getElementById("user-name")) {
-          document.getElementById("user-name").textContent = user.name || user.email;
+        var user = getCurrentUser();
+        var userNameEl = document.getElementById("user-name");
+        var authLink = document.getElementById("header-auth-link");
+        if (user && normalizeRole(user.role) !== "customer") {
+          redirectByRole(user.role);
+          return;
+        }
+        if (user && userNameEl && authLink) {
+          userNameEl.textContent = user.name || user.email;
+          authLink.textContent = "Đăng xuất";
+          authLink.href = "#";
+          authLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            logout();
+          });
+        } else if (userNameEl) {
+          userNameEl.style.display = "none";
         }
         var grid = document.getElementById("specialty-grid");
         apiJson("/api/patient/specialties").then(function (list) {
@@ -58,7 +72,7 @@
 
           grid.innerHTML = list.map(function (item) {
             return '<div class="dept-card">'
-              + '<span class="dept-icon" style="font-size: 2.5rem">🏥</span>'
+              + '<span class="dept-icon" style="font-size: 2.5rem"></span>'
               + '<div class="dept-name" style="font-weight: 600; font-size: 1.1rem">' + (item.ten || '-') + '</div>'
               + '<div style="color: #64748b; font-size: 0.95rem">' + (item.moTa || 'Chuyen khoa tong hop') + '</div>'
               + '<a href="/customer/datlich.html" class="btn btn-link" style="margin-top: 0.5rem; color: #2563eb">Dat lich kham →</a>'

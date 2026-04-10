@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đặt lịch khám - Khách hàng</title>
+    <title>Đặt lịch khám - PHÒNG KHÁM PHENIKAAMEC</title>
     <link rel="stylesheet" href="/css/kieu.css" />
   </head>
   <body class="customer-layout">
     <header class="customer-header">
-      <a href="/customer/trangkhach.html" class="brand">PHÒNG KHÁM PHENIKAA UNI</a>
+      <a href="/customer/trangchu.html" class="brand"><img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC" style="height:36px;vertical-align:middle;margin-right:8px">PHÒNG KHÁM PHENIKAAMEC</a>
       <nav>
         <a href="/customer/trangchu.html">Trang chủ</a>
         <a href="/customer/khoa.html">Chuyên khoa</a>
@@ -156,18 +156,27 @@
     <script src="/js/xacthuc.js"></script>
     <script>
       (function () {
-        var user = requireAuth(["patient"]);
-        if (!user) return;
-        var account = (user.username || user.email || "").trim();
+        var user = getCurrentUser();
+        if (!user) {
+          window.location.href = "/admin/dangnhap.html";
+          return;
+        }
+        if (normalizeRole(user.role) !== "customer") {
+          redirectByRole(user.role);
+          return;
+        }
+        var account = user ? (user.username || user.email || "").trim() : "";
 
         var specialtySelect = document.getElementById("department");
         var doctorSelect = document.getElementById("doctor");
         var dateInput = document.getElementById("date");
         var timeSelect = document.getElementById("time");
 
-        document.getElementById("user-name").textContent = user.name || user.email;
-        document.getElementById("fullname").value = user.name || "";
-        document.getElementById("phone").value = user.phone || "";
+        if (user) {
+          document.getElementById("user-name").textContent = user.name || user.email;
+          document.getElementById("fullname").value = user.name || "";
+          document.getElementById("phone").value = user.phone || "";
+        }
 
         var today = new Date().toISOString().slice(0, 10);
         dateInput.setAttribute("min", today);
@@ -182,13 +191,14 @@
 
         function applyProfileToForm(profile) {
           if (!profile) return;
-          document.getElementById("fullname").value = profile.fullname || user.name || "";
+          document.getElementById("fullname").value = profile.fullname || (user ? user.name : "") || "";
           document.getElementById("age").value = profile.age || "";
           document.getElementById("gender").value = profile.gender || "";
           document.getElementById("cccd").value = profile.cccd || "";
-          document.getElementById("phone").value = profile.phone || user.phone || "";
+          document.getElementById("phone").value = profile.phone || (user ? user.phone : "") || "";
           document.getElementById("address").value = profile.address || "";
 
+          if (!user) return;
           user.patientId = profile.id || user.patientId;
           if (profile.fullname) user.name = profile.fullname;
           if (profile.phone) user.phone = profile.phone;
@@ -253,6 +263,9 @@
         }
 
         async function ensurePatientProfile() {
+          if (!user) {
+            throw new Error("Vui long dang nhap de dat lich.");
+          }
           if (!user.patientId) {
             await loadPatientProfileByAccount();
           }

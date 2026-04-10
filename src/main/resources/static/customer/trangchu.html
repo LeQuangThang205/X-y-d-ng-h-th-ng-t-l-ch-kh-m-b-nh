@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ - Phòng khám Phenikaa Uni</title>
+    <title>Trang chủ - PHÒNG KHÁM PHENIKAAMEC</title>
     <link rel="stylesheet" href="/css/kieu.css">
 </head>
 <body class="landing-page">
     <header class="landing-header">
         <a href="/customer/trangchu.html" class="logo">
-            <span class="logo-icon">🏥</span>
-            <span class="logo-text">PHÒNG KHÁM PHENIKAA UNI</span>
+            <img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC" class="logo-img" style="height:36px;vertical-align:middle;margin-right:8px;">
+            <span class="logo-text">PHÒNG KHÁM PHENIKAAMEC</span>
         </a>
         <nav class="landing-nav">
             <a href="/customer/trangchu.html">Trang chủ</a>
@@ -28,12 +28,27 @@
 
     <section class="hero-section" id="trang-chu">
         <div class="hero-inner">
-            <div class="hero-left">
-                <h1 class="hero-heading">ĐẶT LỊCH KHÁM NHANH, TIỆN, CHỦ ĐỘNG</h1>
-                <p class="hero-desc">Chọn chuyên khoa, bác sĩ và khung giờ phù hợp chỉ trong vài bước. Theo dõi lịch khám trực tuyến ngay trên tài khoản của bạn.</p>
-                <a href="/customer/datlich.html" class="btn btn-primary btn-lg">Đặt lịch ngay</a>
+            <div class="hero-left hero-anim-left">
+                <h1 class="hero-heading hero-anim-item">ĐẶT LỊCH KHÁM NHANH, TIỆN, CHỦ ĐỘNG</h1>
+                <p class="hero-desc hero-anim-item">Chọn chuyên khoa, bác sĩ và khung giờ phù hợp chỉ trong vài bước. Theo dõi lịch khám trực tuyến ngay trên tài khoản của bạn.</p>
+                <a href="/customer/datlich.html" class="btn btn-primary btn-lg hero-anim-item">Đặt lịch ngay</a>
+                <div class="hero-points hero-anim-item">
+                    <span>Đặt lịch 24/7</span>
+                    <span>Nhắc lịch tự động</span>
+                    <span>Chọn bác sĩ theo chuyên khoa</span>
+                </div>
+                <div class="hero-stats hero-anim-item">
+                    <div class="hero-stat-card">
+                        <strong>50+</strong>
+                        <span>Bác sĩ chuyên môn</span>
+                    </div>
+                    <div class="hero-stat-card">
+                        <strong>1000+</strong>
+                        <span>Lượt khám mỗi tháng</span>
+                    </div>
+                </div>
             </div>
-            <div class="hero-right">
+            <div class="hero-right hero-anim-right">
                 <div class="hero-image">
                     <img src="/images/trangchubenhnhan.webp" alt="Khám bệnh" class="hero-image-photo" loading="lazy">
                 </div>
@@ -44,11 +59,8 @@
     <section class="section section-departments" id="chuyen-khoa">
         <div class="container">
             <h2 class="section-heading">Chuyên khoa nổi bật</h2>
-            <div class="dept-grid">
-                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">❤️</span><span class="dept-name">Tim mạch</span></a>
-                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">🩺</span><span class="dept-name">Nội khoa</span></a>
-                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">🦴</span><span class="dept-name">Ngoại khoa</span></a>
-                <a href="/customer/khoa.html" class="dept-card"><span class="dept-icon">👶</span><span class="dept-name">Nhi khoa</span></a>
+            <div class="dept-grid" id="home-specialty-grid">
+                <div class="text-muted">Đang tải chuyên khoa...</div>
             </div>
         </div>
     </section>
@@ -56,9 +68,8 @@
     <section class="section section-doctors" id="bac-si">
         <div class="container">
             <h2 class="section-heading">Bác sĩ tiêu biểu</h2>
-            <div class="doctor-grid">
-                <a href="/customer/bacsi.html" class="doctor-card"><div class="doctor-avatar">BS</div><h3 class="doctor-name">BS. Nguyễn Văn Minh</h3><p class="doctor-spec">Chuyên khoa Tim mạch</p></a>
-                <a href="/customer/bacsi.html" class="doctor-card"><div class="doctor-avatar">TL</div><h3 class="doctor-name">BS. Trần Thị Lan</h3><p class="doctor-spec">Chuyên khoa Nội tổng quát</p></a>
+            <div class="doctor-grid" id="home-doctor-grid">
+                <div class="text-muted">Đang tải bác sĩ...</div>
             </div>
         </div>
     </section>
@@ -77,7 +88,7 @@
     <footer class="landing-footer">
         <div class="container footer-grid">
             <div class="footer-col">
-                <h4>Phòng khám Phenikaa Uni</h4>
+                <h4>PHÒNG KHÁM PHENIKAAMEC</h4>
                 <p>Yên Nghĩa, Hà Đông, Hà Nội</p>
             </div>
             <div class="footer-col">
@@ -95,6 +106,10 @@
         (function() {
             var user = getCurrentUser();
             var authLink = document.getElementById("header-auth-link");
+            var specialtyGrid = document.getElementById("home-specialty-grid");
+            var doctorGrid = document.getElementById("home-doctor-grid");
+            var specialtyIcons = ["❤️", "🩺", "🦴", "👶", "🧠", "👁️", "🫁", "🦷"];
+
             if (user && user.role !== "customer") {
                 redirectByRole(user.role);
                 return;
@@ -103,6 +118,70 @@
                 authLink.textContent = user.name || user.email || "Tài khoản";
                 authLink.href = "/customer/hoso.html";
             }
+
+            function animateDelay(index) {
+                return "animation-delay:" + (index * 0.08).toFixed(2) + "s";
+            }
+
+            function renderSpecialties(list) {
+                if (!specialtyGrid) return;
+                if (!list || !list.length) {
+                    specialtyGrid.innerHTML = '<div class="text-muted">Chưa có chuyên khoa.</div>';
+                    return;
+                }
+
+                specialtyGrid.innerHTML = list.slice(0, 8).map(function (item, index) {
+                    var icon = specialtyIcons[index % specialtyIcons.length];
+                    return '<a href="/customer/khoa.html" class="dept-card reveal-card" style="' + animateDelay(index) + '">' +
+                        '<span class="dept-icon">' + icon + '</span>' +
+                        '<span class="dept-name">' + (item.ten || '-') + '</span>' +
+                        '</a>';
+                }).join('');
+            }
+
+            function initials(name) {
+                return (name || 'BS')
+                    .trim()
+                    .split(/\s+/)
+                    .slice(-2)
+                    .map(function (w) { return w.charAt(0); })
+                    .join('')
+                    .toUpperCase() || 'BS';
+            }
+
+            function renderDoctors(list) {
+                if (!doctorGrid) return;
+                if (!list || !list.length) {
+                    doctorGrid.innerHTML = '<div class="text-muted">Chưa có bác sĩ.</div>';
+                    return;
+                }
+
+                doctorGrid.innerHTML = list.slice(0, 6).map(function (doc, index) {
+                    var fullName = doc.hoTen || '-';
+                    var specName = doc.chuyenKhoa && doc.chuyenKhoa.ten ? doc.chuyenKhoa.ten : '-';
+                    return '<a href="/customer/bacsi.html" class="doctor-card reveal-card" style="' + animateDelay(index) + '">' +
+                        '<div class="doctor-avatar">' + initials(fullName) + '</div>' +
+                        '<h3 class="doctor-name">' + fullName + '</h3>' +
+                        '<p class="doctor-spec">Chuyên khoa ' + specName + '</p>' +
+                        '</a>';
+                }).join('');
+            }
+
+            apiJson('/api/patient/specialties')
+                .then(renderSpecialties)
+                .catch(function (err) {
+                    if (specialtyGrid) {
+                        specialtyGrid.innerHTML = '<div class="text-danger">' + (err.message || 'Tải chuyên khoa thất bại') + '</div>';
+                    }
+                });
+
+            apiJson('/api/patient/doctors')
+                .then(renderDoctors)
+                .catch(function (err) {
+                    if (doctorGrid) {
+                        doctorGrid.innerHTML = '<div class="text-danger">' + (err.message || 'Tải bác sĩ thất bại') + '</div>';
+                    }
+                });
         })();
     </script>
 </body>

@@ -30,7 +30,7 @@
   - Giao dien su dung mau xanh duong – trang, form bo goc va shadow nhe.
 
 - **Trang khach hang sau khi dang nhap**:
-  - `customer/trangkhach.html`: trang chinh cua khach hang, header co menu, khu vuc thong ke nhanh (so lich sap toi, so lich da kham) va card "Thao tac nhanh" (dat lich moi, xem lich cua toi).
+  - `customer/trangchu.html`: trang chinh cua khach hang, header co menu, khu vuc thong ke nhanh (so lich sap toi, so lich da kham) va card "Thao tac nhanh" (dat lich moi, xem lich cua toi).
   - `customer/hoso.html`: thong tin ca nhan, layout 2 cot (menu ben trai, noi dung ben phai). Co form chinh sua: ho ten, tuoi, gioi tinh, CCCD, so dien thoai, dia chi, email; ben duoi la bang lich su dat lich kham.
   - `customer/khoa.html`: danh sach chuyen khoa (grid card), moi card co icon, ten chuyen khoa, mo ta ngan va nut "Dat lich kham".
   - `customer/bacsi.html`: danh sach bac si, phia tren co thanh loc (dropdown chuyen khoa, thoi gian lam viec), ben duoi la card bac si (anh dai dien chu cai, ten, chuc danh, chuyen khoa).
@@ -99,9 +99,10 @@ File style chinh: `src/main/resources/static/css/kieu.css`.
    - Mac dinh ung dung chay tai `http://localhost:8080/`.
 3. Cac duong dan chinh:
    - Trang chu landing: `http://localhost:8080/trangchu.html`
-  - Dang nhap / dang ky: `http://localhost:8080/admin/dangnhap.html`
-   - Sau khi dang nhap voi vai tro customer: `http://localhost:8080/customer/trangkhach.html`
-   - Dashboard admin: `http://localhost:8080/admin/trangquantri.html`
+
+- Dang nhap / dang ky: `http://localhost:8080/admin/dangnhap.html`
+- Sau khi dang nhap voi vai tro customer: `http://localhost:8080/customer/trangchu.html`
+- Dashboard admin: `http://localhost:8080/admin/trangquantri.html`
 
 ## 5. Goi y noi dung bao cao do an
 

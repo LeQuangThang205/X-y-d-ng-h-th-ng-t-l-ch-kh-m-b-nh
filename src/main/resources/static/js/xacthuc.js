@@ -29,6 +29,9 @@ function getCurrentUser() {
     try {
         var parsed = JSON.parse(data);
         parsed.role = normalizeRole(parsed.role);
+        if (!parsed.name || !String(parsed.name).trim()) {
+            parsed.name = parsed.fullname || parsed.username || parsed.email || "";
+        }
         return parsed;
     } catch (e) {
         localStorage.removeItem(STORAGE_KEY);
@@ -38,22 +41,25 @@ function getCurrentUser() {
 
 function setCurrentUser(user) {
     var normalized = Object.assign({}, user, { role: normalizeRole(user.role) });
+    if (!normalized.name || !String(normalized.name).trim()) {
+        normalized.name = normalized.fullname || normalized.username || normalized.email || "";
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
 }
 
 function logout() {
     var onCustomerPage = window.location.pathname.indexOf("/customer/") === 0;
-    if (onCustomerPage && !window.confirm("Báº¡n cĂ³ cháº¯c muá»‘n Ä‘Äƒng xuáº¥t ?")) {
+    if (onCustomerPage && !window.confirm("Bạn có chắc muốn đăng xuất ?")) {
         return;
     }
     localStorage.removeItem(STORAGE_KEY);
-    window.location.href = "/admin/dangnhap.html";
+    window.location.href = "/customer/trangchu.html";
 }
 
 function requireAuth(allowedRoles) {
     var user = getCurrentUser();
     if (!user) {
-        window.location.href = "/admin/dangnhap.html";
+        window.location.href = "/customer/trangchu.html";
         return null;
     }
     if (allowedRoles && allowedRoles.length) {
