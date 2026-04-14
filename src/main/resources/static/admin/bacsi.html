@@ -10,14 +10,14 @@
     <aside class="sidebar">
         <div class="sidebar-header"><span class="logo"><img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC" style="height:20px;vertical-align:middle;margin-right:6px">Admin</span></div>
         <nav class="sidebar-nav">
-            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Bảng điều khiển</a>
             <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/taikhoan.html"><span class="icon">🔐</span> Quản lý tài khoản</a>
             <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
             <a href="/admin/bacsi.html" class="active"><span class="icon">🩺</span> Quản lý bác sĩ</a>
             <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
             <a href="/admin/phongkham.html">Quản lý phòng khám</a>
             <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
-            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
         </nav>
     </aside>
     <main class="main-area">
@@ -29,52 +29,44 @@
             </div>
         </header>
         <div class="content">
-            <h1 class="page-title">Danh sach bac si</h1>
+            <h1 class="page-title">Danh sách bác sĩ</h1>
 
             <div class="card mb-1">
-                <div class="card-header">Them phong kham</div>
+                <div class="card-header">Thêm bác sĩ</div>
                 <div class="card-body">
-                    <form id="room-form" class="form-row">
-                        <div class="form-group">
-                            <label>Ten phong</label>
-                            <input type="text" id="room-name" required />
-                        </div>
-                        <div class="form-group" style="align-self:end;">
-                            <button type="submit" class="btn btn-outline">Them phong</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card mb-1">
-                <div class="card-header">Them bac si</div>
-                <div class="card-body">
+                    <p class="text-muted" id="room-hint" style="margin-top:0;margin-bottom:10px;">Phòng khám được lấy từ dữ liệu hệ thống.</p>
                     <form id="doctor-form">
                         <div class="form-row">
-                            <div class="form-group"><label>Ho ten</label><input type="text" id="d-name" required /></div>
-                            <div class="form-group"><label>Chuc danh</label><input type="text" id="d-title" /></div>
+                            <div class="form-group"><label>Họ tên</label><input type="text" id="d-name" required /></div>
+                            <div class="form-group"><label>Chức danh</label><input type="text" id="d-title" /></div>
                             <div class="form-group"><label>Email</label><input type="email" id="d-email" /></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>So dien thoai</label><input type="text" id="d-phone" /></div>
-                            <div class="form-group"><label>Chuyen khoa</label><select id="d-specialty" required></select></div>
-                            <div class="form-group"><label>Phong kham</label><select id="d-room" required></select></div>
+                            <div class="form-group"><label>Số điện thoại</label><input type="text" id="d-phone" /></div>
+                            <div class="form-group"><label>Chuyên khoa</label><select id="d-specialty" required></select></div>
+                            <div class="form-group"><label>Phòng khám</label><select id="d-room" required></select></div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Them bac si</button>
+                        <button type="submit" class="btn btn-primary">Thêm bác sĩ</button>
                     </form>
                 </div>
             </div>
 
             <div class="card mb-1">
-                <div class="card-header">Tao lich lam viec</div>
+                <div class="card-header">Tạo lịch làm việc theo ca</div>
                 <div class="card-body">
                     <form id="schedule-form" class="form-row">
-                        <div class="form-group"><label>Bac si</label><select id="s-doctor" required></select></div>
-                        <div class="form-group"><label>Ngay</label><input type="date" id="s-date" required /></div>
-                        <div class="form-group"><label>Bat dau</label><input type="time" id="s-start" required /></div>
-                        <div class="form-group"><label>Ket thuc</label><input type="time" id="s-end" required /></div>
-                        <div class="form-group"><label>Phi</label><input type="number" id="s-fee" min="0" step="1000" /></div>
-                        <div class="form-group" style="align-self:end;"><button type="submit" class="btn btn-outline">Tao lich</button></div>
+                        <div class="form-group"><label>Bác sĩ</label><select id="s-doctor" required></select></div>
+                        <div class="form-group"><label>Ngày</label><input type="date" id="s-date" required /></div>
+                        <div class="form-group">
+                            <label>Ca làm việc</label>
+                            <select id="s-shift" required>
+                                <option value="MORNING">Ca sáng (08:00 - 12:00)</option>
+                                <option value="AFTERNOON">Ca chiều (13:00 - 17:00)</option>
+                                <option value="EVENING">Ca tối (18:00 - 21:00)</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Phí khám</label><input type="number" id="s-fee" min="0" step="1000" /></div>
+                        <div class="form-group" style="align-self:end;"><button type="submit" class="btn btn-outline">Tạo lịch</button></div>
                     </form>
                 </div>
             </div>
@@ -83,8 +75,8 @@
                 <div class="card-body">
                     <div class="table-wrap">
                         <table>
-                            <thead><tr><th>ID</th><th>Bac si</th><th>Chuyen khoa</th><th>Phong</th><th>Email</th></tr></thead>
-                            <tbody id="doctor-body"><tr><td colspan="5" class="text-muted">Dang tai...</td></tr></tbody>
+                            <thead><tr><th>ID</th><th>Bác sĩ</th><th>Chuyên khoa</th><th>Phòng</th><th>Email</th></tr></thead>
+                            <tbody id="doctor-body"><tr><td colspan="5" class="text-muted">Đang tải...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -101,6 +93,8 @@
             var roomSelect = document.getElementById('d-room');
             var doctorSelect = document.getElementById('s-doctor');
             var doctorBody = document.getElementById('doctor-body');
+            var doctorForm = document.getElementById('doctor-form');
+            var roomHint = document.getElementById('room-hint');
 
             function fillSelect(el, list, textFn) {
                 el.innerHTML = '';
@@ -123,11 +117,27 @@
                     var doctors = results[2] || [];
 
                     fillSelect(specialtySelect, specialties, function(s) { return s.ten; });
-                    fillSelect(roomSelect, rooms, function(r) { return r.ten; });
+                    if (rooms.length) {
+                        fillSelect(roomSelect, rooms, function(r) { return r.ten; });
+                        roomSelect.disabled = false;
+                        if (roomHint) roomHint.textContent = 'Phòng khám được lấy từ dữ liệu hệ thống.';
+                        if (doctorForm) {
+                            var btn = doctorForm.querySelector('button[type="submit"]');
+                            if (btn) btn.disabled = false;
+                        }
+                    } else {
+                        roomSelect.innerHTML = '<option value="">Chưa có phòng khám</option>';
+                        roomSelect.disabled = true;
+                        if (roomHint) roomHint.innerHTML = 'Chưa có phòng khám trong dữ liệu. Vui lòng tạo ở trang <a href="/admin/phongkham.html">Quản lý phòng khám</a>.';
+                        if (doctorForm) {
+                            var btn2 = doctorForm.querySelector('button[type="submit"]');
+                            if (btn2) btn2.disabled = true;
+                        }
+                    }
                     fillSelect(doctorSelect, doctors, function(d) { return d.hoTen; });
 
                     if (!doctors.length) {
-                        doctorBody.innerHTML = '<tr><td colspan="5" class="text-muted">Chua co bac si.</td></tr>';
+                        doctorBody.innerHTML = '<tr><td colspan="5" class="text-muted">Chưa có bác sĩ.</td></tr>';
                         return;
                     }
 
@@ -141,27 +151,16 @@
                             + '</tr>';
                     }).join('');
                 }).catch(function(err) {
-                    doctorBody.innerHTML = '<tr><td colspan="5" class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</td></tr>';
+                    doctorBody.innerHTML = '<tr><td colspan="5" class="text-danger">' + (err.message || 'Tải dữ liệu thất bại') + '</td></tr>';
                 });
             }
 
-            document.getElementById('room-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                var roomName = document.getElementById('room-name').value.trim();
-                apiJson('/api/admin/rooms', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ten: roomName })
-                }).then(function() {
-                    document.getElementById('room-form').reset();
-                    return loadAll();
-                }).catch(function(err) {
-                    alert(err.message || 'Them phong that bai');
-                });
-            });
-
             document.getElementById('doctor-form').addEventListener('submit', function(e) {
                 e.preventDefault();
+                if (!roomSelect.value) {
+                    alert('Vui lòng tạo phòng khám trước trong trang Quản lý phòng khám.');
+                    return;
+                }
                 var payload = {
                     hoTen: document.getElementById('d-name').value.trim(),
                     chucDanh: document.getElementById('d-title').value.trim(),
@@ -179,7 +178,7 @@
                     document.getElementById('doctor-form').reset();
                     return loadAll();
                 }).catch(function(err) {
-                    alert(err.message || 'Them bac si that bai');
+                    alert(err.message || 'Thêm bác sĩ thất bại');
                 });
             });
 
@@ -188,8 +187,7 @@
                 var params = new URLSearchParams({
                     doctorId: doctorSelect.value,
                     date: document.getElementById('s-date').value,
-                    start: document.getElementById('s-start').value,
-                    end: document.getElementById('s-end').value,
+                    shift: document.getElementById('s-shift').value,
                 });
                 var fee = document.getElementById('s-fee').value;
                 if (fee) params.set('fee', fee);
@@ -197,11 +195,11 @@
                 apiJson('/api/admin/work-schedules?' + params.toString(), {
                     method: 'POST'
                 }).then(function(res) {
-                    if (!res.success) throw new Error(res.message || 'Tao lich that bai');
-                    alert('Da tao lich lam viec');
+                    if (!res.success) throw new Error(res.message || 'Tạo lịch thất bại');
+                    alert('Đã tạo lịch làm việc theo ca');
                     document.getElementById('schedule-form').reset();
                 }).catch(function(err) {
-                    alert(err.message || 'Tao lich that bai');
+                    alert(err.message || 'Tạo lịch thất bại');
                 });
             });
 
@@ -210,4 +208,5 @@
     </script>
 </body>
 </html>
+
 

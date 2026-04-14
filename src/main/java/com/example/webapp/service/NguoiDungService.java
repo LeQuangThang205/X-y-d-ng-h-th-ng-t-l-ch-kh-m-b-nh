@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +27,29 @@ public class NguoiDungService {
 
     public Optional<NguoiDung> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public List<NguoiDung> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public NguoiDung findUserById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay tai khoan id=" + userId));
+    }
+
+    public NguoiDung updateRole(long userId, String role) {
+        NguoiDung user = findUserById(userId);
+        user.setRole(normalizeRole(role));
+        return userRepository.save(user);
+    }
+
+    public NguoiDung saveUser(NguoiDung user) {
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(long userId) {
+        userRepository.deleteById(userId);
     }
 
     public boolean checkPassword(NguoiDung user, String rawPassword) {

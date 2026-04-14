@@ -113,6 +113,17 @@ a:hover {
     box-shadow: 0 18px 40px rgba(3, 105, 161, 0.6);
 }
 
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #f9fafb;
+    box-shadow: 0 14px 30px rgba(220, 38, 38, 0.5);
+}
+
+.btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 40px rgba(220, 38, 38, 0.6);
+}
+
 .btn-outline {
     border-color: rgba(148, 163, 184, 0.7);
     color: #e5e7eb;
@@ -891,11 +902,16 @@ a:hover {
 .customer-header nav a {
     color: #cbd5f5;
     font-size: 0.9rem;
-    padding: 6px 4px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
 }
 
 .customer-header nav a:hover {
     color: #ffffff;
+    background: rgba(14, 165, 233, 0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(3, 105, 161, 0.2);
 }
 
 .customer-header #user-name {
@@ -925,6 +941,110 @@ a:hover {
 .customer-header .btn.btn-sm:hover {
     transform: translateY(-1px);
     box-shadow: 0 18px 40px rgba(3, 105, 161, 0.6);
+}
+
+/* ===== Dynamic UX for customer pages ===== */
+.customer-header,
+.landing-header {
+    transition: transform 0.35s ease, opacity 0.35s ease, box-shadow 0.35s ease;
+}
+
+.customer-header.header-hidden,
+.landing-header.header-hidden {
+    transform: translateY(-120%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.customer-layout .page-title,
+.customer-layout .card,
+.customer-layout .dept-card,
+.customer-layout .doctor-card,
+.customer-layout .booking-form-wrap,
+.customer-layout .table-wrap,
+.customer-layout .form-section,
+.customer-layout .stat-card,
+.customer-layout .filter-bar,
+.landing-page .section,
+.landing-page .dept-card,
+.landing-page .doctor-card,
+.landing-page .hero-inner,
+.landing-page .hotline-inner,
+.landing-page .footer-grid {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+}
+
+.ui-fly-in {
+    animation: uiFlyIn 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--fly-delay, 0s);
+}
+
+@keyframes uiFlyIn {
+    0% {
+        opacity: 0;
+        transform: translateY(28px) scale(0.985);
+    }
+    65% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.003);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dept-card,
+.doctor-card,
+.card,
+.booking-card,
+.form-section,
+.report-card,
+.benefit-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.25s ease;
+}
+
+.dept-card:hover,
+.doctor-card:hover,
+.card:hover,
+.booking-card:hover,
+.form-section:hover,
+.report-card:hover,
+.benefit-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+    border-color: rgba(14, 165, 233, 0.35);
+}
+
+.landing-nav a,
+.header-nav a {
+    position: relative;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.landing-nav a::after,
+.header-nav a::after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: -5px;
+    height: 2px;
+    background: linear-gradient(90deg, #0ea5e9, #0369a1);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.28s ease;
+}
+
+.landing-nav a:hover,
+.header-nav a:hover {
+    transform: translateY(-1px);
+}
+
+.landing-nav a:hover::after,
+.header-nav a:hover::after {
+    transform: scaleX(1);
 }
 
 .customer-content {
@@ -987,6 +1107,14 @@ a:hover {
     border-radius: 12px;
     font-size: 0.9rem;
     color: var(--text-muted);
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, color 0.25s ease;
+}
+
+.profile-menu a:hover {
+    transform: translateY(-2px);
+    color: #0f172a;
+    background: rgba(14, 165, 233, 0.12);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
 }
 
 .profile-menu a.active {
@@ -1093,12 +1221,21 @@ th, td {
     display: grid;
     grid-template-columns: 240px 1fr;
     min-height: 100vh;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.app-layout.page-ready {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .sidebar {
-    background: #020617;
+    background: linear-gradient(180deg, #020617 0%, #0b1220 100%);
     color: #e5e7eb;
     padding: 14px 16px;
+    border-right: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .sidebar-header .logo {
@@ -1123,15 +1260,19 @@ th, td {
     border-radius: 10px;
     font-size: 0.9rem;
     color: #cbd5f5;
+    transition: transform 0.22s ease, background-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .sidebar-nav a.active {
-    background: #0f172a;
-    color: #e5e7eb;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.28), rgba(2, 132, 199, 0.28));
+    color: #f8fafc;
+    box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.35), 0 10px 20px rgba(2, 6, 23, 0.35);
 }
 
 .sidebar-nav a:hover {
-    background: #020617;
+    background: rgba(14, 165, 233, 0.16);
+    color: #ffffff;
+    transform: translateX(4px);
 }
 
 .main-area {
@@ -1145,8 +1286,12 @@ th, td {
     align-items: center;
     justify-content: space-between;
     padding: 12px 20px;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 20;
 }
 
 .user-menu {
@@ -1157,6 +1302,133 @@ th, td {
 
 .content {
     padding: 20px 22px 28px;
+}
+
+.app-layout .card,
+.app-layout .stat-card,
+.app-layout .report-card,
+.app-layout .table-wrap,
+.app-layout .toolbar,
+.app-layout .page-title {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.app-layout .ui-fly-in {
+    animation: adminFlyIn 0.8s ease forwards;
+    animation-delay: var(--admin-delay, 0s);
+}
+
+@keyframes adminFlyIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.app-layout .btn,
+.app-layout button,
+.app-layout .sidebar-nav a,
+.app-layout .topbar,
+.app-layout .card {
+    transition: all 0.25s ease;
+}
+
+.app-layout .btn:hover,
+.app-layout button:hover {
+    transform: translateY(-1px);
+}
+
+.app-layout .card:hover,
+.app-layout .report-card:hover,
+.app-layout .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+}
+
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+.report-card {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    background: #ffffff;
+}
+
+.report-title {
+    margin: 0 0 12px;
+    font-size: 1rem;
+}
+
+.donut-wrap {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 6px auto 10px;
+}
+
+.donut-chart {
+    --cancel-rate: 0%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(#ef4444 var(--cancel-rate), #22c55e 0);
+    box-shadow: inset 0 0 0 18px #ffffff;
+}
+
+.donut-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #0f172a;
+}
+
+.bar-group {
+    display: grid;
+    gap: 10px;
+}
+
+.bar-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 46px;
+    gap: 8px;
+    align-items: center;
+    font-size: 0.86rem;
+}
+
+.bar-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    transition: width 0.45s ease;
+}
+
+.bar-ok {
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+}
+
+.bar-cancel {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
 }
 
 /* Modal chi tiet lich kham */
@@ -1328,4 +1600,112 @@ th, td {
 }
 .lang-btn {
     color: #0f172a !important;
+}
+
+/* ===== Phần "Tại sao nên chọn Phenikaamec" ===== */
+.why-choose-section {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.why-choose-container {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 3rem;
+    align-items: flex-start;
+}
+
+.why-choose-image-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.why-choose-image-column img {
+    width: 100%;
+    max-width: 380px;
+}
+
+.why-choose-benefits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.benefit-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.benefit-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+    border-color: rgba(14, 165, 233, 0.35);
+}
+
+.benefit-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.benefit-card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.benefit-card p {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+    text-align: justify;
+}
+
+@media (max-width: 900px) {
+    .why-choose-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .why-choose-benefits {
+        grid-template-columns: 1fr;
+    }
+
+    .why-choose-image-column img {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .why-choose-section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .benefit-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .benefit-card h3 {
+        font-size: 1rem;
+    }
+
+    .benefit-card p {
+        font-size: 0.85rem;
+    }
+
+    .benefit-icon {
+        font-size: 2rem;
+    }
 }

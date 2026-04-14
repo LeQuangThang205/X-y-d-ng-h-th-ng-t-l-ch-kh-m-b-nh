@@ -140,8 +140,10 @@
                             role: "customer"
                         });
 
+                        markProfileSetupRequired(login.user || email);
+
                         alert("Đăng ký thành công");
-                        window.location.href = "/customer/trangchu.html";
+                        window.location.href = "/customer/hoso.html?setup=1";
                     } catch (err) {
                         alert(err.message || "Đăng ký thất bại");
                     }

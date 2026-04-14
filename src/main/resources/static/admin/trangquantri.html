@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - PHÒNG KHÁM PHENIKAAMEC</title>
+    <title>Bảng điều khiển Admin - PHÒNG KHÁM PHENIKAAMEC</title>
     <link rel="stylesheet" href="/css/kieu.css">
 </head>
 <body class="app-layout">
     <aside class="sidebar">
         <div class="sidebar-header"><span class="logo">Admin</span></div>
         <nav class="sidebar-nav">
-            <a href="/admin/trangquantri.html" class="active"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/trangquantri.html" class="active"><span class="icon">📊</span> Bảng điều khiển</a>
             <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/taikhoan.html"><span class="icon">🔐</span> Quản lý tài khoản</a>
             <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
             <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
             <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
             <a href="/admin/phongkham.html">Quản lý phòng khám</a>
             <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
-            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
         </nav>
     </aside>
     <main class="main-area">
         <header class="topbar">
-            <h2>Dashboard</h2>
+            <h2>Bảng điều khiển</h2>
             <div class="user-menu">
                 <span id="user-name"></span>
                 <span class="badge badge-info" id="user-role"></span>
@@ -38,11 +38,45 @@
                 </div>
                 <div class="stat-card">
                     <div class="value" id="stat-bookings">0</div>
-                    <div class="label">Tong luot dat</div>
+                    <div class="label">Tổng lượt đặt</div>
                 </div>
                 <div class="stat-card">
                     <div class="value" id="stat-cancel-rate">0%</div>
-                    <div class="label">Ty le huy</div>
+                    <div class="label">Tỷ lệ hủy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="stat-revenue">0</div>
+                    <div class="label">Doanh thu đã khám</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Báo cáo tổng hợp</div>
+                <div class="card-body report-grid">
+                    <div class="report-card">
+                        <h3 class="report-title">Tỉ lệ hủy lịch</h3>
+                        <div class="donut-wrap">
+                            <div class="donut-chart" id="cancel-donut"></div>
+                            <div class="donut-text" id="cancel-donut-text">0%</div>
+                        </div>
+                        <p class="text-muted" id="cancel-note">Tỷ lệ hủy trên tổng lịch hẹn.</p>
+                    </div>
+
+                    <div class="report-card">
+                        <h3 class="report-title">Tình trạng lịch hẹn</h3>
+                        <div class="bar-group">
+                            <div class="bar-row">
+                                <span>Đã tiếp nhận</span>
+                                <div class="bar-track"><div class="bar-fill bar-ok" id="bar-ok"></div></div>
+                                <strong id="bar-ok-text">0%</strong>
+                            </div>
+                            <div class="bar-row">
+                                <span>Đã hủy</span>
+                                <div class="bar-track"><div class="bar-fill bar-cancel" id="bar-cancel"></div></div>
+                                <strong id="bar-cancel-text">0%</strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,10 +96,26 @@
             ]).then(function(results) {
                 var report = results[0] || {};
                 var patients = results[1] || [];
+                var total = Number(report.tongLuotDat || 0);
+                var cancel = Number(report.tongHuy || 0);
+                var cancelRate = Number(report.tiLeHuy || 0);
+                var okRate = Math.max(0, 100 - cancelRate);
+
                 document.getElementById('stat-patients').textContent = String(patients.length || 0);
-                document.getElementById('stat-bookings').textContent = String(report.tongLuotDat || 0);
-                var rate = Number(report.tiLeHuy || 0).toFixed(1);
+                document.getElementById('stat-bookings').textContent = String(total);
+                var rate = cancelRate.toFixed(1);
                 document.getElementById('stat-cancel-rate').textContent = rate + '%';
+                document.getElementById('stat-revenue').textContent = String(report.doanhThu || 0);
+
+                var donut = document.getElementById('cancel-donut');
+                donut.style.setProperty('--cancel-rate', rate + '%');
+                document.getElementById('cancel-donut-text').textContent = rate + '%';
+                document.getElementById('cancel-note').textContent = 'Tổng ' + total + ' lịch, hủy ' + cancel + ' lịch.';
+
+                document.getElementById('bar-ok').style.width = okRate.toFixed(1) + '%';
+                document.getElementById('bar-cancel').style.width = rate + '%';
+                document.getElementById('bar-ok-text').textContent = okRate.toFixed(1) + '%';
+                document.getElementById('bar-cancel-text').textContent = rate + '%';
             }).catch(function(err) {
                 console.error(err);
             });
@@ -73,4 +123,5 @@
     </script>
 </body>
 </html>
+
 

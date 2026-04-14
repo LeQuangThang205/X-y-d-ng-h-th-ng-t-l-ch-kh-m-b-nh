@@ -10,14 +10,14 @@
     <aside class="sidebar">
         <div class="sidebar-header"><span class="logo">Admin</span></div>
         <nav class="sidebar-nav">
-            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Bảng điều khiển</a>
             <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/taikhoan.html"><span class="icon">🔐</span> Quản lý tài khoản</a>
             <a href="/admin/lichhen.html" class="active"><span class="icon">📅</span> Quản lý đặt lịch</a>
             <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
             <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
             <a href="/admin/phongkham.html">Quản lý phòng khám</a>
             <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
-            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
         </nav>
     </aside>
     <main class="main-area">
@@ -46,7 +46,7 @@
                             </thead>
                             <tbody id="appointments-body">
                                 <tr>
-                                    <td colspan="6" class="text-muted">Dang tai du lieu...</td>
+                                    <td colspan="6" class="text-muted">Đang tải dữ liệu...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -73,7 +73,7 @@
 
             function render(list) {
                 if (!list || !list.length) {
-                    body.innerHTML = '<tr><td colspan="6" class="text-muted">Chua co lich hen.</td></tr>';
+                    body.innerHTML = '<tr><td colspan="6" class="text-muted">Chưa có lịch hẹn.</td></tr>';
                     return;
                 }
 
@@ -84,7 +84,7 @@
                         + '<td>' + (item.chuyenKhoa ? item.chuyenKhoa.ten : '-') + '</td>'
                         + '<td>' + (item.ngayKham || '-') + ' ' + (item.gioKham || '') + '</td>'
                         + '<td><span class="badge badge-info">' + (item.trangThai || '-') + '</span></td>'
-                        + '<td>' + statusSelect(item.trangThai) + ' <button type="button" class="btn-sm btn-outline" data-save>Cap nhat</button></td>'
+                        + '<td>' + statusSelect(item.trangThai) + ' <button type="button" class="btn btn-sm btn-outline" data-save>Cập nhật</button></td>'
                         + '</tr>';
                 }).join('');
             }
@@ -108,7 +108,7 @@
                         return merged;
                     });
                 }).then(render).catch(function(err) {
-                    body.innerHTML = '<tr><td colspan="6" class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</td></tr>';
+                    body.innerHTML = '<tr><td colspan="6" class="text-danger">' + (err.message || 'Tải dữ liệu thất bại') + '</td></tr>';
                 });
             }
 
@@ -124,10 +124,10 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: status })
                 }).then(function(res) {
-                    if (!res.success) throw new Error(res.message || 'Cap nhat that bai');
+                    if (!res.success) throw new Error(res.message || 'Cập nhật thất bại');
                     return loadAppointments();
                 }).catch(function(err) {
-                    alert(err.message || 'Cap nhat that bai');
+                    alert(err.message || 'Cập nhật thất bại');
                 });
             });
 
@@ -136,4 +136,5 @@
     </script>
 </body>
 </html>
+
 

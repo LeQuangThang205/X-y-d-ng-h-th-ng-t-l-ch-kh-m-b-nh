@@ -2,69 +2,14 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=/admin/trangquantri.html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thống kê & báo cáo - PHÒNG KHÁM PHENIKAAMEC</title>
-    <link rel="stylesheet" href="/css/kieu.css">
+    <title>Chuyển hướng đến Bảng điều khiển</title>
 </head>
-<body class="app-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header"><span class="logo">Admin</span></div>
-        <nav class="sidebar-nav">
-            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
-            <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
-            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
-            <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
-            <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
-            <a href="/admin/phongkham.html">Quản lý phòng khám</a>
-            <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
-            <a href="/admin/baocao.html" class="active"><span class="icon">📈</span> Thống kê & báo cáo</a>
-        </nav>
-    </aside>
-    <main class="main-area">
-        <header class="topbar">
-            <h2>Thống kê & báo cáo</h2>
-            <div class="user-menu">
-                <span id="user-name"></span>
-                <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
-            </div>
-        </header>
-        <div class="content">
-            <h1 class="page-title">Bao cao</h1>
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="value" id="r-total">0</div>
-                    <div class="label">Tong luot dat</div>
-                </div>
-                <div class="stat-card">
-                    <div class="value" id="r-cancel">0</div>
-                    <div class="label">Tong huy</div>
-                </div>
-                <div class="stat-card">
-                    <div class="value" id="r-rate">0%</div>
-                    <div class="label">Ty le huy</div>
-                </div>
-                <div class="stat-card">
-                    <div class="value" id="r-revenue">0</div>
-                    <div class="label">Doanh thu da kham</div>
-                </div>
-            </div>
-        </div>
-    </main>
-    <script src="/js/xacthuc.js"></script>
+<body>
+    <p>Đang chuyển hướng đến Bảng điều khiển...</p>
     <script>
-        (function() {
-            var user = requireAuth(['admin']);
-            if (user) document.getElementById('user-name').textContent = user.name || user.email;
-
-            apiJson('/api/admin/reports/overview').then(function(report) {
-                document.getElementById('r-total').textContent = String(report.tongLuotDat || 0);
-                document.getElementById('r-cancel').textContent = String(report.tongHuy || 0);
-                document.getElementById('r-rate').textContent = Number(report.tiLeHuy || 0).toFixed(1) + '%';
-                document.getElementById('r-revenue').textContent = String(report.doanhThu || 0);
-            }).catch(function(err) {
-                alert(err.message || 'Khong tai duoc bao cao');
-            });
-        })();
+        window.location.replace('/admin/trangquantri.html');
     </script>
 </body>
 </html>

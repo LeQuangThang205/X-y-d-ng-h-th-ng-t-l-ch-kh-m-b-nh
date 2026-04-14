@@ -5,109 +5,352 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thông tin cá nhân - PHÒNG KHÁM PHENIKAAMEC</title>
     <link rel="stylesheet" href="/css/kieu.css">
+    <style>
+        :root {
+            --primary: #0d6efd;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            background: #e3f2fd;
+        }
+
+        .frame {
+            width: calc(100% - 40px);
+            max-width: 1440px;
+            height: calc(100vh - 40px);
+            max-height: 920px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(2, 6, 23, 0.15);
+            display: flex;
+            overflow: hidden;
+        }
+
+        .left {
+            width: 52%;
+            padding: 26px 42px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            gap: 14px;
+            overflow-y: auto;
+        }
+
+        .topbar-mini {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: #111;
+            font-size: 20px;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 36px;
+        }
+
+        .user-mini {
+            font-size: 14px;
+            color: #4b5563;
+            text-align: right;
+        }
+
+        .card-modern {
+            width: 100%;
+            max-width: 720px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .card-header-modern {
+            padding: 28px 34px 12px;
+            background: transparent;
+        }
+
+        .card-title {
+            font-size: 28px;
+            margin: 0 0 6px;
+            color: #111;
+            font-weight: 700;
+        }
+
+        .card-desc {
+            margin: 0;
+            color: #6b7280;
+        }
+
+        .card-body-modern {
+            padding: 10px 34px 24px;
+            background: #fff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        select {
+            width: 100%;
+            height: 48px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e6e9ef;
+            font-size: 15px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        #email {
+            background: #f1f5f9;
+        }
+
+        .btn-primary-custom {
+            display: inline-block;
+            width: 100%;
+            height: 48px;
+            background: var(--primary);
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .right {
+            width: 48%;
+            position: relative;
+            display: block;
+        }
+
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.78) 0%, rgba(13, 110, 253, 0.55) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            padding: 32px;
+        }
+
+        .overlay h2 {
+            font-size: 34px;
+            margin: 0 0 12px;
+        }
+
+        .small {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat .n {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .enter-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            animation: enterLeft 2.2s ease-out forwards;
+        }
+
+        .enter-card {
+            opacity: 0;
+            transform: translateY(24px);
+            animation: enterUp 2.4s ease-out 0.15s forwards;
+        }
+
+        .enter-right {
+            opacity: 0;
+            transform: translateX(48px);
+            animation: enterRight 2.6s ease-out 0.2s forwards;
+        }
+
+        @keyframes enterLeft {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes enterRight {
+            from { opacity: 0; transform: translateX(48px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes enterUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1000px) {
+            .frame {
+                flex-direction: column;
+                height: auto;
+                max-height: none;
+            }
+
+            .left,
+            .right {
+                width: 100%;
+            }
+
+            .left {
+                padding: 20px 16px;
+                overflow: visible;
+            }
+
+            .right {
+                min-height: 320px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-<body class="customer-layout">
-        <header class="customer-header">
-            <a href="/customer/trangchu.html" class="brand"><img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC" style="height:36px;vertical-align:middle;margin-right:8px">PHÒNG KHÁM PHENIKAAMEC</a>
-      <nav>
-        <a href="/customer/trangchu.html">Trang chủ</a>
-        <a href="/customer/khoa.html">Chuyên khoa</a>
-        <a href="/customer/bacsi.html">Bác sĩ</a>
-        <a href="/customer/datlich.html">Đặt lịch</a>
-        <a href="/customer/lichcuatoi.html">Lịch khám</a>
-        <a href="/customer/hoso.html">Thông tin cá nhân</a>
-        <span class="text-muted" id="user-name"></span>
-        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
-      </nav>
-    </header>
-    <div class="customer-content profile-page">
-        <div class="profile-layout">
-            <aside class="profile-sidebar">
-                <nav class="profile-menu">
-                    <a href="/customer/hoso.html" class="active">Thông tin cá nhân</a>
-                    <a href="/customer/lichcuatoi.html">Lịch khám</a>
-                    <a href="#">Đánh giá</a>
-                    <a href="#" onclick="logout(); return false;">Đăng xuất</a>
-                </nav>
-            </aside>
-            <main class="profile-main">
-                <h1 class="page-title">Thông tin cá nhân</h1>
-                <div class="card">
-                    <div class="card-header">Chỉnh sửa thông tin</div>
-                    <div class="card-body">
-                        <form id="profile-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Họ tên *</label>
-                                    <input type="text" id="fullname" placeholder="Họ và tên" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Tuổi</label>
-                                    <input type="number" id="age" placeholder="25" min="1" max="120">
-                                </div>
-                                <div class="form-group">
-                                    <label>Giới tính</label>
-                                    <select id="gender">
-                                        <option value="">-- Chọn --</option>
-                                        <option value="male">Nam</option>
-                                        <option value="female">Nữ</option>
-                                        <option value="other">Khác</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>CCCD/CMND</label>
-                                    <input type="text" id="cccd" placeholder="Số CCCD">
-                                </div>
-                                <div class="form-group">
-                                    <label>Số điện thoại *</label>
-                                    <input type="tel" id="phone" placeholder="0901234567" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Địa chỉ</label>
-                                <input type="text" id="address" placeholder="Địa chỉ liên hệ">
-                            </div>
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" id="email" readonly style="background: #f1f5f9;">
-                            </div>
-                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                        </form>
-                    </div>
+<body>
+    <div class="frame">
+        <div class="left enter-left">
+            <div class="topbar-mini">
+                <a class="logo" href="/customer/trangchu.html">
+                    <img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC">
+                    <span>PHÒNG KHÁM PHENIKAAMEC</span>
+                </a>
+                <div class="user-mini">
+                    <div id="user-name"></div>
+                    <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
                 </div>
-                <h2 class="section-title">Lịch sử đặt lịch khám</h2>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Mã lịch</th>
-                                        <th>Chuyên khoa</th>
-                                        <th>Bác sĩ</th>
-                                        <th>Ngày giờ</th>
-                                        <th>Trạng thái</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="appointments-tbody">
-                                    <tr>
-                                        <td colspan="5" style="text-align: center; color: #888;">Đang tải...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            </div>
+
+            <div class="card-modern enter-card">
+                <div class="card-header-modern">
+                    <h1 class="card-title" id="page-title">Thông tin cá nhân</h1>
+                    <p class="card-desc" id="page-subtitle">Cập nhật hồ sơ để hệ thống hỗ trợ bạn tốt hơn.</p>
+                </div>
+                <div class="card-body-modern">
+                    <form id="profile-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Họ tên *</label>
+                                <input type="text" id="fullname" placeholder="Nhập họ và tên" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tuổi *</label>
+                                <input type="number" id="age" placeholder="Ví dụ: 25" min="1" max="120">
+                            </div>
+                            <div class="form-group">
+                                <label>Giới tính *</label>
+                                <select id="gender">
+                                    <option value="">-- Chọn --</option>
+                                    <option value="male">Nam</option>
+                                    <option value="female">Nữ</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>CCCD/CMND *</label>
+                                <input type="text" id="cccd" placeholder="Nhập số CCCD/CMND">
+                            </div>
+                            <div class="form-group">
+                                <label>Số điện thoại *</label>
+                                <input type="tel" id="phone" placeholder="Ví dụ: 0901234567" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email đăng ký</label>
+                                <input type="email" id="email" readonly>
+                            </div>
+                            <div class="form-group full">
+                                <label>Địa chỉ *</label>
+                                <input type="text" id="address" placeholder="Nhập địa chỉ liên hệ">
+                            </div>
                         </div>
+                        <button type="submit" class="btn-primary-custom">Lưu thông tin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="right enter-right">
+            <img class="hero-img" src="https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=1600&auto=format&fit=crop" alt="Healthcare" />
+            <div class="overlay">
+                <div style="max-width:520px;text-align:center">
+                    <h2>Hoàn thiện hồ sơ để bắt đầu đặt lịch</h2>
+                    <p class="small">Thông tin chính xác giúp bác sĩ tư vấn nhanh hơn và hệ thống gửi thông báo đầy đủ cho bạn.</p>
+                    <div class="stats" role="list">
+                        <div class="stat"><div class="n">24/7</div><div class="small">Đặt lịch</div></div>
+                        <div class="stat"><div class="n">Nhanh</div><div class="small">Xác nhận</div></div>
+                        <div class="stat"><div class="n">An toàn</div><div class="small">Dữ liệu</div></div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     </div>
     <script src="/js/xacthuc.js"></script>
     <script>
         (function() {
             var user = requireAuth(['patient']);
+            var setupMode = isProfileSetupRequiredForCurrentUser()
+                || new URLSearchParams(window.location.search).get('setup') === '1';
             var account = (user && (user.username || user.email) ? (user.username || user.email) : '').trim();
+            var pageTitle = document.getElementById('page-title');
+            var pageSubtitle = document.getElementById('page-subtitle');
+
+            if (setupMode) {
+                if (pageTitle) pageTitle.textContent = 'Hoàn thiện thông tin cá nhân';
+                if (pageSubtitle) pageSubtitle.textContent = 'Vui lòng nhập đầy đủ thông tin trước khi sử dụng hệ thống.';
+            }
 
             function formPayload() {
                 return {
@@ -134,7 +377,7 @@
                 document.getElementById('cccd').value = profile.cccd || '';
                 document.getElementById('phone').value = profile.phone || user.phone || '';
                 document.getElementById('address').value = profile.address || '';
-                document.getElementById('user-name').textContent = user.name || user.email;
+                document.getElementById('user-name').textContent = user.name || user.email || '';
             }
 
             async function loadProfileFromDb() {
@@ -146,7 +389,7 @@
             }
 
             if (user) {
-                document.getElementById('user-name').textContent = user.name || user.email;
+                document.getElementById('user-name').textContent = user.name || user.email || '';
                 document.getElementById('email').value = user.email || '';
                 document.getElementById('fullname').value = user.name || '';
                 if (user.phone) document.getElementById('phone').value = user.phone;
@@ -157,6 +400,22 @@
 
                 try {
                     var payload = formPayload();
+
+                    if (setupMode) {
+                        var missing = [];
+                        if (!payload.fullname) missing.push('Họ tên');
+                        if (!payload.age) missing.push('Tuổi');
+                        if (!payload.gender) missing.push('Giới tính');
+                        if (!payload.cccd) missing.push('CCCD/CMND');
+                        if (!payload.phone) missing.push('Số điện thoại');
+                        if (!payload.address) missing.push('Địa chỉ');
+
+                        if (missing.length) {
+                            alert('Vui lòng nhập đầy đủ thông tin: ' + missing.join(', '));
+                            return;
+                        }
+                    }
+
                     var saved;
 
                     if (user.patientId) {
@@ -177,6 +436,14 @@
                     }
 
                     applyProfile(saved);
+                    clearProfileSetupRequirement(account || user.username || user.email);
+
+                    if (setupMode) {
+                        alert('Hoàn tất thông tin cá nhân thành công. Hệ thống sẽ chuyển về trang chủ.');
+                        window.location.href = '/customer/trangchu.html';
+                        return;
+                    }
+
                     alert('Da luu thong tin co ban vao he thong.');
                 } catch (err) {
                     alert(err.message || 'Luu ho so that bai');
@@ -187,69 +454,6 @@
                 // Khong co profile trong DB thi van hien localStorage va tao khi luu.
             });
 
-            // Load appointments (lịch sử đặt khám)
-            async function loadAppointments() {
-                if (!user || !user.patientId) return;
-                try {
-                    var appointments = await apiJson('/api/patient/' + encodeURIComponent(user.patientId) + '/appointments');
-                    var tbody = document.getElementById('appointments-tbody');
-                    
-                    if (!appointments || appointments.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">Chưa có lịch khám nào</td></tr>';
-                        return;
-                    }
-
-                    tbody.innerHTML = appointments.map(function(appt) {
-                        var ngayGio = '';
-                        if (appt.ngayKham && appt.gioKham) {
-                            var day = appt.ngayKham;
-                            var time = appt.gioKham;
-                            // Format: DD/MM/YYYY HH:mm
-                            ngayGio = day + ' ' + time;
-                        }
-
-                        var bacSiName = appt.bacSi && appt.bacSi.hoTen ? appt.bacSi.hoTen : 'N/A';
-                        var chuyenKhoaName = appt.chuyenKhoa && appt.chuyenKhoa.tenChuyenKhoa ? appt.chuyenKhoa.tenChuyenKhoa : 'N/A';
-                        
-                        var statusBadge = '';
-                        var status = appt.trangThai;
-                        if (status === 'CHO_XAC_NHAN') {
-                            statusBadge = '<span class="badge badge-warning">Chờ xác nhận</span>';
-                        } else if (status === 'DA_XAC_NHAN') {
-                            statusBadge = '<span class="badge badge-info">Đã xác nhận</span>';
-                        } else if (status === 'DA_KHAM') {
-                            statusBadge = '<span class="badge badge-success">Đã khám</span>';
-                        } else if (status === 'HUY') {
-                            statusBadge = '<span class="badge badge-danger">Đã hủy</span>';
-                        } else {
-                            statusBadge = '<span class="badge">' + status + '</span>';
-                        }
-
-                        return '<tr>'
-                            + '<td>#LH' + appt.id + '</td>'
-                            + '<td>' + chuyenKhoaName + '</td>'
-                            + '<td>BS. ' + bacSiName + '</td>'
-                            + '<td>' + ngayGio + '</td>'
-                            + '<td>' + statusBadge + '</td>'
-                            + '</tr>';
-                    }).join('');
-                } catch (err) {
-                    var tbody = document.getElementById('appointments-tbody');
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">Không thể tải lịch khám</td></tr>';
-                    console.error('Error loading appointments:', err);
-                }
-            }
-
-            // Load appointments sau khi load profile
-            if (user && user.patientId) {
-                loadAppointments();
-            } else {
-                loadProfileFromDb().then(function() {
-                    loadAppointments();
-                }).catch(function() {
-                    // Handle error
-                });
-            }
         })();
     </script>
 </body>

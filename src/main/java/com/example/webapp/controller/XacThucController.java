@@ -57,4 +57,21 @@ public class XacThucController {
         }
         return res;
     }
+
+    @GetMapping("/me")
+    public Map<String, Object> me(@RequestParam String username) {
+        Map<String, Object> res = new HashMap<>();
+        Optional<NguoiDung> userOpt = userService.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            res.put("success", false);
+            res.put("message", "Khong tim thay tai khoan");
+            return res;
+        }
+
+        NguoiDung user = userOpt.get();
+        res.put("success", true);
+        res.put("user", user.getUsername());
+        res.put("role", userService.normalizeRole(user.getRole()));
+        return res;
+    }
 }

@@ -152,6 +152,19 @@ public class DatLichKhamService {
         return chuyenKhoaRepository.save(chuyenKhoa);
     }
 
+    @Transactional
+    public void xoaChuyenKhoa(Long id) {
+        ChuyenKhoa chuyenKhoa = chuyenKhoaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Chuyên khoa không tồn tại"));
+
+        List<BacSi> bacSiList = bacSiRepository.findByChuyenKhoaId(id);
+        if (!bacSiList.isEmpty()) {
+            throw new IllegalArgumentException("Không thể xóa chuyên khoa đang được bác sĩ sử dụng");
+        }
+
+        chuyenKhoaRepository.deleteById(id);
+    }
+
     public BacSi luuBacSi(BacSi bacSi, Long chuyenKhoaId, Long phongKhamId) {
         ChuyenKhoa chuyenKhoa = chuyenKhoaRepository.findById(chuyenKhoaId)
                 .orElseThrow(() -> new IllegalArgumentException("Khong tim thay chuyen khoa"));

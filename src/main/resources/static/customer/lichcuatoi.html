@@ -31,19 +31,19 @@
           </nav>
         </aside>
         <main class="profile-main">
-          <h1 class="page-title">Lịch hẹn của tôi</h1>
+          <h1 class="page-title">Lịch khám của tôi</h1>
           <div class="card">
-            <div class="card-header">Lịch sắp tới &amp; đã khám</div>
+            <div class="card-header">Lịch sử đặt lịch khám</div>
             <div class="card-body">
               <div class="table-wrap">
                 <table>
                   <thead>
                     <tr>
-                      <th>Mã</th>
-                      <th>Khoa</th>
+                      <th>Mã lịch</th>
+                      <th>Chuyên khoa</th>
+                      <th>Bác sĩ</th>
                       <th>Ngày giờ</th>
                       <th>Trạng thái</th>
-                      <th>Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -114,11 +114,11 @@
             var st = item.trangThai || "CHO_XAC_NHAN";
             return (
               "<tr>" +
-              "<td>#" + item.id + "</td>" +
+              "<td>#LH" + item.id + "</td>" +
               "<td>" + (item.chuyenKhoa ? item.chuyenKhoa.ten : "-") + "</td>" +
+              "<td>" + (item.bacSi ? item.bacSi.hoTen : "-") + "</td>" +
               "<td>" + formatDateTime(item) + "</td>" +
               "<td><span class=\"badge " + (badgeClass[st] || "badge-info") + "\">" + (statusLabel[st] || st) + "</span></td>" +
-              "<td>" + (item.bacSi ? item.bacSi.hoTen : "-") + "</td>" +
               "</tr>"
             );
           }).join("");
@@ -137,7 +137,7 @@
         }
 
         if (!user.patientId) {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-muted">Chua tim thay ho so benh nhan. Hay dat lich lan dau tai trang Dat lich.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="text-muted">Chua tim thay ho so benh nhan. Hay hoan thien thong tin ca nhan truoc.</td></tr>';
           reminderList.innerHTML = '';
           return;
         }

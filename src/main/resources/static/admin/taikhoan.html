@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý tài khoản - PHÒNG KHÁM PHENIKAAMEC</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+</head>
+<body class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><span class="logo">Admin</span></div>
+        <nav class="sidebar-nav">
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Bảng điều khiển</a>
+            <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/taikhoan.html" class="active"><span class="icon">🔐</span> Quản lý tài khoản</a>
+            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
+            <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
+            <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
+            <a href="/admin/phongkham.html">Quản lý phòng khám</a>
+            <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
+        </nav>
+    </aside>
+
+    <main class="main-area">
+        <header class="topbar">
+            <h2>Quản lý tài khoản</h2>
+            <div class="user-menu">
+                <span id="user-name"></span>
+                <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
+            </div>
+        </header>
+
+        <div class="content">
+            <h1 class="page-title">Danh sách tài khoản hệ thống</h1>
+            <div class="card mb-1">
+                <div class="card-header">Tạo tài khoản mới</div>
+                <div class="card-body">
+                    <form id="create-account-form" class="form-row" style="align-items: end;">
+                        <div class="form-group">
+                            <label>Tài khoản (username/email)</label>
+                            <input type="text" id="new-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" id="new-password" minlength="6" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Vai trò</label>
+                            <select id="new-role" required>
+                                <option value="customer">Khách hàng</option>
+                                <option value="doctor">Bác sĩ</option>
+                                <option value="admin">Quản trị viên</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="toolbar" style="margin-bottom: 12px;">
+                <input type="search" id="search-account" class="search-input" placeholder="Tìm theo tài khoản, tên hiển thị, role..." style="max-width: 360px;">
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tài khoản</th>
+                                    <th>Tên hiển thị</th>
+                                    <th>Vai trò</th>
+                                    <th>Đổi vai trò</th>
+                                    <th>Thao tác</th>
+                                    <th>Thông tin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="account-body">
+                                <tr><td colspan="7" class="text-muted">Đang tải dữ liệu...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="profile-modal" style="display:none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content" style="max-width: 560px;">
+            <div class="modal-header">
+                <h3>Thông tin cá nhân</h3>
+                <button type="button" class="modal-close" id="profile-close">×</button>
+            </div>
+            <div id="profile-content" class="card-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="profile-close-2">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="edit-modal" style="display:none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Sửa tài khoản</h3>
+                <button type="button" class="modal-close" id="edit-close">×</button>
+            </div>
+            <form id="edit-form" class="card-body">
+                <div class="form-group">
+                    <label>ID tài khoản</label>
+                    <input type="text" id="edit-id" readonly style="background: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label>Tài khoản (username)</label>
+                    <input type="text" id="edit-username" required>
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu mới (để trống nếu không thay đổi)</label>
+                    <input type="password" id="edit-password" minlength="6">
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="edit-close-2">Hủy</button>
+                <button type="button" class="btn btn-primary" id="edit-submit">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        (function() {
+            var user = requireAuth(['admin']);
+            if (user) {
+                document.getElementById('user-name').textContent = user.name || user.email;
+            }
+
+            var accountBody = document.getElementById('account-body');
+            var searchInput = document.getElementById('search-account');
+            var createForm = document.getElementById('create-account-form');
+            var modal = document.getElementById('profile-modal');
+            var profileContent = document.getElementById('profile-content');
+            var allAccounts = [];
+
+            function roleOptions(current) {
+                var roles = ['customer', 'doctor', 'admin'];
+                return roles.map(function(r) {
+                    var selected = r === current ? ' selected' : '';
+                    var label = r === 'admin' ? 'Quản trị viên' : (r === 'doctor' ? 'Bác sĩ' : 'Khách hàng');
+                    return '<option value="' + r + '"' + selected + '>' + label + '</option>';
+                }).join('');
+            }
+
+            function renderRows(list) {
+                if (!list || !list.length) {
+                    accountBody.innerHTML = '<tr><td colspan="7" class="text-muted">Không có tài khoản.</td></tr>';
+                    return;
+                }
+
+                accountBody.innerHTML = list.map(function(item) {
+                    return '<tr>'
+                        + '<td>' + item.id + '</td>'
+                        + '<td>' + (item.username || '-') + '</td>'
+                        + '<td>' + (item.displayName || '-') + '</td>'
+                        + '<td><span class="badge badge-info">' + (item.role || '-') + '</span></td>'
+                        + '<td>'
+                        +   '<select class="role-select" data-id="' + item.id + '">' + roleOptions(item.role) + '</select>'
+                        + '</td>'
+                        + '<td><button type="button" class="btn btn-sm btn-outline btn-edit" data-id="' + item.id + '" data-username="' + (item.username || '') + '">Sửa</button> <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="' + item.id + '">Xóa</button></td>'
+                        + '<td><button type="button" class="btn btn-sm btn-outline btn-view" data-id="' + item.id + '">Xem đầy đủ</button></td>'
+                        + '</tr>';
+                }).join('');
+
+                bindRowEvents();
+            }
+
+            function line(label, value) {
+                return '<p style="margin:6px 0;"><strong>' + label + ':</strong> ' + (value == null || value === '' ? '-' : value) + '</p>';
+            }
+
+            function renderProfile(profile) {
+                profileContent.innerHTML = ''
+                    + line('ID tài khoản', profile.id)
+                    + line('Tài khoản', profile.username)
+                    + line('Vai trò', profile.role)
+                    + line('Loại hồ sơ', profile.profileType)
+                    + line('Họ tên', profile.fullName)
+                    + line('Email', profile.email)
+                    + line('Số điện thoại', profile.phone)
+                    + line('Địa chỉ', profile.address)
+                    + line('Tuổi', profile.age)
+                    + line('Giới tính', profile.gender)
+                    + line('CCCD', profile.cccd)
+                    + line('Chức danh', profile.title)
+                    + line('Chuyên khoa', profile.specialty)
+                    + line('Phòng khám', profile.room);
+            }
+
+            function loadAccounts() {
+                return apiJson('/api/admin/accounts')
+                    .then(function(data) {
+                        allAccounts = data || [];
+                        renderRows(allAccounts);
+                    })
+                    .catch(function(err) {
+                        accountBody.innerHTML = '<tr><td colspan="7" class="text-danger">' + (err.message || 'Tải dữ liệu thất bại') + '</td></tr>';
+                    });
+            }
+
+            searchInput.addEventListener('input', function() {
+                var q = (searchInput.value || '').trim().toLowerCase();
+                if (!q) {
+                    renderRows(allAccounts);
+                    return;
+                }
+                var filtered = allAccounts.filter(function(item) {
+                    return (item.username || '').toLowerCase().includes(q)
+                        || (item.displayName || '').toLowerCase().includes(q)
+                        || (item.role || '').toLowerCase().includes(q)
+                        || String(item.id || '').includes(q);
+                });
+                renderRows(filtered);
+            });
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+            document.getElementById('profile-close').addEventListener('click', closeModal);
+            document.getElementById('profile-close-2').addEventListener('click', closeModal);
+            modal.querySelector('.modal-overlay').addEventListener('click', closeModal);
+
+            createForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var username = document.getElementById('new-username').value.trim();
+                var password = document.getElementById('new-password').value;
+                var role = document.getElementById('new-role').value;
+
+                apiJson('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: password, role: role })
+                }).then(function(res) {
+                    if (!res.success) {
+                        throw new Error(res.message || 'Tạo tài khoản thất bại');
+                    }
+                    alert('Đã tạo tài khoản mới thành công');
+                    createForm.reset();
+                    return loadAccounts();
+                }).catch(function(err) {
+                    alert(err.message || 'Tạo tài khoản thất bại');
+                });
+            });
+
+            var editModal = document.getElementById('edit-modal');
+            var editForm = document.getElementById('edit-form');
+            var editId = document.getElementById('edit-id');
+            var editUsername = document.getElementById('edit-username');
+            var editPassword = document.getElementById('edit-password');
+
+            function closeEditModal() {
+                editModal.style.display = 'none';
+                editForm.reset();
+            }
+            document.getElementById('edit-close').addEventListener('click', closeEditModal);
+            document.getElementById('edit-close-2').addEventListener('click', closeEditModal);
+            editModal.querySelector('.modal-overlay').addEventListener('click', closeEditModal);
+
+            document.getElementById('edit-submit').addEventListener('click', function() {
+                var userId = editId.value;
+                var username = editUsername.value.trim();
+                var password = editPassword.value.trim();
+
+                if (!username) {
+                    alert('Vui lòng nhập tài khoản');
+                    return;
+                }
+
+                var body = { username: username };
+                if (password) {
+                    body.password = password;
+                }
+
+                apiJson('/api/admin/accounts/' + encodeURIComponent(userId), {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                }).then(function(res) {
+                    if (!res.success) {
+                        throw new Error(res.message || 'Cập nhật tài khoản thất bại');
+                    }
+                    alert('Đã cập nhật tài khoản thành công');
+                    closeEditModal();
+                    return loadAccounts();
+                }).catch(function(err) {
+                    alert(err.message || 'Cập nhật tài khoản thất bại');
+                });
+            });
+
+            function bindRowEvents() {
+                Array.prototype.forEach.call(document.querySelectorAll('.role-select'), function(el) {
+                    el.addEventListener('change', function() {
+                        var userId = el.getAttribute('data-id');
+                        var newRole = el.value;
+                        apiJson('/api/admin/accounts/' + encodeURIComponent(userId) + '/role', {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ role: newRole })
+                        }).then(function(res) {
+                            if (!res.success) {
+                                throw new Error(res.message || 'Cập nhật vai trò thất bại');
+                            }
+                            alert('Đã cập nhật vai trò thành công. Trang sẽ tải lại để kiểm tra quyền.');
+                            window.location.reload();
+                        }).catch(function(err) {
+                            alert(err.message || 'Cập nhật vai trò thất bại');
+                            renderRows(allAccounts);
+                        });
+                    });
+                });
+
+                Array.prototype.forEach.call(document.querySelectorAll('.btn-edit'), function(el) {
+                    el.addEventListener('click', function() {
+                        var userId = el.getAttribute('data-id');
+                        var username = el.getAttribute('data-username');
+                        editId.value = userId;
+                        editUsername.value = username;
+                        editPassword.value = '';
+                        editModal.style.display = 'flex';
+                    });
+                });
+
+                Array.prototype.forEach.call(document.querySelectorAll('.btn-delete'), function(el) {
+                    el.addEventListener('click', function() {
+                        var userId = el.getAttribute('data-id');
+                        var username = el.getAttribute('data-username') || 'ID ' + userId;
+                        if (confirm('Bạn chắc chắn muốn xóa tài khoản "' + username + '" không?')) {
+                            apiJson('/api/admin/accounts/' + encodeURIComponent(userId), {
+                                method: 'DELETE'
+                            }).then(function(res) {
+                                if (!res.success) {
+                                    throw new Error(res.message || 'Xóa tài khoản thất bại');
+                                }
+                                alert('Đã xóa tài khoản thành công');
+                                return loadAccounts();
+                            }).catch(function(err) {
+                                alert(err.message || 'Xóa tài khoản thất bại');
+                            });
+                        }
+                    });
+                });
+
+                Array.prototype.forEach.call(document.querySelectorAll('.btn-view'), function(el) {
+                    el.addEventListener('click', function() {
+                        var userId = el.getAttribute('data-id');
+                        apiJson('/api/admin/accounts/' + encodeURIComponent(userId) + '/profile')
+                            .then(function(profile) {
+                                renderProfile(profile);
+                                modal.style.display = 'flex';
+                            })
+                            .catch(function(err) {
+                                alert(err.message || 'Không tải được thông tin cá nhân');
+                            });
+                    });
+                });
+            }
+
+            loadAccounts();
+        })();
+    </script>
+</body>
+</html>

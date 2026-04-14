@@ -2,6 +2,7 @@ package com.example.webapp.controller;
 
 import com.example.webapp.entity.BenhNhan;
 import com.example.webapp.service.BenhNhanService;
+import com.example.webapp.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,9 @@ import java.util.Optional;
 public class BenhNhanController {
     @Autowired
     private BenhNhanService patientService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping
     public List<BenhNhan> getAllPatients() {
@@ -46,10 +50,38 @@ public class BenhNhanController {
         Optional<BenhNhan> current = patientService.getPatientByTaiKhoan(account);
 
         patient.setTaiKhoan(account);
+
         if (current.isPresent()) {
+            // Profile already exists, just update it
             return patientService.updatePatient(current.get().getId(), patient);
         }
-        return patientService.savePatient(patient);
+
+        // First time creating profile, save it and send welcome email
+        var saved = patientService.savePatient(patient);
+
+        // Send welcome email only when required profile fields are completed.
+        if (isProfileCompleted(patient)) {
+            boolean sent = emailService.sendRegistrationSuccessEmail(account, patient.getFullname());
+            if (!sent) {
+                System.err.println("Failed to send welcome email to: " + account);
+            }
+        }
+
+        return saved;
+    }
+
+    private boolean isProfileCompleted(BenhNhan patient) {
+        return patient != null
+                && hasText(patient.getFullname())
+                && hasText(patient.getGender())
+                && hasText(patient.getCccd())
+                && hasText(patient.getPhone())
+                && hasText(patient.getAddress())
+                && patient.getAge() != null;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     @DeleteMapping("/{id}")

@@ -10,14 +10,14 @@
     <aside class="sidebar">
         <div class="sidebar-header"><span class="logo">Admin</span></div>
         <nav class="sidebar-nav">
-            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Dashboard</a>
+            <a href="/admin/trangquantri.html"><span class="icon">📊</span> Bảng điều khiển</a>
             <a href="/admin/khachhang.html" class="active"><span class="icon">👥</span> Quản lý khách hàng</a>
+            <a href="/admin/taikhoan.html"><span class="icon">🔐</span> Quản lý tài khoản</a>
             <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
             <a href="/admin/bacsi.html"><span class="icon">🩺</span> Quản lý bác sĩ</a>
             <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
             <a href="/admin/phongkham.html">Quản lý phòng khám</a>
             <a href="/admin/dichvu.html"><span class="icon">📋</span> Quản lý dịch vụ</a>
-            <a href="/admin/baocao.html"><span class="icon">📈</span> Thống kê & báo cáo</a>
         </nav>
     </aside>
     <main class="main-area">
@@ -51,7 +51,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="8" class="text-muted">Dang tai du lieu...</td>
+                                    <td colspan="8" class="text-muted">Đang tải dữ liệu...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -72,7 +72,7 @@
 
             function renderRows(list) {
                 if (!list || !list.length) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-muted">Chua co benh nhan.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-muted">Chưa có bệnh nhân.</td></tr>';
                     return;
                 }
 
@@ -94,7 +94,7 @@
                 allPatients = data || [];
                 renderRows(allPatients);
             }).catch(function(err) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-danger">' + (err.message || 'Tai du lieu that bai') + '</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-danger">' + (err.message || 'Tải dữ liệu thất bại') + '</td></tr>';
             });
 
             searchInput.addEventListener('input', function() {
@@ -116,4 +116,5 @@
     </script>
 </body>
 </html>
+
 
