@@ -293,7 +293,8 @@ function setupFlyInAnimations() {
         ".landing-page .doctor-card",
         ".landing-page .hero-inner",
         ".landing-page .hotline-inner",
-        ".landing-page .footer-grid"
+        ".landing-page .site-footer-main",
+        ".landing-page .site-footer-bottom"
     ];
 
     var all = document.querySelectorAll(selectors.join(","));

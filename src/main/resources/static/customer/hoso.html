@@ -1,462 +1,296 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thông tin cá nhân - PHÒNG KHÁM PHENIKAAMEC</title>
-    <link rel="stylesheet" href="/css/kieu.css">
-    <style>
-        :root {
-            --primary: #0d6efd;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thông tin cá nhân - TT Care+</title>
+    <link rel="stylesheet" href="/css/kieu.css" />
+  </head>
+  <body class="customer-layout">
+    <header class="customer-header">
+      <a href="/customer/trangchu.html" class="brand"><img src="/images/logo1.jpg" alt="TT Care+" style="height:36px;vertical-align:middle;margin-right:8px">TT Care+</a>
+      <nav>
+        <a href="/customer/trangchu.html">Trang chủ</a>
+        <a href="/customer/khoa.html">Chuyên khoa</a>
+        <a href="/customer/bacsi.html">Bác sĩ</a>
+        <a href="/customer/datlich.html">Đặt lịch</a>
+        <a href="/customer/lichcuatoi.html">Lịch khám</a>
+        <a href="/customer/hoso.html">Thông tin cá nhân</a>
+        <span class="text-muted" id="user-name"></span>
+        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
+      </nav>
+    </header>
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            font-family: Inter, Arial, Helvetica, sans-serif;
-            background: #e3f2fd;
-        }
+    <div class="customer-content profile-page">
+      <div class="profile-layout">
+        <aside class="profile-sidebar">
+          <nav class="profile-menu">
+            <a href="/customer/hoso.html" class="active">Thông tin cá nhân</a>
+            <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="#">Đánh giá</a>
+            <a href="#" onclick="logout(); return false;">Đăng xuất</a>
+          </nav>
+        </aside>
 
-        .frame {
-            width: calc(100% - 40px);
-            max-width: 1440px;
-            height: calc(100vh - 40px);
-            max-height: 920px;
-            margin: 20px auto;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(2, 6, 23, 0.15);
-            display: flex;
-            overflow: hidden;
-        }
+        <main class="profile-main">
+          <h1 class="page-title" id="page-title">Thông tin cá nhân</h1>
+          <p class="page-subtitle" id="page-subtitle">Cập nhật hồ sơ để hệ thống hỗ trợ bạn tốt hơn.</p>
 
-        .left {
-            width: 52%;
-            padding: 26px 42px 28px;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: flex-start;
-            gap: 14px;
-            overflow-y: auto;
-        }
-
-        .topbar-mini {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: #111;
-            font-size: 20px;
-            text-decoration: none;
-        }
-
-        .logo img {
-            height: 36px;
-        }
-
-        .user-mini {
-            font-size: 14px;
-            color: #4b5563;
-            text-align: right;
-        }
-
-        .card-modern {
-            width: 100%;
-            max-width: 720px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
-            overflow: hidden;
-            background: #fff;
-        }
-
-        .card-header-modern {
-            padding: 28px 34px 12px;
-            background: transparent;
-        }
-
-        .card-title {
-            font-size: 28px;
-            margin: 0 0 6px;
-            color: #111;
-            font-weight: 700;
-        }
-
-        .card-desc {
-            margin: 0;
-            color: #6b7280;
-        }
-
-        .card-body-modern {
-            padding: 10px 34px 24px;
-            background: #fff;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            color: #495057;
-            margin-bottom: 6px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="number"],
-        select {
-            width: 100%;
-            height: 48px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 1px solid #e6e9ef;
-            font-size: 15px;
-            box-sizing: border-box;
-            background: #fff;
-        }
-
-        #email {
-            background: #f1f5f9;
-        }
-
-        .btn-primary-custom {
-            display: inline-block;
-            width: 100%;
-            height: 48px;
-            background: var(--primary);
-            color: #fff;
-            border: 0;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .right {
-            width: 48%;
-            position: relative;
-            display: block;
-        }
-
-        .hero-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(13, 110, 253, 0.78) 0%, rgba(13, 110, 253, 0.55) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            padding: 32px;
-        }
-
-        .overlay h2 {
-            font-size: 34px;
-            margin: 0 0 12px;
-        }
-
-        .small {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .stats {
-            display: flex;
-            gap: 24px;
-            margin-top: 16px;
-            justify-content: center;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat .n {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .enter-left {
-            opacity: 0;
-            transform: translateX(-40px);
-            animation: enterLeft 2.2s ease-out forwards;
-        }
-
-        .enter-card {
-            opacity: 0;
-            transform: translateY(24px);
-            animation: enterUp 2.4s ease-out 0.15s forwards;
-        }
-
-        .enter-right {
-            opacity: 0;
-            transform: translateX(48px);
-            animation: enterRight 2.6s ease-out 0.2s forwards;
-        }
-
-        @keyframes enterLeft {
-            from { opacity: 0; transform: translateX(-40px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes enterRight {
-            from { opacity: 0; transform: translateX(48px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes enterUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 1000px) {
-            .frame {
-                flex-direction: column;
-                height: auto;
-                max-height: none;
-            }
-
-            .left,
-            .right {
-                width: 100%;
-            }
-
-            .left {
-                padding: 20px 16px;
-                overflow: visible;
-            }
-
-            .right {
-                min-height: 320px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="frame">
-        <div class="left enter-left">
-            <div class="topbar-mini">
-                <a class="logo" href="/customer/trangchu.html">
-                    <img src="/images/logo.png" alt="PHÒNG KHÁM PHENIKAAMEC">
-                    <span>PHÒNG KHÁM PHENIKAAMEC</span>
-                </a>
-                <div class="user-mini">
-                    <div id="user-name"></div>
-                    <button type="button" class="btn" onclick="logout()">Đăng xuất</button>
+          <div class="card booking-form-wrap">
+            <div class="card-header">Hồ sơ cá nhân</div>
+            <div class="card-body">
+              <form id="profile-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Họ tên *</label>
+                    <input type="text" id="fullname" placeholder="Nhập họ và tên" required />
+                  </div>
+                  <div class="form-group">
+                    <label>Tuổi *</label>
+                    <input type="number" id="age" placeholder="Ví dụ: 25" min="1" max="120" />
+                  </div>
                 </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Giới tính *</label>
+                    <select id="gender">
+                      <option value="">-- Chọn --</option>
+                      <option value="male">Nam</option>
+                      <option value="female">Nữ</option>
+                      <option value="other">Khác</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>CCCD/CMND *</label>
+                    <input type="text" id="cccd" placeholder="Nhập số CCCD/CMND" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Số điện thoại *</label>
+                    <input type="tel" id="phone" placeholder="Ví dụ: 0901234567" required />
+                  </div>
+                  <div class="form-group">
+                    <label>Email đăng ký</label>
+                    <input type="email" id="email" readonly />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Địa chỉ *</label>
+                  <input type="text" id="address" placeholder="Nhập địa chỉ liên hệ" />
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                  <button type="button" class="btn btn-outline" onclick="window.location.href='/customer/trangchu.html'">Về trang chủ</button>
+                </div>
+              </form>
             </div>
-
-            <div class="card-modern enter-card">
-                <div class="card-header-modern">
-                    <h1 class="card-title" id="page-title">Thông tin cá nhân</h1>
-                    <p class="card-desc" id="page-subtitle">Cập nhật hồ sơ để hệ thống hỗ trợ bạn tốt hơn.</p>
-                </div>
-                <div class="card-body-modern">
-                    <form id="profile-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Họ tên *</label>
-                                <input type="text" id="fullname" placeholder="Nhập họ và tên" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Tuổi *</label>
-                                <input type="number" id="age" placeholder="Ví dụ: 25" min="1" max="120">
-                            </div>
-                            <div class="form-group">
-                                <label>Giới tính *</label>
-                                <select id="gender">
-                                    <option value="">-- Chọn --</option>
-                                    <option value="male">Nam</option>
-                                    <option value="female">Nữ</option>
-                                    <option value="other">Khác</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>CCCD/CMND *</label>
-                                <input type="text" id="cccd" placeholder="Nhập số CCCD/CMND">
-                            </div>
-                            <div class="form-group">
-                                <label>Số điện thoại *</label>
-                                <input type="tel" id="phone" placeholder="Ví dụ: 0901234567" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email đăng ký</label>
-                                <input type="email" id="email" readonly>
-                            </div>
-                            <div class="form-group full">
-                                <label>Địa chỉ *</label>
-                                <input type="text" id="address" placeholder="Nhập địa chỉ liên hệ">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-primary-custom">Lưu thông tin</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="right enter-right">
-            <img class="hero-img" src="https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=1600&auto=format&fit=crop" alt="Healthcare" />
-            <div class="overlay">
-                <div style="max-width:520px;text-align:center">
-                    <h2>Hoàn thiện hồ sơ để bắt đầu đặt lịch</h2>
-                    <p class="small">Thông tin chính xác giúp bác sĩ tư vấn nhanh hơn và hệ thống gửi thông báo đầy đủ cho bạn.</p>
-                    <div class="stats" role="list">
-                        <div class="stat"><div class="n">24/7</div><div class="small">Đặt lịch</div></div>
-                        <div class="stat"><div class="n">Nhanh</div><div class="small">Xác nhận</div></div>
-                        <div class="stat"><div class="n">An toàn</div><div class="small">Dữ liệu</div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+          </div>
+        </main>
+      </div>
     </div>
+
+    <footer class="site-footer">
+      <div class="site-footer-main">
+        <div class="site-footer-col">
+          <a href="/customer/trangchu.html" class="site-footer-brand">
+            <img src="/images/logo1.jpg" alt="TT Care+" class="site-footer-logo" />
+            <span>TT Care+</span>
+          </a>
+          <p class="site-footer-desc">TT Care+ là nền tảng phòng khám giúp người bệnh đặt lịch nhanh, theo dõi hồ sơ và kết nối bác sĩ chuyên khoa minh bạch, thuận tiện mỗi ngày.</p>
+          <div class="site-footer-social" aria-label="Mạng xã hội TT Care+">
+            <a href="#" class="social-link" aria-label="Facebook">f</a>
+            <a href="#" class="social-link" aria-label="Twitter">x</a>
+            <a href="#" class="social-link" aria-label="YouTube">yt</a>
+            <a href="#" class="social-link" aria-label="LinkedIn">in</a>
+          </div>
+        </div>
+
+        <div class="site-footer-col">
+          <h4>Liên kết hữu ích</h4>
+          <ul class="site-footer-links">
+            <li><a href="/customer/trangchu.html#tai-sao-chon">Về chúng tôi</a></li>
+            <li><a href="/customer/datlich.html">Dịch vụ</a></li>
+            <li><a href="/customer/khoa.html">Dự án / Sản phẩm</a></li>
+            <li><a href="/customer/trangchu.html#chuyen-khoa">Blog / Tin tức</a></li>
+            <li><a href="/customer/trangchu.html#lien-he">Liên hệ</a></li>
+          </ul>
+        </div>
+
+        <div class="site-footer-col">
+          <h4>Hỗ trợ khách hàng</h4>
+          <ul class="site-footer-links">
+            <li><a href="#">Câu hỏi thường gặp (FAQ)</a></li>
+            <li><a href="#">Chính sách bảo hành</a></li>
+            <li><a href="#">Chính sách đổi trả</a></li>
+            <li><a href="#">Chính sách vận chuyển</a></li>
+            <li><a href="#">Hướng dẫn mua hàng</a></li>
+          </ul>
+        </div>
+
+        <div class="site-footer-col">
+          <h4>Thông tin liên hệ</h4>
+          <ul class="site-footer-contact">
+            <li>Địa chỉ: Yên Nghĩa, Hà Đông, Hà Nội</li>
+            <li>Email: <a href="mailto:support@example.com">support@example.com</a></li>
+            <li>Hotline: <a href="tel:19001234">1900 1234</a></li>
+            <li>Giờ làm việc: Thứ 2 - Thứ 7 (8h00 - 17h00)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="site-footer-bottom">
+        <div class="site-footer-bottom-inner">
+          <div class="site-footer-copy">© 2025 TT Care+. All rights reserved.</div>
+          <div class="site-footer-payments" aria-label="Phương thức thanh toán chấp nhận">
+            <span class="payment-badge">Visa</span>
+            <span class="payment-badge">Mastercard</span>
+            <span class="payment-badge">MoMo</span>
+            <span class="payment-badge">VNPay</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
     <script src="/js/xacthuc.js"></script>
     <script>
-        (function() {
-            var user = requireAuth(['patient']);
-            var setupMode = isProfileSetupRequiredForCurrentUser()
-                || new URLSearchParams(window.location.search).get('setup') === '1';
-            var account = (user && (user.username || user.email) ? (user.username || user.email) : '').trim();
-            var pageTitle = document.getElementById('page-title');
-            var pageSubtitle = document.getElementById('page-subtitle');
+      (function () {
+        var user = requireAuth(["customer"]);
+        if (!user) return;
 
-            if (setupMode) {
-                if (pageTitle) pageTitle.textContent = 'Hoàn thiện thông tin cá nhân';
-                if (pageSubtitle) pageSubtitle.textContent = 'Vui lòng nhập đầy đủ thông tin trước khi sử dụng hệ thống.';
-            }
+        var setupMode =
+          isProfileSetupRequiredForCurrentUser() ||
+          new URLSearchParams(window.location.search).get("setup") === "1";
+        var account = (user.username || user.email || "").trim();
 
-            function formPayload() {
-                return {
-                    fullname: document.getElementById('fullname').value.trim(),
-                    age: document.getElementById('age').value ? Number(document.getElementById('age').value) : null,
-                    gender: document.getElementById('gender').value || null,
-                    cccd: document.getElementById('cccd').value.trim() || null,
-                    phone: document.getElementById('phone').value.trim() || null,
-                    address: document.getElementById('address').value.trim() || null,
-                    taiKhoan: account || null,
-                };
-            }
+        var pageTitle = document.getElementById("page-title");
+        var pageSubtitle = document.getElementById("page-subtitle");
 
-            function applyProfile(profile) {
-                if (!profile) return;
-                if (profile.id) user.patientId = profile.id;
-                if (profile.fullname) user.name = profile.fullname;
-                if (profile.phone) user.phone = profile.phone;
-                setCurrentUser(user);
+        if (setupMode) {
+          pageTitle.textContent = "Hoàn thiện thông tin cá nhân";
+          pageSubtitle.textContent =
+            "Vui lòng nhập đầy đủ thông tin trước khi sử dụng hệ thống.";
+        }
 
-                document.getElementById('fullname').value = profile.fullname || user.name || '';
-                document.getElementById('age').value = profile.age || '';
-                document.getElementById('gender').value = profile.gender || '';
-                document.getElementById('cccd').value = profile.cccd || '';
-                document.getElementById('phone').value = profile.phone || user.phone || '';
-                document.getElementById('address').value = profile.address || '';
-                document.getElementById('user-name').textContent = user.name || user.email || '';
-            }
+        function formPayload() {
+          return {
+            fullname: document.getElementById("fullname").value.trim(),
+            age: document.getElementById("age").value
+              ? Number(document.getElementById("age").value)
+              : null,
+            gender: document.getElementById("gender").value || null,
+            cccd: document.getElementById("cccd").value.trim() || null,
+            phone: document.getElementById("phone").value.trim() || null,
+            address: document.getElementById("address").value.trim() || null,
+            taiKhoan: account || null,
+          };
+        }
 
-            async function loadProfileFromDb() {
-                if (!account) return;
-                var profile = await apiJson('/api/patients/by-account?account=' + encodeURIComponent(account));
-                if (profile && profile.id) {
-                    applyProfile(profile);
+        function applyProfile(profile) {
+          if (!profile) return;
+          if (profile.id) user.patientId = profile.id;
+          if (profile.fullname) user.name = profile.fullname;
+          if (profile.phone) user.phone = profile.phone;
+          setCurrentUser(user);
+
+          document.getElementById("fullname").value =
+            profile.fullname || user.name || "";
+          document.getElementById("age").value = profile.age || "";
+          document.getElementById("gender").value = profile.gender || "";
+          document.getElementById("cccd").value = profile.cccd || "";
+          document.getElementById("phone").value =
+            profile.phone || user.phone || "";
+          document.getElementById("address").value = profile.address || "";
+          document.getElementById("user-name").textContent =
+            user.name || user.email || "";
+        }
+
+        async function loadProfileFromDb() {
+          if (!account) return;
+          var profile = await apiJson(
+            "/api/patients/by-account?account=" + encodeURIComponent(account)
+          );
+          if (profile && profile.id) {
+            applyProfile(profile);
+          }
+        }
+
+        document.getElementById("user-name").textContent =
+          user.name || user.email || "";
+        document.getElementById("email").value = user.email || "";
+        document.getElementById("fullname").value = user.name || "";
+        if (user.phone) document.getElementById("phone").value = user.phone;
+
+        document
+          .getElementById("profile-form")
+          .addEventListener("submit", async function (e) {
+            e.preventDefault();
+            try {
+              var payload = formPayload();
+
+              if (setupMode) {
+                var missing = [];
+                if (!payload.fullname) missing.push("Họ tên");
+                if (!payload.age) missing.push("Tuổi");
+                if (!payload.gender) missing.push("Giới tính");
+                if (!payload.cccd) missing.push("CCCD/CMND");
+                if (!payload.phone) missing.push("Số điện thoại");
+                if (!payload.address) missing.push("Địa chỉ");
+
+                if (missing.length) {
+                  alert("Vui lòng nhập đầy đủ thông tin: " + missing.join(", "));
+                  return;
                 }
+              }
+
+              var saved;
+              if (user.patientId) {
+                saved = await apiJson(
+                  "/api/patients/" + encodeURIComponent(user.patientId),
+                  {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                  }
+                );
+              } else {
+                var upsertUrl = account
+                  ? "/api/patients/upsert-by-account?account=" +
+                    encodeURIComponent(account)
+                  : "/api/patients";
+                saved = await apiJson(upsertUrl, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+              }
+
+              applyProfile(saved);
+              clearProfileSetupRequirement(account || user.username || user.email);
+
+              if (setupMode) {
+                alert("Hoàn tất thông tin cá nhân thành công.");
+                setupMode = false;
+                pageTitle.textContent = "Thông tin cá nhân";
+                pageSubtitle.textContent =
+                  "Cập nhật hồ sơ để hệ thống hỗ trợ bạn tốt hơn.";
+                return;
+              }
+
+              alert("Đã lưu thông tin cơ bản vào hệ thống.");
+            } catch (err) {
+              alert(err.message || "Lưu hồ sơ thất bại");
             }
+          });
 
-            if (user) {
-                document.getElementById('user-name').textContent = user.name || user.email || '';
-                document.getElementById('email').value = user.email || '';
-                document.getElementById('fullname').value = user.name || '';
-                if (user.phone) document.getElementById('phone').value = user.phone;
-            }
-            document.getElementById('profile-form').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                if (!user) return;
-
-                try {
-                    var payload = formPayload();
-
-                    if (setupMode) {
-                        var missing = [];
-                        if (!payload.fullname) missing.push('Họ tên');
-                        if (!payload.age) missing.push('Tuổi');
-                        if (!payload.gender) missing.push('Giới tính');
-                        if (!payload.cccd) missing.push('CCCD/CMND');
-                        if (!payload.phone) missing.push('Số điện thoại');
-                        if (!payload.address) missing.push('Địa chỉ');
-
-                        if (missing.length) {
-                            alert('Vui lòng nhập đầy đủ thông tin: ' + missing.join(', '));
-                            return;
-                        }
-                    }
-
-                    var saved;
-
-                    if (user.patientId) {
-                        saved = await apiJson('/api/patients/' + encodeURIComponent(user.patientId), {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload),
-                        });
-                    } else {
-                        var upsertUrl = account
-                            ? '/api/patients/upsert-by-account?account=' + encodeURIComponent(account)
-                            : '/api/patients';
-                        saved = await apiJson(upsertUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload),
-                        });
-                    }
-
-                    applyProfile(saved);
-                    clearProfileSetupRequirement(account || user.username || user.email);
-
-                    if (setupMode) {
-                        alert('Hoàn tất thông tin cá nhân thành công. Hệ thống sẽ chuyển về trang chủ.');
-                        window.location.href = '/customer/trangchu.html';
-                        return;
-                    }
-
-                    alert('Da luu thong tin co ban vao he thong.');
-                } catch (err) {
-                    alert(err.message || 'Luu ho so that bai');
-                }
-            });
-
-            loadProfileFromDb().catch(function() {
-                // Khong co profile trong DB thi van hien localStorage va tao khi luu.
-            });
-
-        })();
+        loadProfileFromDb().catch(function () {
+          // Không có profile trong DB thì vẫn hiển thị localStorage và tạo khi lưu.
+        });
+      })();
     </script>
-</body>
+  </body>
 </html>
-
-

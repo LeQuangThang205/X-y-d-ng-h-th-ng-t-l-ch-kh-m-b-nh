@@ -21,7 +21,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    @Value("${app.mail.reply-to:support@phenikaamec.vn}")
+    @Value("${app.mail.reply-to:support@ttcare.vn}")
     private String replyToEmail;
 
     public boolean sendRegistrationSuccessEmail(String toEmail, String customerName) {
@@ -35,7 +35,7 @@ public class EmailService {
             message.setFrom(fromEmail);
             message.setReplyTo(replyToEmail);
             message.setTo(toEmail);
-            message.setSubject("Xác nhận đăng ký thành công - Phòng khám PhenikaaMEC");
+            message.setSubject("Xác nhận đăng ký thành công - TT Care+");
 
             String body = buildRegistrationEmailBody(customerName);
             message.setText(body);
@@ -56,16 +56,16 @@ public class EmailService {
         String displayName = customerName != null && !customerName.trim().isEmpty() ? customerName : "khách hàng";
 
         return "Xin chào " + displayName + ",\n\n" +
-                "Chúc mừng bạn đã đăng ký tài khoản thành công trên hệ thống đặt lịch khám bệnh trực tuyến của Phòng khám PhenikaaMEC.\n\n"
+                "Chúc mừng bạn đã đăng ký tài khoản thành công trên hệ thống đặt lịch khám bệnh trực tuyến của TT Care+.\n\n"
                 +
                 "Từ bây giờ, bạn có thể:\n" +
                 "- Đăng nhập để quản lý thông tin cá nhân.\n" +
                 "- Đặt lịch khám bệnh nhanh chóng và thuận tiện.\n" +
                 "- Theo dõi lịch sử khám và kết quả xét nghiệm.\n\n" +
-                "Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại: 0123 456 789 hoặc email: support@phenikaamec.vn.\n\n"
+                "Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại: 0123 456 789 hoặc email: support@ttcare.vn.\n\n"
                 +
                 "Cảm ơn bạn đã tin tưởng và lựa chọn dịch vụ của chúng tôi.\n\n" +
                 "Trân trọng,\n" +
-                "Phòng khám PhenikaaMEC";
+                "TT Care+";
     }
 }
