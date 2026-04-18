@@ -13,12 +13,15 @@
         <a href="/customer/trangchu.html">Trang chủ</a>
         <a href="/customer/khoa.html">Chuyên khoa</a>
         <a href="/customer/bacsi.html">Bác sĩ</a>
+        <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
         <a href="/customer/datlich.html">Đặt lịch</a>
         <a href="/customer/lichcuatoi.html">Lịch khám</a>
-        <a href="/customer/hoso.html">Thông tin cá nhân</a>
-        <span class="text-muted" id="user-name"></span>
-        <button type="button" class="btn btn-sm" onclick="logout()">Đăng xuất</button>
+        <a href="#lien-he">Liên hệ</a>
       </nav>
+      <div class="header-actions">
+        <a href="/admin/dangnhap.html" class="btn btn-outline" id="header-auth-link">Đăng nhập</a>
+        <a href="/customer/datlich.html" class="btn btn-primary">Đặt lịch khám</a>
+      </div>
     </header>
 
     <div class="customer-content profile-page">
@@ -27,6 +30,7 @@
           <nav class="profile-menu">
             <a href="/customer/hoso.html" class="active">Thông tin cá nhân</a>
             <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
             <a href="#">Đánh giá</a>
             <a href="#" onclick="logout(); return false;">Đăng xuất</a>
           </nav>
@@ -116,7 +120,7 @@
             <li><a href="/customer/trangchu.html#tai-sao-chon">Về chúng tôi</a></li>
             <li><a href="/customer/datlich.html">Dịch vụ</a></li>
             <li><a href="/customer/khoa.html">Dự án / Sản phẩm</a></li>
-            <li><a href="/customer/trangchu.html#chuyen-khoa">Blog / Tin tức</a></li>
+            <li><a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a></li>
             <li><a href="/customer/trangchu.html#lien-he">Liên hệ</a></li>
           </ul>
         </div>
@@ -161,6 +165,7 @@
       (function () {
         var user = requireAuth(["customer"]);
         if (!user) return;
+        var headerUserName = document.getElementById("user-name");
 
         var setupMode =
           isProfileSetupRequiredForCurrentUser() ||
@@ -205,8 +210,9 @@
           document.getElementById("phone").value =
             profile.phone || user.phone || "";
           document.getElementById("address").value = profile.address || "";
-          document.getElementById("user-name").textContent =
-            user.name || user.email || "";
+          if (headerUserName) {
+            headerUserName.textContent = user.name || user.email || "";
+          }
         }
 
         async function loadProfileFromDb() {
@@ -219,8 +225,9 @@
           }
         }
 
-        document.getElementById("user-name").textContent =
-          user.name || user.email || "";
+        if (headerUserName) {
+          headerUserName.textContent = user.name || user.email || "";
+        }
         document.getElementById("email").value = user.email || "";
         document.getElementById("fullname").value = user.name || "";
         if (user.phone) document.getElementById("phone").value = user.phone;

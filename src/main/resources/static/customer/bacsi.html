@@ -13,22 +13,25 @@
         <a href="/customer/trangchu.html">Trang chủ</a>
         <a href="/customer/khoa.html">Chuyên khoa</a>
         <a href="/customer/bacsi.html">Bác sĩ</a>
+        <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
         <a href="/customer/datlich.html">Đặt lịch</a>
         <a href="/customer/lichcuatoi.html">Lịch khám</a>
-        <a href="/customer/hoso.html">Thông tin cá nhân</a>
-        <span class="text-muted" id="user-name"></span>
-        <a href="/admin/dangnhap.html" class="btn btn-sm" id="header-auth-link">Đăng nhập</a>
+        <a href="#lien-he">Liên hệ</a>
       </nav>
+      <div class="header-actions">
+        <a href="/admin/dangnhap.html" class="btn btn-outline" id="header-auth-link">Đăng nhập</a>
+        <a href="/customer/datlich.html" class="btn btn-primary">Đặt lịch khám</a>
+      </div>
     </header>
     <div class="customer-content profile-page">
       <div class="profile-layout">
         <aside class="profile-sidebar">
             <nav class="profile-menu">
-            <a href="/customer/hoso.html">Trang chủ</a>
-            <a href="/customer/hoso.html">Chuyên khoa</a>
-
+            <a href="/customer/trangchu.html">Trang chủ</a>
+            <a href="/customer/khoa.html">Chuyên khoa</a>
             <a href="/customer/hoso.html">Thông tin cá nhân</a>
             <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
             <a href="#">Đánh giá</a>
             <a href="#" onclick="logout(); return false;">Đăng xuất</a>
           </nav>
@@ -79,7 +82,7 @@
             <li><a href="/customer/trangchu.html#tai-sao-chon">Về chúng tôi</a></li>
             <li><a href="/customer/datlich.html">Dịch vụ</a></li>
             <li><a href="/customer/khoa.html">Dự án / Sản phẩm</a></li>
-            <li><a href="/customer/trangchu.html#chuyen-khoa">Blog / Tin tức</a></li>
+            <li><a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a></li>
             <li><a href="/customer/trangchu.html#lien-he">Liên hệ</a></li>
           </ul>
         </div>
@@ -122,22 +125,9 @@
     <script>
       (function () {
         var user = getCurrentUser();
-        var userNameEl = document.getElementById("user-name");
-        var authLink = document.getElementById("header-auth-link");
         if (user && normalizeRole(user.role) !== "customer") {
           redirectByRole(user.role);
           return;
-        }
-        if (user && userNameEl && authLink) {
-          userNameEl.textContent = user.name || user.email;
-          authLink.textContent = "Đăng xuất";
-          authLink.href = "#";
-          authLink.addEventListener("click", function (e) {
-            e.preventDefault();
-            logout();
-          });
-        } else if (userNameEl) {
-          userNameEl.style.display = "none";
         }
 
         var specSelect = document.getElementById("filter-spec");

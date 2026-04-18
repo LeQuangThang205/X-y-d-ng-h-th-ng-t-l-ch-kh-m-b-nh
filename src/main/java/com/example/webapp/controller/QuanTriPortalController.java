@@ -3,6 +3,8 @@ package com.example.webapp.controller;
 import com.example.webapp.entity.*;
 import com.example.webapp.repository.BacSiRepository;
 import com.example.webapp.repository.BenhNhanRepository;
+import com.example.webapp.repository.ChuyenKhoaRepository;
+import com.example.webapp.repository.PhongKhamRepository;
 import com.example.webapp.service.NguoiDungService;
 import com.example.webapp.service.DatLichKhamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,12 @@ public class QuanTriPortalController {
 
     @Autowired
     private BacSiRepository bacSiRepository;
+
+    @Autowired
+    private ChuyenKhoaRepository chuyenKhoaRepository;
+
+    @Autowired
+    private PhongKhamRepository phongKhamRepository;
 
     @GetMapping("/patients")
     public List<BenhNhan> patients() {
@@ -179,6 +187,86 @@ public class QuanTriPortalController {
         }).toList();
     }
 
+    @PostMapping("/accounts")
+    public Map<String, Object> createAccount(@RequestBody Map<String, String> req) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            String username = req.getOrDefault("username", "").trim();
+            String password = req.getOrDefault("password", "").trim();
+            String role = nguoiDungService.normalizeRole(req.getOrDefault("role", "customer"));
+
+            if (username.isEmpty()) {
+                throw new IllegalArgumentException("Tài khoản không được để trống");
+            }
+            if (password.length() < 6) {
+                throw new IllegalArgumentException("Mật khẩu phải có ít nhất 6 ký tự");
+            }
+            if (nguoiDungService.findByUsername(username).isPresent()) {
+                throw new IllegalArgumentException("Tài khoản đã tồn tại");
+            }
+
+            NguoiDung created = nguoiDungService.registerUser(username, password, role);
+
+            if ("customer".equals(role)) {
+                String fullName = req.getOrDefault("fullName", "").trim();
+                if (fullName.isEmpty()) {
+                    throw new IllegalArgumentException("Họ tên khách hàng không được để trống");
+                }
+
+                BenhNhan benhNhan = new BenhNhan();
+                benhNhan.setTaiKhoan(username);
+                benhNhan.setFullname(fullName);
+                benhNhan.setPhone(trimToNull(req.get("phone")));
+                benhNhan.setAddress(trimToNull(req.get("address")));
+                benhNhan.setGender(trimToNull(req.get("gender")));
+                benhNhan.setCccd(trimToNull(req.get("cccd")));
+
+                Integer age = parseIntegerNullable(req.get("age"));
+                benhNhan.setAge(age);
+                benhNhanRepository.save(benhNhan);
+            }
+
+            if ("doctor".equals(role)) {
+                String fullName = req.getOrDefault("fullName", "").trim();
+                if (fullName.isEmpty()) {
+                    throw new IllegalArgumentException("Họ tên bác sĩ không được để trống");
+                }
+
+                BacSi bacSi = new BacSi();
+                bacSi.setHoTen(fullName);
+                bacSi.setEmail(username);
+                bacSi.setSoDienThoai(trimToNull(req.get("phone")));
+                bacSi.setChucDanh(trimToNull(req.get("title")));
+
+                Long specialtyId = parseLongNullable(req.get("specialtyId"));
+                if (specialtyId != null) {
+                    ChuyenKhoa chuyenKhoa = chuyenKhoaRepository.findById(specialtyId)
+                            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy chuyên khoa"));
+                    bacSi.setChuyenKhoa(chuyenKhoa);
+                }
+
+                Long roomId = parseLongNullable(req.get("roomId"));
+                if (roomId != null) {
+                    PhongKham phongKham = phongKhamRepository.findById(roomId)
+                            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phòng khám"));
+                    bacSi.setPhongKham(phongKham);
+                }
+
+                bacSiRepository.save(bacSi);
+            }
+
+            res.put("success", true);
+            res.put("id", created.getId());
+            res.put("username", created.getUsername());
+            res.put("role", created.getRole());
+            res.put("message", "Đã tạo tài khoản thành công");
+        } catch (Exception ex) {
+            res.put("success", false);
+            res.put("message", ex.getMessage());
+        }
+        return res;
+    }
+
     @PatchMapping("/accounts/{userId}/role")
     public Map<String, Object> updateAccountRole(@PathVariable long userId, @RequestBody Map<String, String> req) {
         Map<String, Object> res = new HashMap<>();
@@ -300,6 +388,37 @@ public class QuanTriPortalController {
             return LocalTime.parse(input, DateTimeFormatter.ofPattern("H:mm:ss"));
         } catch (DateTimeParseException ex) {
             throw new IllegalArgumentException("Dinh dang gio khong hop le: " + value);
+        }
+    }
+
+    private String trimToNull(String value) {
+        if (value == null)
+            return null;
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private Integer parseIntegerNullable(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed == null) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(trimmed);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Tuổi không hợp lệ");
+        }
+    }
+
+    private Long parseLongNullable(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed == null) {
+            return null;
+        }
+        try {
+            return Long.valueOf(trimmed);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Giá trị ID không hợp lệ");
         }
     }
 

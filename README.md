@@ -1,104 +1,621 @@
-# Website quan ly dat lich kham - Benh vien A Thai Nguyen
+# TT Care+ - Hệ thống đặt lịch khám bệnh trực tuyến
 
-> Tai lieu giai thich cau truc giao dien (UI) va cach su dung nhanh. Toan bo noi dung bang tieng Viet khong dau de de dang dua vao cong cu AI ho tro.
+**TT Care+** là nền tảng web hiện đại dành cho bệnh viện, cho phép bệnh nhân đặt lịch khám trực tuyến một cách nhanh chóng và thuận tiện, đồng thời cung cấp bảng điều khiển quản lý toàn diện cho nhân viên bệnh viện.
 
-## 1. Tong quan ung dung
+## 📋 Mục lục
 
-- **Muc tieu**: Mo phong he thong dat lich kham benh online cho benh vien, gom 2 nhom nguoi dung chinh:
-  - **Khach hang**: dat lich, quan ly thong tin ca nhan, xem lich da dat.
-  - **Admin / Nhan vien le tan**: quan ly lich hen, khach hang, bac si, chuyen khoa, dich vu, bao cao thong ke.
-- **Cong nghe**: Spring Boot (backend), giao dien HTML / CSS tinh tai thu muc `src/main/resources/static`.
+- [Tổng quan dự án](#tổng-quan-dự-án)
+- [Tính năng chính](#tính-năng-chính)
+- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
+- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
+- [Hướng dẫn cài đặt](#hướng-dẫn-cài-đặt)
+- [Hướng dẫn sử dụng](#hướng-dẫn-sử-dụng)
+- [Các thực thể dữ liệu](#các-thực-thể-dữ-liệu)
+- [API chính](#api-chính)
+- [Hướng dẫn phát triển](#hướng-dẫn-phát-triển)
 
-## 2. Cau truc cac trang giao dien
+---
 
-### 2.1. Nhom khach hang (Frontend website)
+## 🎯 Tổng quan dự án
 
-- **Trang chu landing**: `trangchu.html`
-  - Header co logo benh vien, menu: Trang chu, Chuyen khoa, Bac si, Dich vu, Dat lich, Lien he.
-  - Hero section 2 cot: ben trai la tieu de lon "DAT LICH KHAM BENH ONLINE NHANH CHONG – TIEN LOI" va nut "Dat lich ngay", ben phai la hinh minh hoa bac si va benh nhan.
-  - Cac section tiep theo:
-    - Chuyen khoa noi bat (luoi card 4 cot).
-    - Bac si tieu bieu (luoi card bac si).
-    - Dich vu kham chua benh (grid 3x2).
-    - Hotline & ho tro.
-    - Footer 3 cot: thong tin benh vien, lien ket nhanh, thong tin lien he.
+**TT Care+** là một hệ thống quản lý lịch khám bệnh toàn diện với 3 nhóm người dùng chính:
 
-- **Trang dang nhap / dang ky**: `dangnhap.html`
-  - Card trung tam, chia 2 tab: "Dang nhap" va "Dang ky".
-  - Tab Dang nhap: email / so dien thoai, mat khau, checkbox "Ghi nho dang nhap", link "Quen mat khau", nut Dang nhap.
-  - Tab Dang ky: ho ten, so dien thoai, email, mat khau, xac nhan mat khau, nut Dang ky.
-  - Giao dien su dung mau xanh duong – trang, form bo goc va shadow nhe.
+### 👥 Nhóm người dùng
 
-- **Trang khach hang sau khi dang nhap**:
-  - `customer/trangchu.html`: trang chinh cua khach hang, header co menu, khu vuc thong ke nhanh (so lich sap toi, so lich da kham) va card "Thao tac nhanh" (dat lich moi, xem lich cua toi).
-  - `customer/hoso.html`: thong tin ca nhan, layout 2 cot (menu ben trai, noi dung ben phai). Co form chinh sua: ho ten, tuoi, gioi tinh, CCCD, so dien thoai, dia chi, email; ben duoi la bang lich su dat lich kham.
-  - `customer/khoa.html`: danh sach chuyen khoa (grid card), moi card co icon, ten chuyen khoa, mo ta ngan va nut "Dat lich kham".
-  - `customer/bacsi.html`: danh sach bac si, phia tren co thanh loc (dropdown chuyen khoa, thoi gian lam viec), ben duoi la card bac si (anh dai dien chu cai, ten, chuc danh, chuyen khoa).
-  - `customer/datlich.html`: form dat lich chia 2 nhom:
-    - Thong tin ca nhan: ho ten, tuoi, gioi tinh, CCCD, so dien thoai, dia chi.
-    - Thong tin kham benh: chuyen khoa, bac si, dich vu, ngay, khung gio, trieu chung co ban.
+1. **Khách hàng (Bệnh nhân)**
+   - Đặt lịch khám bệnh trực tuyến
+   - Quản lý thông tin cá nhân
+   - Xem lịch khám của mình
+   - Xem danh sách bác sĩ và chuyên khoa
+   - Nhận thông báo nhắc lịch
 
-### 2.2. Nhom admin / nhan vien le tan (Dashboard)
+2. **Bác sĩ**
+   - Xem lịch khám được phân công
+   - Quản lý thời gian làm việc
 
-- **Dashboard chinh**: `admin/trangquantri.html`
-  - Layout sidebar + noi dung chinh:
-    - Sidebar: Dashboard, Quan ly khach hang, Quan ly dat lich, Quan ly bac si, Quan ly chuyen khoa, Quan ly dich vu, Thong ke & bao cao.
-    - Noi dung: cac card thong ke nhanh (tong khach hang, lich kham hom nay, lich kham thang).
+3. **Quản trị viên / Nhân viên lễ tân**
+   - Quản lý toàn bộ lịch khám hẹn
+   - Quản lý thông tin bệnh nhân
+   - Quản lý danh sách bác sĩ
+   - Quản lý chuyên khoa và phòng khám
+   - Xem báo cáo và thống kê
 
-- **Quan ly dat lich**: `admin/lichhen.html`
-  - Bang danh sach lich kham, cac cot: Khach hang, Bac si, Chuyen khoa, Thoi gian, Trang thai, Thao tac.
-  - Nut hanh dong mo popup chi tiet lich kham (modal), trong modal co nut Xac nhan lich / Dong.
+### 🎨 Thiết kế giao diện
 
-- **Quan ly bac si**: `admin/bacsi.html`
-  - Su dung chung layout sidebar + main.
-  - Noi dung chinh duoc thiet ke de de dang bo sung bang danh sach va form them / sua bac si.
+- **Landing page**: Giới thiệu bệnh viện, quảng bá dịch vụ
+- **Giao diện khách hàng**: Thân thiện, dễ sử dụng, responsive
+- **Dashboard quản trị**: Chuyên nghiệp, hiện đại, đầy đủ chức năng
 
-- **Quan ly chuyen khoa**: `admin/khoa.html`
-  - Tuong tu quan ly bac si, dung bang danh sach de luu chuyen khoa, nut Them moi, Chinh sua, Xoa (co the bo sung sau).
+---
 
-- **Thong ke & bao cao**: `admin/baocao.html`
-  - Khu vuc card chua bieu do / chi so tong hop (co the tich hop chart JS sau).
+## ✨ Tính năng chính
 
-## 3. Giai thich cac thanh phan CSS chinh
+### 🔐 Xác thực & Phân quyền
 
-File style chinh: `src/main/resources/static/css/kieu.css`.
+- Đăng nhập/Đăng ký cho khách hàng
+- Phân biệt vai trò: Khách hàng, Bác sĩ, Quản trị viên
+- Quản lý phiên đăng nhập an toàn (localStorage)
+- Nhắc lịch tự động qua email/SMS
 
-- **Bien mau va reset**:
-  - Dinh nghia cac bien `--primary`, `--secondary`, `--bg`, `--card`, `--text`, `--text-muted`, `--border` de thong nhat giao dien toan he thong.
-  - Reset box sizing, font va nen cho toan bo body.
+### 📅 Quản lý lịch khám
 
-- **Nhom nut (class `.btn`)**:
-  - `.btn`: nut co border bo tron, font ro rang, hieu ung hover nhe.
-  - `.btn-primary`: nut chinh mau xanh duong, gradient, shadow.
-  - `.btn-outline`: nut vien mong, nen toi hon, dung cho hanh dong phu.
-  - `.btn-lg`, `.btn-block`: bien the nut lon va nut full chieu ngang.
+- Đặt lịch khám nhanh (3-4 bước)
+- Chọn chuyên khoa, bác sĩ, khung giờ phù hợp
+- Xem trạng thái lịch hẹn (Chờ xác nhận, Đã xác nhận, Đã khám, v.v.)
+- Xác nhận / Hủy lịch (cho bệnh viện)
 
-- **Landing page**:
-  - `.landing-header`, `.landing-nav`, `.header-actions`, `.lang-switch`, `.lang-btn`: tao header sticky hien dai co menu va nut chuyen ngon ngu.
-  - `.hero-section`, `.hero-inner`, `.hero-heading`, `.hero-desc`, `.hero-image-placeholder`: tao hero 2 cot, co hinh minh hoa bac si / benh nhan.
-  - `.section`, `.dept-grid`, `.dept-card`, `.doctor-grid`, `.service-grid`, `.section-hotline`, `.landing-footer`, `.footer-grid`: quan ly cac block Chuyen khoa, Bac si, Dich vu, Hotline, Footer theo kieu card & grid.
+### 👨‍⚕️ Quản lý bác sĩ & Chuyên khoa
 
-- **Customer layout**:
-  - `.customer-layout`, `.customer-header`, `.customer-content`: bo cuc cho cac trang sau khi khach hang dang nhap.
-  - `.stats-row`, `.stat-card`: the hien thong ke nhanh (so lich, so da kham).
-  - `.profile-layout`, `.profile-menu`: layout 2 cot cho trang ho so ca nhan.
-  - `.booking-form-wrap`, `.form-row`, `.form-section`: to chuc form dat lich theo tung nhom ro rang.
+- Danh sách bác sĩ với ảnh đại diện (avatar với 2 chữ cái)
+- Phân loại theo chuyên khoa (Nội tổng quát, Tai Mũi Họng, Da liễu, v.v.)
+- Lịch làm việc linh hoạt
 
-- **Admin dashboard**:
-  - `.app-layout`, `.sidebar`, `.sidebar-nav`, `.main-area`, `.topbar`, `.content`: bo cuc tong the kieu dashboard hien dai.
-  - `.table-wrap`, `table`, `.badge`, `.badge-success`, `.badge-info`: dinh dang bang du lieu va nhan trang thai.
-  - `.modal`, `.modal-overlay`, `.modal-content`: popup chi tiet lich hen cho nhan vien le tan.
+### 👤 Hồ sơ bệnh nhân
 
-## 4. Cach chay ung dung
+- Cập nhật thông tin cá nhân (Họ tên, Tuổi, Giới tính, CCCD, Địa chỉ)
+- Lưu trữ lịch sử khám bệnh
+- Hỗ trợ tái khám nhanh
 
-1. Yeu cau:
-   - Da cai dat Java 17 (hoac tuong duong) va Maven.
-2. Cac buoc chay:
-   - Mo du an trong IDE (VD: IntelliJ, VS Code + plugin Spring).
-   - Chay class Spring Boot chinh (co annotation `@SpringBootApplication`).
-   - Mac dinh ung dung chay tai `http://localhost:8080/`.
-3. Cac duong dan chinh:
-   - Trang chu landing: `http://localhost:8080/trangchu.html`
+### 📊 Thống kê & Báo cáo
+
+- Thống kê số lượng lịch khám
+- Báo cáo tỉ lệ khám thành công
+- Phân tích theo chuyên khoa, bác sĩ
+
+### 📱 Giao diện Responsive
+
+- Tối ưu cho desktop, tablet, mobile
+- Header thông minh (ẩn/hiển khi cuộn)
+- Menu dropdown cho tài khoản người dùng
+
+### 📰 Tin tức & Cẩm nang
+
+- Trang "Tin tức & cẩm nang" với danh sách bài viết
+- Hướng dẫn cho bệnh nhân (4 bước chuẩn bị khám)
+- Dễ mở rộng để thêm bài viết mới
+
+---
+
+## 🛠️ Công nghệ sử dụng
+
+### Backend
+
+- **Java 17** - Ngôn ngữ lập trình
+- **Spring Boot 3.2.0** - Framework web chính
+- **Spring Data JPA** - ORM (Object-Relational Mapping)
+- **Spring Security** - Bảo mật, mã hóa
+- **MySQL 8.0.33** - Cơ sở dữ liệu
+- **Maven** - Quản lý dependency
+
+### Frontend
+
+- **HTML5** - Cấu trúc trang
+- **CSS3** (Responsive, Flexbox, Grid) - Styling
+- **JavaScript (ES6+)** - Logic tương tác (không sử dụng framework nặng)
+- **Vanilla JS** - Quản lý dropdown, modal, animation
+
+### Đặc điểm Frontend
+
+- Không dùng React/Vue/Angular (giữ lightweight)
+- CSS Grid/Flexbox cho layout responsive
+- LocalStorage cho quản lý session khách hàng
+
+---
+
+## 📁 Cấu trúc thư mục
+
+```
+TT Care+ (java-web-project)
+│
+├── src/main/
+│   ├── java/com/example/webapp/
+│   │   ├── UngDungWeb.java                 # Main class (Spring Boot)
+│   │   │
+│   │   ├── controller/                      # Điều khiển HTTP requests
+│   │   │   ├── TrangChuController.java     # Trang chủ
+│   │   │   ├── XacThucController.java      # Đăng nhập/Đăng ký
+│   │   │   ├── BenhNhanPortalController.java # Portal bệnh nhân
+│   │   │   ├── BenhNhanController.java     # API bệnh nhân
+│   │   │   ├── BacSiPortalController.java  # Portal bác sĩ
+│   │   │   ├── HomeController.java         # Dashboard trang chủ
+│   │   │   └── QuanTriPortalController.java # Dashboard quản trị
+│   │   │
+│   │   ├── entity/                          # Model dữ liệu (JPA)
+│   │   │   ├── NguoiDung.java              # Người dùng (User)
+│   │   │   ├── BenhNhan.java               # Bệnh nhân
+│   │   │   ├── BacSi.java                  # Bác sĩ
+│   │   │   ├── ChuyenKhoa.java             # Chuyên khoa
+│   │   │   ├── PhongKham.java              # Phòng khám
+│   │   │   ├── LichHen.java                # Lịch hẹn khám
+│   │   │   ├── LichLamViec.java            # Lịch làm việc bác sĩ
+│   │   │   ├── ThongBaoNhacLich.java       # Thông báo nhắc lịch
+│   │   │   ├── TrangThaiLichHen.java       # Trạng thái lịch hẹn (enum)
+│   │   │   └── TrangThaiLichLamViec.java   # Trạng thái lịch làm (enum)
+│   │   │
+│   │   ├── repository/                      # Data Access Layer
+│   │   │   ├── NguoiDungRepository.java
+│   │   │   ├── BenhNhanRepository.java
+│   │   │   ├── BacSiRepository.java
+│   │   │   ├── ChuyenKhoaRepository.java
+│   │   │   ├── PhongKhamRepository.java
+│   │   │   ├── LichHenRepository.java
+│   │   │   ├── LichLamViecRepository.java
+│   │   │   ├── ThongBaoNhacLichRepository.java
+│   │   │   └── ...
+│   │   │
+│   │   ├── service/                         # Business Logic Layer (Service)
+│   │   │   ├── NguoiDungService.java       # Quản lý người dùng
+│   │   │   ├── BenhNhanService.java        # Quản lý bệnh nhân
+│   │   │   ├── DatLichKhamService.java     # Logic đặt lịch khám
+│   │   │   ├── EmailService.java           # Gửi email thông báo
+│   │   │   └── ...
+│   │   │
+│   │   └── config/                          # Cấu hình Spring
+│   │       ├── SecurityConfig.java
+│   │       ├── CorsConfig.java
+│   │       └── ...
+│   │
+│   └── resources/
+│       ├── application.properties           # Cấu hình ứng dụng
+│       └── static/                          # Frontend tĩnh
+│           ├── css/
+│           │   └── kieu.css                # CSS chính (1500+ lines)
+│           ├── js/
+│           │   ├── xacthuc.js              # Logic xác thực & dropdown
+│           │   └── ungdung.js              # Logic chung ứng dụng
+│           ├── images/                     # Ảnh banner, logo
+│           ├── admin/                      # Trang quản trị
+│           │   ├── trangquantri.html       # Dashboard chính
+│           │   ├── bach.html               # Quản lý bác sĩ
+│           │   ├── khoa.html               # Quản lý chuyên khoa
+│           │   ├── lichhen.html            # Quản lý lịch hẹn
+│           │   ├── phongkham.html          # Quản lý phòng khám
+│           │   ├── khachhang.html          # Quản lý khách hàng
+│           │   ├── baocao.html             # Báo cáo thống kê
+│           │   ├── taikhoan.html           # Quản lý tài khoản
+│           │   ├── dangnhap.html           # Đăng nhập/Đăng ký
+│           │   └── dangky-nhanvien.html    # Đăng ký nhân viên
+│           └── customer/                   # Trang khách hàng (bệnh nhân)
+│               ├── trangchu.html           # Trang chủ công khai
+│               ├── tintuc-camnang.html     # Tin tức & cẩm nang
+│               ├── khoa.html               # Danh sách chuyên khoa
+│               ├── bacsi.html              # Danh sách bác sĩ
+│               ├── datlich.html            # Form đặt lịch
+│               ├── hoso.html               # Hồ sơ cá nhân
+│               └── lichcuatoi.html         # Lịch khám của tôi
+│
+├── pom.xml                                  # Maven dependencies
+├── README.md                                # Tài liệu này
+└── target/                                  # Build output
+
+```
+
+---
+
+## 🚀 Hướng dẫn cài đặt
+
+### Yêu cầu hệ thống
+
+- **Java JDK 17 trở lên** - [Tải tại đây](https://www.oracle.com/java/technologies/downloads/#java17)
+- **Maven 3.8.1 trở lên** - [Tải tại đây](https://maven.apache.org/download.cgi)
+- **MySQL 8.0 trở lên** - [Tải tại đây](https://www.mysql.com/downloads/)
+- **IDE** - [IntelliJ IDEA](https://www.jetbrains.com/idea/) hoặc [VS Code](https://code.visualstudio.com/)
+
+### Bước 1: Chuẩn bị cơ sở dữ liệu
+
+```sql
+-- Tạo schema
+CREATE DATABASE tt_care_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE tt_care_db;
+
+-- Spring Boot JPA sẽ tự tạo bảng từ entities
+-- Hoặc chạy script init nếu có file schema.sql
+```
+
+### Bước 2: Clone/Tải dự án
+
+```bash
+# Clone từ GitHub (nếu có)
+git clone https://github.com/your-repo/tt-care.git
+cd tt-care
+
+# Hoặc extract file ZIP
+```
+
+### Bước 3: Cấu hình application.properties
+
+Chỉnh sửa file `src/main/resources/application.properties`:
+
+```properties
+# Server
+server.port=8080
+server.servlet.context-path=/
+
+# Database
+spring.datasource.url=jdbc:mysql://localhost:3306/tt_care_db?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.format_sql=true
+
+# Encoding
+spring.http.encoding.charset=UTF-8
+spring.http.encoding.enabled=true
+spring.http.encoding.force=true
+
+# Mail (tùy chọn - nếu cần gửi email)
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+```
+
+### Bước 4: Build dự án
+
+```bash
+# Sử dụng Maven
+mvn clean install
+
+# Hoặc IDE tự động build
+```
+
+### Bước 5: Chạy ứng dụng
+
+**Cách 1: Từ IDE**
+
+- Mở dự án trong IntelliJ IDEA / VS Code
+- Tìm lớp `UngDungWeb.java` (có annotation `@SpringBootApplication`)
+- Click nút Run (hoặc Shift + F10)
+
+**Cách 2: Từ Terminal**
+
+```bash
+mvn spring-boot:run
+```
+
+**Cách 3: Chạy JAR đã build**
+
+```bash
+java -jar target/java-web-project-1.0.0.jar
+```
+
+### Bước 6: Truy cập ứng dụng
+
+Mở trình duyệt và truy cập:
+
+- **Trang chủ**: [http://localhost:8080/customer/trangchu.html](http://localhost:8080/customer/trangchu.html)
+- **Đăng nhập**: [http://localhost:8080/admin/dangnhap.html](http://localhost:8080/admin/dangnhap.html)
+- **Dashboard quản trị**: [http://localhost:8080/admin/trangquantri.html](http://localhost:8080/admin/trangquantri.html)
+
+---
+
+## 📖 Hướng dẫn sử dụng
+
+### 👤 Cho Khách hàng (Bệnh nhân)
+
+1. **Truy cập trang chủ**: [http://localhost:8080/customer/trangchu.html](http://localhost:8080/customer/trangchu.html)
+
+2. **Đăng ký tài khoản**:
+   - Click nút "Đăng ký" trên header
+   - Điền email/SĐT, mật khẩu, xác nhận mật khẩu
+   - Click "Đăng ký"
+
+3. **Đặt lịch khám**:
+   - Đăng nhập vào tài khoản
+   - Click "Đặt lịch khám"
+   - Chọn chuyên khoa → bác sĩ → dịch vụ → ngày → khung giờ
+   - Điền triệu chứng (tùy chọn)
+   - Click "Xác nhận đặt lịch"
+
+4. **Quản lý hồ sơ cá nhân**:
+   - Vào "Thông tin cá nhân"
+   - Cập nhật: Họ tên, Tuổi, Giới tính, CCCD, SĐT, Địa chỉ
+   - Click "Lưu thông tin"
+
+5. **Xem lịch khám**:
+   - Vào "Lịch khám của tôi"
+   - Xem trạng thái: Chờ xác nhận, Đã xác nhận, Đã khám
+
+6. **Xem tin tức & cẩm nang**:
+   - Click "Tin tức & cẩm nang" trên menu
+   - Đọc bài viết, hướng dẫn
+
+### 👨‍💼 Cho Quản trị viên / Nhân viên lễ tân
+
+1. **Đăng nhập**:
+   - Truy cập [http://localhost:8080/admin/dangnhap.html](http://localhost:8080/admin/dangnhap.html)
+   - Đăng nhập bằng tài khoản admin (bạn cần tạo trong DB)
+
+2. **Dashboard chính**:
+   - Thống kê: Tổng khách hàng, Lịch khám hôm nay, Lịch khám tháng
+   - Navigation sidebar: Truy cập các module quản lý
+
+3. **Quản lý lịch khám** (Lịch hẹn):
+   - Xem danh sách lịch khám chưa xác nhận
+   - Click vào lịch để xem chi tiết
+   - Xác nhận hoặc hủy lịch
+
+4. **Quản lý bác sĩ**:
+   - Thêm bác sĩ mới, chỉnh sửa thông tin
+   - Phân công chuyên khoa
+
+5. **Quản lý chuyên khoa**:
+   - Thêm/Sửa/Xóa chuyên khoa
+   - Quản lý danh sách dịch vụ
+
+6. **Báo cáo thống kê**:
+   - Xem số lượng lịch khám theo tháng
+   - Thống kê theo chuyên khoa, bác sĩ
+
+---
+
+## 🗂️ Các thực thể dữ liệu
+
+### Bảng chính
+
+| Thực thể             | Mô tả                | Các trường quan trọng                                         |
+| -------------------- | -------------------- | ------------------------------------------------------------- |
+| **NguoiDung**        | Người dùng hệ thống  | id, username, email, password, role (CUSTOMER/DOCTOR/ADMIN)   |
+| **BenhNhan**         | Bệnh nhân            | id, fullname, age, gender, cccd, phone, address, account (FK) |
+| **BacSi**            | Bác sĩ               | id, hoTen, chucDanh, chuyenKhoa (FK), phongKham (FK)          |
+| **ChuyenKhoa**       | Chuyên khoa khám     | id, ten, moTa                                                 |
+| **PhongKham**        | Phòng khám           | id, ten, dia_chi                                              |
+| **LichHen**          | Lịch hẹn khám benh   | id, benhNhan (FK), bacSi (FK), ngayKham, gioKham, trangThai   |
+| **LichLamViec**      | Lịch làm việc bác sĩ | id, bacSi (FK), ngayLamViec, gioBatDau, gioKetThuc            |
+| **ThongBaoNhacLich** | Thông báo nhắc lịch  | id, lichHen (FK), noiDung, thoiDiemNhac                       |
+
+### Enum (Trạng thái)
+
+- **TrangThaiLichHen**: CHO_XAC_NHAN, DA_XAC_NHAN, DA_HUY, DANG_KHAM, DA_KHAM, BO_LO
+- **TrangThaiLichLamViec**: DANG_LAM, NGHI, HUY
+
+---
+
+## 🔌 API chính
+
+### Authentication
+
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "user@example.com",
+  "password": "password123",
+  "role": "customer"
+}
+```
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Bệnh nhân
+
+```http
+GET /api/patient/specialties          # Danh sách chuyên khoa
+GET /api/patient/doctors               # Danh sách bác sĩ
+GET /api/patient/doctors?specialtyId=1 # Bác sĩ theo chuyên khoa
+GET /api/patient/doctors/{id}/available-slots?date=2024-01-15
+
+POST /api/patient/appointments         # Đặt lịch khám
+GET /api/patient/{patientId}/appointments # Xem lịch khám
+
+POST /api/patients/upsert-by-account   # Cập nhật hồ sơ bệnh nhân
+GET /api/patients/by-account           # Lấy hồ sơ bệnh nhân
+```
+
+### Quản trị
+
+```http
+GET /api/admin/appointments            # Danh sách lịch khám
+PUT /api/admin/appointments/{id}       # Cập nhật lịch khám
+DELETE /api/admin/appointments/{id}    # Hủy lịch khám
+
+GET /api/admin/doctors                 # Danh sách bác sĩ
+POST /api/admin/doctors                # Thêm bác sĩ
+PUT /api/admin/doctors/{id}            # Cập nhật bác sĩ
+DELETE /api/admin/doctors/{id}         # Xóa bác sĩ
+```
+
+---
+
+## 💻 Hướng dẫn phát triển
+
+### Thêm tính năng mới
+
+#### Bước 1: Tạo Entity (Model dữ liệu)
+
+```java
+// src/main/java/com/example/webapp/entity/TinhNang.java
+@Entity
+@Table(name = "tinh_nang")
+public class TinhNang {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "ten")
+    private String ten;
+
+    // Getters/Setters
+}
+```
+
+#### Bước 2: Tạo Repository
+
+```java
+// src/main/java/com/example/webapp/repository/TinhNangRepository.java
+@Repository
+public interface TinhNangRepository extends JpaRepository<TinhNang, Integer> {
+    TinhNang findByTen(String ten);
+}
+```
+
+#### Bước 3: Tạo Service
+
+```java
+// src/main/java/com/example/webapp/service/TinhNangService.java
+@Service
+public class TinhNangService {
+    @Autowired
+    private TinhNangRepository repo;
+
+    public List<TinhNang> getAll() {
+        return repo.findAll();
+    }
+}
+```
+
+#### Bước 4: Tạo Controller
+
+```java
+// src/main/java/com/example/webapp/controller/TinhNangController.java
+@RestController
+@RequestMapping("/api/tinh-nang")
+public class TinhNangController {
+    @Autowired
+    private TinhNangService service;
+
+    @GetMapping
+    public ResponseEntity<List<TinhNang>> getAll() {
+        return ResponseEntity.ok(service.getAll());
+    }
+}
+```
+
+#### Bước 5: Tạo Frontend (HTML/CSS/JS)
+
+```html
+<!-- src/main/resources/static/customer/tinh-nang.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tính năng</title>
+    <link rel="stylesheet" href="/css/kieu.css" />
+  </head>
+  <body>
+    <header class="customer-header">
+      <!-- Header content -->
+    </header>
+
+    <main class="customer-content">
+      <h1>Tính năng</h1>
+      <div id="list"></div>
+    </main>
+
+    <script src="/js/xacthuc.js"></script>
+    <script>
+      fetch("/api/tinh-nang")
+        .then((r) => r.json())
+        .then((data) => {
+          // Render data
+        });
+    </script>
+  </body>
+</html>
+```
+
+### Quy ước mã
+
+- **Naming**: Sử dụng tiếng Việt cho biến, hàm (dễ hiểu trong team VN)
+- **Backend**: Theo chuẩn Clean Code (MVC layer)
+- **Frontend**: Vanilla JS (không framework nặng)
+- **CSS**: Modular, sử dụng CSS variables
+
+### Cơ sở dữ liệu
+
+- Hibernate sẽ tự tạo bảng từ Entities
+- Có thể viết `schema.sql` nếu cần khởi tạo dữ liệu
+- Sử dụng migration tool là tùy chọn
+
+---
+
+## 🐛 Xử lý lỗi phổ biến
+
+| Lỗi                    | Nguyên nhân                           | Giải pháp                       |
+| ---------------------- | ------------------------------------- | ------------------------------- |
+| `Connection refused`   | MySQL chưa chạy                       | Khởi động MySQL service         |
+| `Access Denied`        | Sai username/password DB              | Kiểm tra application.properties |
+| `404 Not Found`        | URL sai hoặc controller không tồn tại | Kiểm tra @RequestMapping        |
+| `CORS error`           | Frontend khác domain                  | Bật CorsConfig trong Spring     |
+| `NullPointerException` | Đối tượng null                        | Thêm null check hoặc @Nullable  |
+
+---
+
+## 📚 Tài liệu thêm
+
+- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
+- [MySQL Documentation](https://dev.mysql.com/doc/)
+- [MDN Web Docs (HTML/CSS/JS)](https://developer.mozilla.org/)
+
+---
+
+## 👨‍💻 Đóng góp
+
+Để đóng góp vào dự án:
+
+1. Fork dự án
+2. Tạo branch feature (`git checkout -b feature/AmazingFeature`)
+3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`)
+4. Push lên branch (`git push origin feature/AmazingFeature`)
+5. Mở Pull Request
+
+---
+
+## 📄 License
+
+Dự án này sử dụng license **MIT**. Xem file [LICENSE](LICENSE) để biết chi tiết.
+
+---
+
+## 📞 Liên hệ hỗ trợ
+
+- **Email**: support@ttcare.vn
+- **Hotline**: 1900 1234
+- **Website**: https://www.ttcare.vn
+
+---
+
+**Cập nhật lần cuối**: 17 tháng 4, 2026
+**Phiên bản**: 1.0.0
+
+- Trang chu landing: `http://localhost:8080/trangchu.html`
 
 - Dang nhap / dang ky: `http://localhost:8080/admin/dangnhap.html`
 - Sau khi dang nhap voi vai tro customer: `http://localhost:8080/customer/trangchu.html`

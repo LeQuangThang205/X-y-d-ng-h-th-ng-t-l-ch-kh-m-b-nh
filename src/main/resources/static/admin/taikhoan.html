@@ -35,25 +35,83 @@
             <div class="card mb-1">
                 <div class="card-header">Tạo tài khoản mới</div>
                 <div class="card-body">
-                    <form id="create-account-form" class="form-row" style="align-items: end;">
-                        <div class="form-group">
-                            <label>Tài khoản (username/email)</label>
-                            <input type="text" id="new-username" required>
+                    <form id="create-account-form">
+                        <div class="form-row" style="align-items: end;">
+                            <div class="form-group">
+                                <label>Tài khoản (username/email)</label>
+                                <input type="text" id="new-username" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mật khẩu</label>
+                                <input type="password" id="new-password" minlength="6" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Vai trò</label>
+                                <select id="new-role" required>
+                                    <option value="customer">Khách hàng</option>
+                                    <option value="doctor">Bác sĩ</option>
+                                    <option value="admin">Quản trị viên</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Mật khẩu</label>
-                            <input type="password" id="new-password" minlength="6" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Vai trò</label>
-                            <select id="new-role" required>
-                                <option value="customer">Khách hàng</option>
-                                <option value="doctor">Bác sĩ</option>
-                                <option value="admin">Quản trị viên</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+
+                        <div id="role-profile-fields" style="margin-top: 10px;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Họ tên</label>
+                                    <input type="text" id="new-fullname" placeholder="Nhập họ tên">
+                                </div>
+                                <div class="form-group">
+                                    <label>Số điện thoại</label>
+                                    <input type="text" id="new-phone" placeholder="Nhập số điện thoại">
+                                </div>
+                                <div class="form-group" id="doctor-title-wrap" style="display:none;">
+                                    <label>Chức danh bác sĩ</label>
+                                    <input type="text" id="new-title" placeholder="Ví dụ: Bác sĩ CKI">
+                                </div>
+                            </div>
+
+                            <div class="form-row" id="patient-fields-wrap">
+                                <div class="form-group">
+                                    <label>Tuổi</label>
+                                    <input type="number" id="new-age" min="0" max="130" placeholder="Ví dụ: 30">
+                                </div>
+                                <div class="form-group">
+                                    <label>Giới tính</label>
+                                    <select id="new-gender">
+                                        <option value="">-- Chọn giới tính --</option>
+                                        <option value="male">Nam</option>
+                                        <option value="female">Nữ</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>CCCD/CMND</label>
+                                    <input type="text" id="new-cccd" placeholder="Nhập số CCCD/CMND">
+                                </div>
+                                <div class="form-group">
+                                    <label>Địa chỉ</label>
+                                    <input type="text" id="new-address" placeholder="Nhập địa chỉ">
+                                </div>
+                            </div>
+
+                            <div class="form-row" id="doctor-fields-wrap" style="display:none;">
+                                <div class="form-group">
+                                    <label>Chuyên khoa</label>
+                                    <select id="new-specialty">
+                                        <option value="">-- Chọn chuyên khoa --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phòng khám</label>
+                                    <select id="new-room">
+                                        <option value="">-- Chọn phòng khám --</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -141,6 +199,12 @@
             var accountBody = document.getElementById('account-body');
             var searchInput = document.getElementById('search-account');
             var createForm = document.getElementById('create-account-form');
+            var roleSelect = document.getElementById('new-role');
+            var doctorFieldsWrap = document.getElementById('doctor-fields-wrap');
+            var patientFieldsWrap = document.getElementById('patient-fields-wrap');
+            var doctorTitleWrap = document.getElementById('doctor-title-wrap');
+            var specialtySelect = document.getElementById('new-specialty');
+            var roomSelect = document.getElementById('new-room');
             var modal = document.getElementById('profile-modal');
             var profileContent = document.getElementById('profile-content');
             var allAccounts = [];
@@ -236,23 +300,107 @@
                 e.preventDefault();
                 var username = document.getElementById('new-username').value.trim();
                 var password = document.getElementById('new-password').value;
-                var role = document.getElementById('new-role').value;
+                var role = roleSelect.value;
 
-                apiJson('/api/auth/register', {
+                var fullName = document.getElementById('new-fullname').value.trim();
+                var phone = document.getElementById('new-phone').value.trim();
+                var title = document.getElementById('new-title').value.trim();
+                var age = document.getElementById('new-age').value.trim();
+                var gender = document.getElementById('new-gender').value;
+                var cccd = document.getElementById('new-cccd').value.trim();
+                var address = document.getElementById('new-address').value.trim();
+                var specialtyId = specialtySelect.value;
+                var roomId = roomSelect.value;
+
+                if ((role === 'customer' || role === 'doctor') && !fullName) {
+                    alert('Vui lòng nhập họ tên cho vai trò đã chọn');
+                    return;
+                }
+
+                var payload = {
+                    username: username,
+                    password: password,
+                    role: role,
+                    fullName: fullName,
+                    phone: phone
+                };
+
+                if (role === 'customer') {
+                    payload.age = age;
+                    payload.gender = gender;
+                    payload.cccd = cccd;
+                    payload.address = address;
+                }
+
+                if (role === 'doctor') {
+                    payload.title = title;
+                    payload.specialtyId = specialtyId;
+                    payload.roomId = roomId;
+                }
+
+                apiJson('/api/admin/accounts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: username, password: password, role: role })
+                    body: JSON.stringify(payload)
                 }).then(function(res) {
                     if (!res.success) {
                         throw new Error(res.message || 'Tạo tài khoản thất bại');
                     }
                     alert('Đã tạo tài khoản mới thành công');
                     createForm.reset();
+                    toggleRoleFields();
                     return loadAccounts();
                 }).catch(function(err) {
                     alert(err.message || 'Tạo tài khoản thất bại');
                 });
             });
+
+            function setSelectOptions(selectEl, list, textMapper) {
+                var html = '<option value="">-- Chọn --</option>';
+                html += (list || []).map(function(item) {
+                    return '<option value="' + item.id + '">' + textMapper(item) + '</option>';
+                }).join('');
+                selectEl.innerHTML = html;
+            }
+
+            function loadDoctorMasterData() {
+                return Promise.all([
+                    apiJson('/api/admin/specialties'),
+                    apiJson('/api/admin/rooms')
+                ]).then(function(results) {
+                    setSelectOptions(specialtySelect, results[0], function(item) { return item.ten || ('#' + item.id); });
+                    setSelectOptions(roomSelect, results[1], function(item) { return item.ten || ('#' + item.id); });
+                }).catch(function() {
+                    setSelectOptions(specialtySelect, [], function(item) { return item.ten || ('#' + item.id); });
+                    setSelectOptions(roomSelect, [], function(item) { return item.ten || ('#' + item.id); });
+                });
+            }
+
+            function clearRoleSpecificInputs() {
+                document.getElementById('new-age').value = '';
+                document.getElementById('new-gender').value = '';
+                document.getElementById('new-cccd').value = '';
+                document.getElementById('new-address').value = '';
+                document.getElementById('new-title').value = '';
+                specialtySelect.value = '';
+                roomSelect.value = '';
+            }
+
+            function toggleRoleFields() {
+                var role = roleSelect.value;
+                var isCustomer = role === 'customer';
+                var isDoctor = role === 'doctor';
+
+                patientFieldsWrap.style.display = isCustomer ? '' : 'none';
+                doctorFieldsWrap.style.display = isDoctor ? '' : 'none';
+                doctorTitleWrap.style.display = isDoctor ? '' : 'none';
+
+                if (!isCustomer && !isDoctor) {
+                    clearRoleSpecificInputs();
+                }
+            }
+
+            roleSelect.addEventListener('change', toggleRoleFields);
 
             var editModal = document.getElementById('edit-modal');
             var editForm = document.getElementById('edit-form');
@@ -367,6 +515,9 @@
                 });
             }
 
+            loadDoctorMasterData().finally(function() {
+                toggleRoleFields();
+            });
             loadAccounts();
         })();
     </script>

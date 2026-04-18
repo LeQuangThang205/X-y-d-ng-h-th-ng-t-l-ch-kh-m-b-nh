@@ -109,6 +109,25 @@ public class DatLichKhamService {
         return lichHenRepository.findByBacSiIdOrderByNgayKhamAscGioKhamAsc(bacSiId);
     }
 
+    public List<LichHen> lichHomNayCuaBacSi(Long bacSiId) {
+        return lichHenRepository.findByBacSiIdAndNgayKhamOrderByGioKhamAsc(bacSiId, LocalDate.now());
+    }
+
+    public List<LichHen> lich7NgayCuaBacSi(Long bacSiId) {
+        LocalDate fromDate = LocalDate.now();
+        LocalDate toDate = fromDate.plusDays(6);
+        return lichHenRepository.findByBacSiIdAndNgayKhamBetweenOrderByNgayKhamAscGioKhamAsc(bacSiId, fromDate, toDate);
+    }
+
+    public List<LichHen> lichSuKhamCuaBacSi(Long bacSiId) {
+        return lichHenRepository.findByBacSiIdAndNgayKhamLessThanOrderByNgayKhamDescGioKhamDesc(bacSiId,
+                LocalDate.now());
+    }
+
+    public List<LichLamViec> lichLamViecTrongNgayCuaBacSi(Long bacSiId, LocalDate ngay) {
+        return lichLamViecRepository.findByBacSiIdAndNgayOrderByGioBatDauAsc(bacSiId, ngay);
+    }
+
     @Transactional
     public LichHen capNhatTrangThaiLichHen(Long lichHenId, TrangThaiLichHen trangThaiMoi) {
         LichHen lichHen = lichHenRepository.findById(lichHenId)
@@ -143,6 +162,133 @@ public class DatLichKhamService {
         }
 
         return lichHenRepository.save(lichHen);
+    }
+
+    @Transactional
+    public LichHen taoLichTaiKham(Long lichHenId, LocalDate ngayTaiKham, LocalTime gioTaiKham, String ghiChuTaiKham) {
+        LichHen lichGoc = lichHenRepository.findById(lichHenId)
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay lich hen goc"));
+
+        if (ngayTaiKham == null || gioTaiKham == null) {
+            throw new IllegalArgumentException("Ngay tai kham va gio tai kham la bat buoc");
+        }
+
+        BacSi bacSi = lichGoc.getBacSi();
+        BenhNhan benhNhan = lichGoc.getBenhNhan();
+
+        List<LichLamViec> schedules = lichLamViecRepository.findByBacSiIdAndNgayOrderByGioBatDauAsc(
+                bacSi.getId(),
+                ngayTaiKham);
+
+        LichLamViec slot = schedules.stream()
+                .filter(item -> gioTaiKham.equals(item.getGioBatDau()))
+                .findFirst()
+                .orElse(null);
+
+        if (slot == null) {
+            slot = new LichLamViec();
+            slot.setBacSi(bacSi);
+            slot.setNgay(ngayTaiKham);
+            slot.setGioBatDau(gioTaiKham);
+            slot.setGioKetThuc(gioTaiKham.plusMinutes(30));
+            slot.setTrangThai(TrangThaiLichLamViec.TRONG);
+            BigDecimal giaKham = lichGoc.getChiPhi() != null ? lichGoc.getChiPhi() : BigDecimal.ZERO;
+            slot.setGiaKham(giaKham);
+            slot = lichLamViecRepository.save(slot);
+        }
+
+        if (slot.getTrangThai() != TrangThaiLichLamViec.TRONG) {
+            throw new IllegalArgumentException("Khung gio tai kham da duoc dat hoac bi khoa");
+        }
+
+        LichHen taiKham = new LichHen();
+        taiKham.setBenhNhan(benhNhan);
+        taiKham.setBacSi(bacSi);
+        taiKham.setChuyenKhoa(lichGoc.getChuyenKhoa());
+        taiKham.setPhongKham(lichGoc.getPhongKham());
+        taiKham.setLichLamViec(slot);
+        taiKham.setNgayKham(ngayTaiKham);
+        taiKham.setGioKham(gioTaiKham);
+        taiKham.setTrangThai(TrangThaiLichHen.DA_XAC_NHAN);
+        taiKham.setTrieuChung("Tai kham - " + (lichGoc.getTrieuChung() == null ? "" : lichGoc.getTrieuChung()));
+        taiKham.setGhiChuTaiKham(ghiChuTaiKham);
+        taiKham.setChiPhi(slot.getGiaKham() == null ? BigDecimal.ZERO : slot.getGiaKham());
+
+        LichHen saved = lichHenRepository.save(taiKham);
+        slot.setTrangThai(TrangThaiLichLamViec.DA_DAT);
+        lichLamViecRepository.save(slot);
+
+        return saved;
+    }
+
+    @Transactional
+    public Map<String, Object> khoaKhungGioTamThoi(Long bacSiId, LocalDate ngay, List<Long> slotIds) {
+        if (ngay == null) {
+            ngay = LocalDate.now();
+        }
+        if (slotIds == null || slotIds.isEmpty()) {
+            throw new IllegalArgumentException("Can chon it nhat 1 khung gio de khoa");
+        }
+
+        List<LichLamViec> slots = lichLamViecRepository.findByBacSiIdAndNgayAndIdIn(bacSiId, ngay, slotIds);
+        long locked = 0;
+        long skipped = 0;
+        for (LichLamViec slot : slots) {
+            if (slot.getTrangThai() == TrangThaiLichLamViec.TRONG) {
+                slot.setTrangThai(TrangThaiLichLamViec.KHOA);
+                locked++;
+            } else {
+                skipped++;
+            }
+        }
+        lichLamViecRepository.saveAll(slots);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("ngay", ngay);
+        result.put("tongChon", slotIds.size());
+        result.put("daKhoa", locked);
+        result.put("boQua", skipped);
+        return result;
+    }
+
+    public Map<String, Object> baoCaoCaNhanBacSi(Long bacSiId) {
+        LocalDate homNay = LocalDate.now();
+        long tongLichHomNay = lichHenRepository.countByBacSiIdAndNgayKham(bacSiId, homNay);
+        long daKhamHomNay = lichHenRepository.countByBacSiIdAndNgayKhamAndTrangThai(bacSiId, homNay,
+                TrangThaiLichHen.DA_KHAM);
+        long tongDaKham = lichHenRepository.countByBacSiIdAndTrangThai(bacSiId, TrangThaiLichHen.DA_KHAM);
+        BigDecimal doanhThu = lichHenRepository.tongDoanhThuDaKhamTheoBacSi(bacSiId);
+
+        Map<String, Object> report = new HashMap<>();
+        report.put("ngay", homNay);
+        report.put("tongLichHomNay", tongLichHomNay);
+        report.put("daKhamHomNay", daKhamHomNay);
+        report.put("tongBenhNhanDaKham", tongDaKham);
+        report.put("doanhThu", doanhThu == null ? BigDecimal.ZERO : doanhThu);
+        return report;
+    }
+
+    @Transactional
+    public Map<String, Object> chotCaBacSi(Long bacSiId) {
+        LocalDate homNay = LocalDate.now();
+        List<LichHen> lichHomNay = lichHenRepository.findByBacSiIdAndNgayKhamOrderByGioKhamAsc(bacSiId, homNay);
+
+        long boLo = 0;
+        for (LichHen item : lichHomNay) {
+            TrangThaiLichHen tt = item.getTrangThai();
+            if (tt == TrangThaiLichHen.CHO_XAC_NHAN || tt == TrangThaiLichHen.DA_XAC_NHAN
+                    || tt == TrangThaiLichHen.DANG_KHAM) {
+                item.setTrangThai(TrangThaiLichHen.BO_LO);
+                boLo++;
+            }
+        }
+        lichHenRepository.saveAll(lichHomNay);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("ngay", homNay);
+        result.put("tongLich", lichHomNay.size());
+        result.put("chuyenBoLo", boLo);
+        return result;
     }
 
     public ChuyenKhoa luuChuyenKhoa(ChuyenKhoa chuyenKhoa) {

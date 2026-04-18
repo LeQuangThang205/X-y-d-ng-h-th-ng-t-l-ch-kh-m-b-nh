@@ -1292,6 +1292,98 @@ a:hover {
     box-shadow: 0 18px 40px rgba(3, 105, 161, 0.6);
 }
 
+.account-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.account-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.account-toggle:hover,
+.account-dropdown.is-open .account-toggle {
+    transform: translateY(-1px);
+    border-color: #7dd3fc;
+    box-shadow: 0 10px 24px rgba(14, 165, 233, 0.18);
+}
+
+.account-caret {
+    font-size: 0.7rem;
+    color: #475569;
+    transition: transform 0.18s ease;
+}
+
+.account-dropdown.is-open .account-caret {
+    transform: rotate(180deg);
+}
+
+.account-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 224px;
+    padding: 8px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.17);
+    display: none;
+    z-index: 45;
+}
+
+.account-dropdown.is-open .account-panel {
+    display: block;
+}
+
+.account-menu-link,
+.account-menu-action {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border: none;
+    background: transparent;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #334155;
+    border-radius: 10px;
+    padding: 10px 11px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.account-menu-link:hover,
+.account-menu-action:hover {
+    color: #0f172a;
+    background: rgba(14, 165, 233, 0.12);
+}
+
+.account-menu-action.logout {
+    color: #b91c1c;
+}
+
+.account-menu-action.logout:hover {
+    background: rgba(220, 38, 38, 0.12);
+}
+
+.hide-on-auth {
+    display: none !important;
+}
+
 /* ===== Dynamic UX for customer pages ===== */
 .customer-header,
 .landing-header {
@@ -1406,6 +1498,143 @@ a:hover {
     width: min(1120px, 100% - 40px);
     margin: 0 auto;
     padding: 28px 0 34px;
+}
+
+.news-guide-page {
+    padding: 26px 0 34px;
+}
+
+.news-guide-hero {
+    border-radius: 22px;
+    padding: 22px;
+    background: linear-gradient(125deg, #0f172a 0%, #075985 45%, #0f766e 100%);
+    color: #e2e8f0;
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.18);
+    margin-bottom: 18px;
+}
+
+.news-guide-kicker {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: rgba(125, 211, 252, 0.2);
+    color: #bae6fd;
+    margin-bottom: 12px;
+}
+
+.news-guide-hero h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.news-guide-hero p {
+    margin: 0;
+    color: #cbd5e1;
+    max-width: 820px;
+    line-height: 1.6;
+}
+
+.news-guide-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin: 0 0 20px;
+}
+
+.news-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.news-card .meta {
+    font-size: 0.78rem;
+    color: #0369a1;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.news-card h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.news-card p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.guide-section {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+    padding: 18px;
+}
+
+.guide-section h2 {
+    margin: 0 0 4px;
+    font-size: 1.18rem;
+}
+
+.guide-section > p {
+    margin: 0 0 14px;
+    color: #64748b;
+}
+
+.guide-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.guide-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    padding: 10px 11px;
+}
+
+.guide-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.guide-list strong {
+    display: block;
+    margin-bottom: 2px;
+    color: #0f172a;
+    font-size: 0.92rem;
+}
+
+.guide-list span {
+    color: #475569;
+    font-size: 0.86rem;
+    line-height: 1.5;
 }
 
 .stats-row {
@@ -1795,6 +2024,10 @@ th, td {
     z-index: 40;
 }
 
+.modal[hidden] {
+    display: none !important;
+}
+
 .modal-overlay {
     position: absolute;
     inset: 0;
@@ -1831,6 +2064,169 @@ th, td {
     justify-content: flex-end;
     gap: 8px;
     margin-top: 12px;
+}
+
+/* ===== Doctor portal ===== */
+.doctor-greeting {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f172a;
+}
+
+.doctor-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.portal-tabs {
+    display: inline-flex;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    margin-bottom: 14px;
+}
+
+.portal-tab {
+    border: 0;
+    background: transparent;
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.portal-tab.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+}
+
+.portal-pane {
+    display: none;
+}
+
+.portal-pane.active {
+    display: block;
+}
+
+.doctor-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.doctor-stat {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 12px;
+}
+
+.doctor-stat label {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.doctor-stat strong {
+    font-size: 1.25rem;
+    color: #0f172a;
+}
+
+.doctor-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.doctor-status-quick {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.doctor-schedule-toolbar {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.doctor-schedule-list {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 10px;
+    max-height: 280px;
+    overflow: auto;
+}
+
+.doctor-slot-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 8px 2px;
+}
+
+.doctor-slot-item:last-child {
+    border-bottom: 0;
+}
+
+.doctor-slot-item .left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.doctor-modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.doctor-modal-grid .full {
+    grid-column: 1 / -1;
+}
+
+.doctor-detail {
+    padding: 10px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-size: 0.86rem;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.doctor-detail strong {
+    color: #0f172a;
+}
+
+@media (max-width: 640px) {
+    .doctor-top-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .portal-tabs {
+        width: 100%;
+        overflow-x: auto;
+        padding: 4px;
+    }
+
+    .doctor-modal-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ===== Responsive ===== */
@@ -1954,6 +2350,15 @@ th, td {
         padding-block: 20px 26px;
     }
 
+    .news-guide-hero {
+        padding: 16px;
+        border-radius: 18px;
+    }
+
+    .guide-section {
+        padding: 14px;
+    }
+
     .customer-header #user-name {
         min-height: 34px;
         padding-inline: 12px;
@@ -1996,6 +2401,16 @@ th, td {
     background: #f3f4f6 !important;
     color: #0f172a !important;
     border: 1px solid var(--border) !important;
+}
+
+.account-toggle {
+    background: #f3f4f6 !important;
+    color: #0f172a !important;
+    border: 1px solid var(--border) !important;
+}
+
+.account-panel {
+    background: #ffffff;
 }
 .lang-switch {
     background: transparent !important;

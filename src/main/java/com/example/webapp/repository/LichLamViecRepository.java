@@ -13,4 +13,6 @@ public interface LichLamViecRepository extends JpaRepository<LichLamViec, Long> 
     List<LichLamViec> findByBacSiIdAndNgayAndTrangThai(Long bacSiId, LocalDate ngay, TrangThaiLichLamViec trangThai);
 
     List<LichLamViec> findByBacSiIdAndNgayOrderByGioBatDauAsc(Long bacSiId, LocalDate ngay);
+
+    List<LichLamViec> findByBacSiIdAndNgayAndIdIn(Long bacSiId, LocalDate ngay, List<Long> ids);
 }

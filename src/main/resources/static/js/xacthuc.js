@@ -126,6 +126,7 @@ function isCustomerPublicPage(pathname) {
     var publicPages = {
         "/customer/trangchu.html": true,
         "/customer/khoa.html": true,
+        "/customer/tintuc-camnang.html": true,
         "/customer/bacsi.html": true,
     };
     return !!publicPages[pathname];
@@ -220,6 +221,96 @@ function getRoleLabel(role) {
         customer: "Khach hang",
     };
     return labels[normalizeRole(role)] || role;
+}
+
+function buildCustomerAccountDropdown(user) {
+    var wrap = document.createElement("div");
+    wrap.className = "account-dropdown";
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "account-toggle";
+    button.setAttribute("aria-expanded", "false");
+    button.innerHTML =
+        '<span class="account-name">' +
+        (user.name || user.email || "Tai khoan") +
+        '</span><span class="account-caret">▼</span>';
+
+    var panel = document.createElement("div");
+    panel.className = "account-panel";
+
+    var links = [
+        { href: "/customer/hoso.html", label: "Thong tin ca nhan" },
+        { href: "/customer/lichcuatoi.html", label: "Lich kham" },
+        { href: "/customer/tintuc-camnang.html", label: "Tin tuc & cam nang" },
+    ];
+
+    links.forEach(function (item) {
+        var a = document.createElement("a");
+        a.className = "account-menu-link";
+        a.href = item.href;
+        a.textContent = item.label;
+        panel.appendChild(a);
+    });
+
+    var logoutBtn = document.createElement("button");
+    logoutBtn.type = "button";
+    logoutBtn.className = "account-menu-action logout";
+    logoutBtn.textContent = "Dang xuat";
+    logoutBtn.addEventListener("click", function () {
+        logout();
+    });
+    panel.appendChild(logoutBtn);
+
+    button.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var opened = wrap.classList.toggle("is-open");
+        button.setAttribute("aria-expanded", opened ? "true" : "false");
+    });
+
+    document.addEventListener("click", function (e) {
+        if (!wrap.contains(e.target)) {
+            wrap.classList.remove("is-open");
+            button.setAttribute("aria-expanded", "false");
+        }
+    });
+
+    wrap.appendChild(button);
+    wrap.appendChild(panel);
+    return wrap;
+}
+
+function setupHeaderAccountDropdown() {
+    if (typeof document === "undefined") return;
+    if (document.querySelector(".account-dropdown")) return;
+
+    var user = getCurrentUser();
+    if (!user || normalizeRole(user.role) !== "customer") return;
+
+    var customerActions = document.querySelector(".customer-header .header-actions");
+    var landingActions = document.querySelector(".landing-header .header-actions");
+    var customerNav = document.querySelector(".customer-header nav");
+    var host = customerActions || landingActions || customerNav;
+    if (!host) return;
+
+    var staleSelectors = [
+        "#header-auth-link",
+        "#user-name",
+        "button[onclick*='logout']",
+        "a[onclick*='logout']",
+    ];
+
+    var headerRoot = host.closest(".customer-header, .landing-header") || host;
+
+    staleSelectors.forEach(function (selector) {
+        var nodes = headerRoot.querySelectorAll(selector);
+        Array.prototype.forEach.call(nodes, function (node) {
+            node.classList.add("hide-on-auth");
+            node.setAttribute("aria-hidden", "true");
+        });
+    });
+
+    host.appendChild(buildCustomerAccountDropdown(user));
 }
 
 function authRegister(username, password, role) {
@@ -355,4 +446,9 @@ function initAdminUiEffects() {
 enforceRoleAccessForCurrentPath();
 initDynamicCustomerUi();
 initAdminUiEffects();
+setupHeaderAccountDropdown();
+
+if (typeof window !== "undefined") {
+    window.addEventListener("load", setupHeaderAccountDropdown);
+}
 
