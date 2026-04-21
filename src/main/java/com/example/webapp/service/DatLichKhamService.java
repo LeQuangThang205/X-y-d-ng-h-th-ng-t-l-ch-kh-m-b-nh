@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,12 +117,21 @@ public class DatLichKhamService {
     public List<LichHen> lich7NgayCuaBacSi(Long bacSiId) {
         LocalDate fromDate = LocalDate.now();
         LocalDate toDate = fromDate.plusDays(6);
-        return lichHenRepository.findByBacSiIdAndNgayKhamBetweenOrderByNgayKhamAscGioKhamAsc(bacSiId, fromDate, toDate);
+        return lichHenRepository.findByBacSiIdAndNgayKhamBetweenOrderByNgayKhamAscGioKhamAsc(bacSiId, fromDate, toDate)
+                .stream()
+                .filter(this::laLichDangXuLy)
+                .toList();
     }
 
     public List<LichHen> lichSuKhamCuaBacSi(Long bacSiId) {
-        return lichHenRepository.findByBacSiIdAndNgayKhamLessThanOrderByNgayKhamDescGioKhamDesc(bacSiId,
-                LocalDate.now());
+        return lichHenRepository.findByBacSiIdOrderByNgayKhamAscGioKhamAsc(bacSiId)
+                .stream()
+                .filter(this::laLichDaKetThuc)
+                .sorted(Comparator
+                        .comparing(LichHen::getNgayKham, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(LichHen::getGioKham, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed())
+                .toList();
     }
 
     public List<LichLamViec> lichLamViecTrongNgayCuaBacSi(Long bacSiId, LocalDate ngay) {
@@ -129,11 +139,33 @@ public class DatLichKhamService {
     }
 
     @Transactional
-    public LichHen capNhatTrangThaiLichHen(Long lichHenId, TrangThaiLichHen trangThaiMoi) {
-        LichHen lichHen = lichHenRepository.findById(lichHenId)
-                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay lich hen"));
+    public LichHen capNhatTrangThaiLichHen(Long lichHenId, Long bacSiId, TrangThaiLichHen trangThaiMoi) {
+        LichHen lichHen = timLichHenThuocBacSi(lichHenId, bacSiId);
+        BacSi bacSi = bacSiRepository.findById(bacSiId)
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay bac si"));
+
+        TrangThaiLichHen trangThaiHienTai = lichHen.getTrangThai();
+        if (trangThaiMoi == null) {
+            throw new IllegalArgumentException("Trang thai moi khong hop le");
+        }
+        if (trangThaiMoi == trangThaiHienTai) {
+            throw new IllegalArgumentException("Lich hen da o trang thai nay");
+        }
+        if (!laChuyenTrangThaiHopLe(trangThaiHienTai, trangThaiMoi)) {
+            throw new IllegalArgumentException(
+                    "Khong the chuyen trang thai tu " + trangThaiHienTai + " sang " + trangThaiMoi);
+        }
+
+        LocalDateTime thoiDiemHen = ghepNgayGioKham(lichHen);
+        if (trangThaiMoi == TrangThaiLichHen.BO_LO && LocalDateTime.now().isBefore(thoiDiemHen)) {
+            throw new IllegalArgumentException("Chi duoc danh dau bo lo sau gio hen");
+        }
+        if (trangThaiMoi == TrangThaiLichHen.DA_KHAM && LocalDateTime.now().isBefore(thoiDiemHen)) {
+            throw new IllegalArgumentException("Chi duoc danh dau da kham xong sau gio hen");
+        }
 
         lichHen.setTrangThai(trangThaiMoi);
+        capNhatThongTinQuanLyBacSi(lichHen, bacSi);
 
         if (trangThaiMoi == TrangThaiLichHen.DA_HUY) {
             LichLamViec slot = lichHen.getLichLamViec();
@@ -147,10 +179,19 @@ public class DatLichKhamService {
     }
 
     @Transactional
-    public LichHen capNhatKetQuaKham(Long lichHenId, String chanDoan, String huongDieuTri,
+    public LichHen capNhatKetQuaKham(Long lichHenId, Long bacSiId, String chanDoan, String huongDieuTri,
             String donThuoc, String ghiChuTaiKham) {
-        LichHen lichHen = lichHenRepository.findById(lichHenId)
-                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay lich hen"));
+        LichHen lichHen = timLichHenThuocBacSi(lichHenId, bacSiId);
+        BacSi bacSi = bacSiRepository.findById(bacSiId)
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay bac si"));
+
+        TrangThaiLichHen trangThaiHienTai = lichHen.getTrangThai();
+        if (trangThaiHienTai == TrangThaiLichHen.DA_HUY || trangThaiHienTai == TrangThaiLichHen.BO_LO) {
+            throw new IllegalArgumentException("Khong the luu ket qua cho lich hen da huy hoac bo lo");
+        }
+        if (LocalDateTime.now().isBefore(ghepNgayGioKham(lichHen))) {
+            throw new IllegalArgumentException("Chi duoc luu ket qua sau gio hen");
+        }
 
         lichHen.setChanDoan(chanDoan);
         lichHen.setHuongDieuTri(huongDieuTri);
@@ -161,13 +202,17 @@ public class DatLichKhamService {
             lichHen.setTrangThai(TrangThaiLichHen.DA_KHAM);
         }
 
+        capNhatThongTinQuanLyBacSi(lichHen, bacSi);
+
         return lichHenRepository.save(lichHen);
     }
 
     @Transactional
-    public LichHen taoLichTaiKham(Long lichHenId, LocalDate ngayTaiKham, LocalTime gioTaiKham, String ghiChuTaiKham) {
-        LichHen lichGoc = lichHenRepository.findById(lichHenId)
-                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay lich hen goc"));
+    public LichHen taoLichTaiKham(Long lichHenId, Long bacSiId, LocalDate ngayTaiKham, LocalTime gioTaiKham,
+            String ghiChuTaiKham) {
+        LichHen lichGoc = timLichHenThuocBacSi(lichHenId, bacSiId);
+        BacSi bacSiDangThaoTac = bacSiRepository.findById(bacSiId)
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay bac si"));
 
         if (ngayTaiKham == null || gioTaiKham == null) {
             throw new IllegalArgumentException("Ngay tai kham va gio tai kham la bat buoc");
@@ -213,12 +258,58 @@ public class DatLichKhamService {
         taiKham.setTrieuChung("Tai kham - " + (lichGoc.getTrieuChung() == null ? "" : lichGoc.getTrieuChung()));
         taiKham.setGhiChuTaiKham(ghiChuTaiKham);
         taiKham.setChiPhi(slot.getGiaKham() == null ? BigDecimal.ZERO : slot.getGiaKham());
+        capNhatThongTinQuanLyBacSi(taiKham, bacSiDangThaoTac);
 
         LichHen saved = lichHenRepository.save(taiKham);
         slot.setTrangThai(TrangThaiLichLamViec.DA_DAT);
         lichLamViecRepository.save(slot);
 
         return saved;
+    }
+
+    private LichHen timLichHenThuocBacSi(Long lichHenId, Long bacSiId) {
+        return lichHenRepository.findByIdAndBacSiId(lichHenId, bacSiId)
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay lich hen thuoc bac si dang thao tac"));
+    }
+
+    private void capNhatThongTinQuanLyBacSi(LichHen lichHen, BacSi bacSi) {
+        lichHen.setCapNhatBoiBacSi(bacSi);
+        lichHen.setCapNhatLuc(LocalDateTime.now());
+    }
+
+    private boolean laChuyenTrangThaiHopLe(TrangThaiLichHen hienTai, TrangThaiLichHen moi) {
+        if (hienTai == null) {
+            return moi == TrangThaiLichHen.CHO_XAC_NHAN;
+        }
+
+        return switch (hienTai) {
+            case CHO_XAC_NHAN ->
+                moi == TrangThaiLichHen.DA_XAC_NHAN || moi == TrangThaiLichHen.BO_LO || moi == TrangThaiLichHen.DA_HUY;
+            case DA_XAC_NHAN -> moi == TrangThaiLichHen.DANG_KHAM || moi == TrangThaiLichHen.DA_KHAM
+                    || moi == TrangThaiLichHen.BO_LO || moi == TrangThaiLichHen.DA_HUY;
+            case DANG_KHAM -> moi == TrangThaiLichHen.DA_KHAM || moi == TrangThaiLichHen.BO_LO;
+            case DA_HUY, DA_KHAM, BO_LO -> false;
+        };
+    }
+
+    private LocalDateTime ghepNgayGioKham(LichHen lichHen) {
+        LocalDate ngay = lichHen.getNgayKham() != null ? lichHen.getNgayKham() : LocalDate.now();
+        LocalTime gio = lichHen.getGioKham() != null ? lichHen.getGioKham() : LocalTime.MIN;
+        return LocalDateTime.of(ngay, gio);
+    }
+
+    private boolean laLichDangXuLy(LichHen lichHen) {
+        TrangThaiLichHen tt = lichHen.getTrangThai();
+        return tt == TrangThaiLichHen.CHO_XAC_NHAN
+                || tt == TrangThaiLichHen.DA_XAC_NHAN
+                || tt == TrangThaiLichHen.DANG_KHAM;
+    }
+
+    private boolean laLichDaKetThuc(LichHen lichHen) {
+        TrangThaiLichHen tt = lichHen.getTrangThai();
+        return tt == TrangThaiLichHen.DA_KHAM
+                || tt == TrangThaiLichHen.BO_LO
+                || tt == TrangThaiLichHen.DA_HUY;
     }
 
     @Transactional

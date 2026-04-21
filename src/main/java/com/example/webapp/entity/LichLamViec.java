@@ -1,6 +1,8 @@
 package com.example.webapp.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ public class LichLamViec {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BacSi bacSi;
 
     @Column(nullable = false)

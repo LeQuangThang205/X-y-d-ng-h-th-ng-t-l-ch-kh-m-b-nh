@@ -313,11 +313,49 @@ function setupHeaderAccountDropdown() {
     host.appendChild(buildCustomerAccountDropdown(user));
 }
 
-function authRegister(username, password, role) {
+function setupFloatingContactRail() {
+    if (typeof document === "undefined") return;
+    var pathname = window.location.pathname || "";
+    if (pathname.indexOf("/customer/") !== 0) return;
+    if (document.getElementById("floating-contact-rail")) return;
+
+    var rail = document.createElement("div");
+    rail.id = "floating-contact-rail";
+    rail.className = "floating-contact-rail";
+    rail.setAttribute("aria-label", "Thông tin liên hệ nhanh");
+
+    rail.innerHTML = ""
+        + '<a class="floating-contact-item phone" href="tel:0985081624" aria-label="Gọi hotline 0985081624">'
+        + '<span class="floating-contact-icon"><img src="/images/phone.png" alt="Phone"></span>'
+        + '<span class="floating-contact-text">0985081624</span>'
+        + '</a>'
+        + '<a class="floating-contact-item facebook" href="https://www.facebook.com/thang.lee.948011/" target="_blank" rel="noopener" aria-label="Liên hệ Facebook">'
+        + '<span class="floating-contact-icon"><img src="/images/fb.png" alt="Facebook"></span>'
+        + '<span class="floating-contact-text">Facebook</span>'
+        + '</a>'
+        + '<a class="floating-contact-item zalo" href="https://zalo.me/0985081624" target="_blank" rel="noopener" aria-label="Liên hệ Zalo">'
+        + '<span class="floating-contact-icon"><img src="/images/zalo.png" alt="Zalo"></span>'
+        + '<span class="floating-contact-text">Zalo</span>'
+        + '</a>'
+        + '<a class="floating-contact-item messenger" href="https://m.me/ttcare.vn" target="_blank" rel="noopener" aria-label="Liên hệ Messenger">'
+        + '<span class="floating-contact-icon"><img src="/images/mess.jpg" alt="Messenger"></span>'
+        + '<span class="floating-contact-text">Mess</span>'
+        + '</a>';
+
+    document.body.appendChild(rail);
+}
+
+function authRegister(username, password, role, extra) {
+    var payload = Object.assign({
+        username: username,
+        password: password,
+        role: normalizeRole(role),
+    }, extra || {});
+
     return apiJson("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username, password: password, role: normalizeRole(role) }),
+        body: JSON.stringify(payload),
     });
 }
 
@@ -389,25 +427,60 @@ function setupFlyInAnimations() {
     ];
 
     var all = document.querySelectorAll(selectors.join(","));
-    Array.prototype.forEach.call(all, function (el, index) {
-        if (el.classList.contains("ui-fly-in")) return;
-        el.style.setProperty("--fly-delay", (index * 0.08).toFixed(2) + "s");
-        el.classList.add("ui-fly-in");
+    if (!all.length) return;
+
+    var revealQueue = [];
+    Array.prototype.forEach.call(all, function (el) {
+        if (el.classList.contains("ui-fly-in") || el.dataset.revealBound === "1") return;
+        el.dataset.revealBound = "1";
+        revealQueue.push(el);
     });
+
+    if (!revealQueue.length) return;
+
+    var reduceMotion = false;
+    try {
+        reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (e) {
+        reduceMotion = false;
+    }
+
+    function revealElement(el, order) {
+        if (!el || el.classList.contains("ui-fly-in")) return;
+        el.style.setProperty("--fly-delay", (order * 0.06).toFixed(2) + "s");
+        el.classList.add("ui-fly-in");
+    }
+
+    if (reduceMotion || typeof IntersectionObserver === "undefined") {
+        Array.prototype.forEach.call(revealQueue, function (el, index) {
+            revealElement(el, index);
+        });
+    } else {
+        var revealedCount = 0;
+        var io = new IntersectionObserver(function (entries, observer) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                revealElement(entry.target, revealedCount);
+                revealedCount += 1;
+                observer.unobserve(entry.target);
+            });
+        }, {
+            root: null,
+            rootMargin: "0px 0px -10% 0px",
+            threshold: 0.12,
+        });
+
+        Array.prototype.forEach.call(revealQueue, function (el) {
+            io.observe(el);
+        });
+    }
 
     var target = document.querySelector(".customer-content") || document.body;
     if (!target || target._uiFlyObserverAttached) return;
     target._uiFlyObserverAttached = true;
 
     var observer = new MutationObserver(function () {
-        var dynamic = document.querySelectorAll(".dept-card, .doctor-card, .card, .form-section, .table-wrap");
-        var offset = 0;
-        Array.prototype.forEach.call(dynamic, function (el) {
-            if (el.classList.contains("ui-fly-in")) return;
-            el.style.setProperty("--fly-delay", (offset * 0.06).toFixed(2) + "s");
-            el.classList.add("ui-fly-in");
-            offset += 1;
-        });
+        setupFlyInAnimations();
     });
 
     observer.observe(target, { childList: true, subtree: true });
@@ -417,6 +490,7 @@ function initDynamicCustomerUi() {
     if (typeof window === "undefined") return;
     setupAutoHideHeader();
     setupFlyInAnimations();
+    setupFloatingContactRail();
 }
 
 function initAdminUiEffects() {
@@ -450,5 +524,6 @@ setupHeaderAccountDropdown();
 
 if (typeof window !== "undefined") {
     window.addEventListener("load", setupHeaderAccountDropdown);
+    window.addEventListener("load", setupFloatingContactRail);
 }
 

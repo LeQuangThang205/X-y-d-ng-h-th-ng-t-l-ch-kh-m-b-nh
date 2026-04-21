@@ -120,28 +120,14 @@
                     }
 
                     try {
-                        var reg = await authRegister(email, password, role);
+                        var reg = await authRegister(email, password, role, { fullName: fullname });
                         if (!reg.success) {
                             alert(reg.message || "Đăng ký thất bại");
                             return;
                         }
 
-                        var login = await authLogin(email, password);
-                        if (!login.success) {
-                            alert(login.message || "Đăng nhập thất bại");
-                            return;
-                        }
-
-                        setCurrentUser({
-                            name: fullname,
-                            fullname: fullname,
-                            email: email,
-                            username: login.user,
-                            role: "customer"
-                        });
-
-                        alert("Đăng ký thành công");
-                        window.location.href = '/customer/trangchu.html';
+                        alert("Đăng ký thành công. Vui lòng đăng nhập để tiếp tục.");
+                        window.location.href = '/admin/dangnhap.html';
                     } catch (err) {
                         alert(err.message || "Đăng ký thất bại");
                     }

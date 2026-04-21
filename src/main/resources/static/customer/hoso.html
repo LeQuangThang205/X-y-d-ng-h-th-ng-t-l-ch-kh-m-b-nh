@@ -87,6 +87,17 @@
                   <input type="text" id="address" placeholder="Nhập địa chỉ liên hệ" />
                 </div>
 
+                <div class="form-group">
+                  <label>Ảnh chân dung</label>
+                  <div class="portrait-uploader">
+                    <img id="portrait-preview" class="portrait-preview" src="/images/logo1.jpg" alt="Ảnh chân dung" />
+                    <div class="portrait-uploader-meta">
+                      <input type="file" id="portrait-file" accept="image/*" />
+                      <small class="text-muted">Hỗ trợ JPG/PNG/WebP, tối đa 2MB.</small>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary">Lưu thông tin</button>
                   <button type="button" class="btn btn-outline" onclick="window.location.href='/customer/trangchu.html'">Về trang chủ</button>
@@ -191,8 +202,35 @@
             cccd: document.getElementById("cccd").value.trim() || null,
             phone: document.getElementById("phone").value.trim() || null,
             address: document.getElementById("address").value.trim() || null,
+            anhChanDung:
+              document.getElementById("portrait-preview").dataset.portrait || null,
             taiKhoan: account || null,
           };
+        }
+
+        function setPortraitPreview(value) {
+          var preview = document.getElementById("portrait-preview");
+          var src = (value || "").trim();
+          if (!src) {
+            preview.src = "/images/logo1.jpg";
+            preview.dataset.portrait = "";
+            return;
+          }
+          preview.src = src;
+          preview.dataset.portrait = src;
+        }
+
+        function fileToDataUrl(file) {
+          return new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function () {
+              resolve(String(reader.result || ""));
+            };
+            reader.onerror = function () {
+              reject(new Error("Không thể đọc file ảnh"));
+            };
+            reader.readAsDataURL(file);
+          });
         }
 
         function applyProfile(profile) {
@@ -210,6 +248,7 @@
           document.getElementById("phone").value =
             profile.phone || user.phone || "";
           document.getElementById("address").value = profile.address || "";
+          setPortraitPreview(profile.anhChanDung || "");
           if (headerUserName) {
             headerUserName.textContent = user.name || user.email || "";
           }
@@ -231,6 +270,25 @@
         document.getElementById("email").value = user.email || "";
         document.getElementById("fullname").value = user.name || "";
         if (user.phone) document.getElementById("phone").value = user.phone;
+        setPortraitPreview("");
+
+        document
+          .getElementById("portrait-file")
+          .addEventListener("change", async function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+              alert("Ảnh vượt quá 2MB. Vui lòng chọn ảnh nhỏ hơn.");
+              e.target.value = "";
+              return;
+            }
+            try {
+              var dataUrl = await fileToDataUrl(file);
+              setPortraitPreview(dataUrl);
+            } catch (err) {
+              alert(err.message || "Không thể tải ảnh chân dung");
+            }
+          });
 
         document
           .getElementById("profile-form")

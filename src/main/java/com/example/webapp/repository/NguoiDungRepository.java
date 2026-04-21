@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface NguoiDungRepository extends JpaRepository<NguoiDung, Long> {
     Optional<NguoiDung> findByUsername(String username);
+
+    Optional<NguoiDung> findByUsernameIgnoreCase(String username);
 }

@@ -49,7 +49,22 @@ public class QuanTriPortalController {
 
     @GetMapping("/doctors")
     public List<BacSi> doctors() {
-        return datLichKhamService.layBacSiQuanTri();
+        return nguoiDungService.layBacSiCoTaiKhoanDoctor();
+    }
+
+    @DeleteMapping("/doctors/orphaned")
+    public Map<String, Object> cleanupOrphanDoctors() {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            int deleted = nguoiDungService.xoaHoSoBacSiKhongCoTaiKhoanDoctor();
+            res.put("success", true);
+            res.put("deleted", deleted);
+            res.put("message", "Da xoa " + deleted + " ho so bac si khong co tai khoan doctor");
+        } catch (Exception ex) {
+            res.put("success", false);
+            res.put("message", ex.getMessage());
+        }
+        return res;
     }
 
     @GetMapping("/specialties")
@@ -102,17 +117,11 @@ public class QuanTriPortalController {
     }
 
     @PostMapping("/doctors")
-    public BacSi createDoctor(@RequestBody Map<String, String> req) {
-        BacSi doctor = new BacSi();
-        doctor.setHoTen(req.get("hoTen"));
-        doctor.setChucDanh(req.get("chucDanh"));
-        doctor.setEmail(req.get("email"));
-        doctor.setSoDienThoai(req.get("soDienThoai"));
-
-        Long chuyenKhoaId = Long.valueOf(req.get("chuyenKhoaId"));
-        Long phongKhamId = Long.valueOf(req.get("phongKhamId"));
-
-        return datLichKhamService.luuBacSi(doctor, chuyenKhoaId, phongKhamId);
+    public Map<String, Object> createDoctor() {
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", false);
+        res.put("message", "Chuc nang them bac si da duoc tat");
+        return res;
     }
 
     @PostMapping("/work-schedules")
@@ -330,19 +339,19 @@ public class QuanTriPortalController {
             String newUsername = req.get("username");
             String newPassword = req.get("password");
 
-            NguoiDung user = nguoiDungService.findUserById(userId);
-            if (user == null) {
+            NguoiDung updated = nguoiDungService.findUserById(userId);
+            if (updated == null) {
                 throw new Exception("Tài khoản không tồn tại");
             }
 
             if (newUsername != null && !newUsername.trim().isEmpty()) {
-                user.setUsername(newUsername.trim());
+                updated = nguoiDungService.updateUsername(userId, newUsername.trim());
             }
             if (newPassword != null && !newPassword.trim().isEmpty()) {
-                user.setPassword(newPassword.trim());
+                updated.setPassword(newPassword.trim());
             }
 
-            NguoiDung updated = nguoiDungService.saveUser(user);
+            updated = nguoiDungService.saveUser(updated);
             res.put("success", true);
             res.put("id", updated.getId());
             res.put("username", updated.getUsername());

@@ -1,5 +1,6 @@
 package com.example.webapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,6 +20,15 @@ public class BacSi {
 
     @Column(unique = true)
     private String email;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "email", referencedColumnName = "username", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "fk_doctors_user_account"))
+    private NguoiDung taiKhoanNguoiDung;
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String anhChanDung;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "specialty_id")
@@ -69,6 +79,22 @@ public class BacSi {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public NguoiDung getTaiKhoanNguoiDung() {
+        return taiKhoanNguoiDung;
+    }
+
+    public void setTaiKhoanNguoiDung(NguoiDung taiKhoanNguoiDung) {
+        this.taiKhoanNguoiDung = taiKhoanNguoiDung;
+    }
+
+    public String getAnhChanDung() {
+        return anhChanDung;
+    }
+
+    public void setAnhChanDung(String anhChanDung) {
+        this.anhChanDung = anhChanDung;
     }
 
     public ChuyenKhoa getChuyenKhoa() {

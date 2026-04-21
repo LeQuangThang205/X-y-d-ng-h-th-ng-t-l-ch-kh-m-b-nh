@@ -10,7 +10,7 @@
     <aside class="sidebar">
         <div class="sidebar-header"><span class="logo">Portal Bác sĩ</span></div>
         <nav class="sidebar-nav">
-            <a href="/doctor/lichkham.html" class="active"><span class="icon">📅</span> Portal cá nhân</a>
+            <a href="/doctor/lichkham.html" class="active"><span class="icon">📅</span> Quản lý đặt lịch</a>
         </nav>
     </aside>
     <main class="main-area">
@@ -34,6 +34,48 @@
                         </div>
                     </form>
                     <p class="text-muted">Hệ thống tự nhận diện bác sĩ theo tài khoản. Bạn chỉ cần nhập mã bác sĩ nếu cần cập nhật thủ công.</p>
+                </div>
+            </div>
+
+            <div class="card mb-1">
+                <div class="card-header">Cập nhật hồ sơ bác sĩ</div>
+                <div class="card-body">
+                    <form id="doctor-profile-form">
+                        <div class="doctor-profile-grid">
+                            <div class="portrait-uploader">
+                                <img id="doctor-portrait-preview" class="portrait-preview" src="/images/logo1.jpg" alt="Ảnh chân dung bác sĩ">
+                                <div class="portrait-uploader-meta">
+                                    <input type="file" id="doctor-portrait-file" accept="image/*">
+                                    <small class="text-muted">Hỗ trợ JPG/PNG/WebP, tối đa 2MB.</small>
+                                </div>
+                            </div>
+                            <div class="doctor-profile-fields">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Họ tên bác sĩ *</label>
+                                        <input type="text" id="doctor-full-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số điện thoại</label>
+                                        <input type="tel" id="doctor-phone" placeholder="Ví dụ: 0901234567">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Chức danh</label>
+                                        <input type="text" id="doctor-title" placeholder="Ví dụ: Bác sĩ chuyên khoa I">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email tài khoản</label>
+                                        <input type="email" id="doctor-email" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Lưu hồ sơ bác sĩ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -191,6 +233,46 @@
             var slotMessage = document.getElementById('slot-lock-message');
             var scheduleDateInput = document.getElementById('schedule-date');
             var visitModal = document.getElementById('doctor-visit-modal');
+            var profileForm = document.getElementById('doctor-profile-form');
+            var profileFullNameInput = document.getElementById('doctor-full-name');
+            var profilePhoneInput = document.getElementById('doctor-phone');
+            var profileTitleInput = document.getElementById('doctor-title');
+            var profileEmailInput = document.getElementById('doctor-email');
+            var profilePortraitInput = document.getElementById('doctor-portrait-file');
+            var profilePortraitPreview = document.getElementById('doctor-portrait-preview');
+
+            function setPortraitPreview(value) {
+                var src = (value || '').trim();
+                if (!src) {
+                    profilePortraitPreview.src = '/images/logo1.jpg';
+                    profilePortraitPreview.dataset.portrait = '';
+                    return;
+                }
+                profilePortraitPreview.src = src;
+                profilePortraitPreview.dataset.portrait = src;
+            }
+
+            function fileToDataUrl(file) {
+                return new Promise(function (resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        resolve(String(reader.result || ''));
+                    };
+                    reader.onerror = function () {
+                        reject(new Error('Khong the doc file anh'));
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function applyDoctorProfile(profile) {
+                if (!profile) return;
+                profileFullNameInput.value = profile.fullName || '';
+                profilePhoneInput.value = profile.phone || '';
+                profileTitleInput.value = profile.title || '';
+                profileEmailInput.value = profile.email || user.email || '';
+                setPortraitPreview(profile.portrait || '');
+            }
 
             function setGreeting(fullName, email) {
                 var displayName = (fullName || '').trim();
@@ -225,7 +307,7 @@
             function statusLabel(status) {
                 var map = {
                     CHO_XAC_NHAN: 'Chờ khám',
-                    DA_XAC_NHAN: 'Chờ khám',
+                    DA_XAC_NHAN: 'Đã xác nhận',
                     DANG_KHAM: 'Đang khám',
                     DA_KHAM: 'Đã khám xong',
                     DA_HUY: 'Đã hủy',
@@ -237,6 +319,28 @@
             function patientHistory(item) {
                 var raw = (item.benhNhan && item.benhNhan.tienSuBenh) || item.ghiChuTaiKham;
                 return raw && String(raw).trim() ? raw : 'Chưa cập nhật';
+            }
+
+            function statusActions(item) {
+                var status = item && item.trangThai;
+                var actions = [];
+
+                if (status === 'CHO_XAC_NHAN') {
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_XAC_NHAN">Xác nhận lịch hẹn</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO">Bỏ lỡ</button>');
+                } else if (status === 'DA_XAC_NHAN') {
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_KHAM">Đã khám xong</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO">Bỏ lỡ</button>');
+                } else if (status === 'DANG_KHAM') {
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_KHAM">Đã khám xong</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO">Bỏ lỡ</button>');
+                }
+
+                if (!actions.length) {
+                    return '<span class="text-muted">Không có thao tác trạng thái</span>';
+                }
+
+                return actions.join('');
             }
 
             function renderTodayStats(list) {
@@ -275,8 +379,7 @@
                         + '<td>'
                         + '<div class="doctor-row-actions">'
                         + '<div class="doctor-status-quick">'
-                        + '<button type="button" class="btn-sm btn-outline" data-status="DANG_KHAM">Đang khám</button>'
-                        + '<button type="button" class="btn-sm btn-outline" data-status="DA_KHAM">Đã khám xong</button>'
+                        + statusActions(item)
                         + '</div>'
                         + '<button type="button" class="btn-sm btn-primary" data-open-visit>Mở hồ sơ</button>'
                         + '</div>'
@@ -350,31 +453,44 @@
             }
 
             function loadDoctorProfileById() {
-                if (!state.doctorId) return Promise.resolve();
+                if (!state.doctorId) return Promise.resolve(false);
                 return apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/profile')
                     .then(function (profile) {
-                        if (!profile) return;
+                        if (!profile) return false;
                         var name = profile.fullName || profile.email;
                         setGreeting(name, profile.email);
-                        user.doctorId = profile.doctorId || state.doctorId;
+                        applyDoctorProfile(profile);
+                        state.doctorId = profile.doctorId || state.doctorId;
+                        user.doctorId = state.doctorId;
                         user.name = name || user.name;
                         user.fullname = profile.fullName || user.fullname;
+                        inputDoctorId.value = state.doctorId || '';
+                        if (state.doctorId) {
+                            localStorage.setItem('doctor_portal_doctorId', String(state.doctorId));
+                        }
                         setCurrentUser(user);
+                        return true;
                     })
                     .catch(function () {
-                        // Khong chan luong tai du lieu neu khong lay duoc profile.
+                        state.doctorId = '';
+                        user.doctorId = '';
+                        inputDoctorId.value = '';
+                        localStorage.removeItem('doctor_portal_doctorId');
+                        setCurrentUser(user);
+                        return false;
                     });
             }
 
             function resolveDoctorProfileFromAccount() {
                 var account = (user.username || user.email || '').trim();
-                if (!account) return Promise.resolve();
+                if (!account) return Promise.resolve(false);
 
                 return apiJson('/api/doctor/profile/by-account?account=' + encodeURIComponent(account))
                     .then(function (profile) {
                         if (!profile) return;
 
                         setGreeting(profile.fullName, profile.email);
+                        applyDoctorProfile(profile);
                         user.name = profile.fullName || user.name;
                         user.fullname = profile.fullName || user.fullname;
 
@@ -386,10 +502,18 @@
                         }
 
                         setCurrentUser(user);
+                        return !!profile.doctorId;
                     })
-                    .catch(function () {
-                        // Khong chan luong tai du lieu neu khong map duoc account -> bac si.
+                    .catch(function (err) {
+                        return false;
                     });
+            }
+
+            function ensureDoctorContext() {
+                return loadDoctorProfileById().then(function (ok) {
+                    if (ok) return true;
+                    return resolveDoctorProfileFromAccount();
+                });
             }
 
             function closeVisitModal() {
@@ -451,7 +575,14 @@
                 user.doctorId = value;
                 setCurrentUser(user);
                 localStorage.setItem('doctor_portal_doctorId', value);
-                loadDoctorProfileById().finally(loadPortalData);
+                ensureDoctorContext().then(function (ok) {
+                    if (!ok) {
+                        throw new Error('Khong tim thay bac si theo ma vua nhap hoac tai khoan dang nhap.');
+                    }
+                    loadPortalData();
+                }).catch(function (err) {
+                    alert(err.message || 'Khong tim thay bac si');
+                });
             });
 
             document.getElementById('portal-tabs').addEventListener('click', function (e) {
@@ -467,6 +598,66 @@
                 });
             });
 
+            profilePortraitInput.addEventListener('change', function (e) {
+                var file = e.target.files && e.target.files[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Anh vuot qua 2MB. Vui long chon anh nho hon.');
+                    e.target.value = '';
+                    return;
+                }
+
+                fileToDataUrl(file)
+                    .then(setPortraitPreview)
+                    .catch(function (err) {
+                        alert(err.message || 'Khong the tai anh chan dung');
+                    });
+            });
+
+            profileForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var fullName = String(profileFullNameInput.value || '').trim();
+                if (!fullName) {
+                    alert('Ho ten bac si khong duoc de trong.');
+                    return;
+                }
+
+                var payload = {
+                    fullName: fullName,
+                    phone: String(profilePhoneInput.value || '').trim() || null,
+                    title: String(profileTitleInput.value || '').trim() || null,
+                    portrait: profilePortraitPreview.dataset.portrait || null
+                };
+
+                ensureDoctorContext().then(function (ok) {
+                    if (!ok || !state.doctorId) {
+                        throw new Error('Khong xac dinh duoc ho so bac si tu tai khoan dang nhap.');
+                    }
+
+                    return apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/profile', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }).then(function (res) {
+                    if (!res.success) throw new Error(res.message || 'Cap nhat ho so that bai');
+                    applyDoctorProfile(res);
+                    setGreeting(res.fullName, res.email);
+                    user.name = res.fullName || user.name;
+                    user.fullname = res.fullName || user.fullname;
+                    user.doctorId = res.doctorId || state.doctorId;
+                    if (user.doctorId) {
+                        state.doctorId = user.doctorId;
+                        inputDoctorId.value = user.doctorId;
+                        localStorage.setItem('doctor_portal_doctorId', String(user.doctorId));
+                    }
+                    setCurrentUser(user);
+                    alert('Da cap nhat ho so bac si thanh cong.');
+                }).catch(function (err) {
+                    alert(err.message || 'Cap nhat ho so that bai');
+                });
+            });
+
             todayBody.addEventListener('click', function (e) {
                 var row = e.target.closest('tr[data-id]');
                 if (!row) return;
@@ -476,7 +667,7 @@
 
                 if (e.target.matches('[data-status]')) {
                     var nextStatus = e.target.getAttribute('data-status');
-                    apiJson('/api/doctor/appointments/' + encodeURIComponent(id) + '/status', {
+                    apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/appointments/' + encodeURIComponent(id) + '/status', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ status: nextStatus })
@@ -508,7 +699,7 @@
                     ghiChuTaiKham: document.getElementById('visit-ghi-chu').value
                 };
 
-                apiJson('/api/doctor/appointments/' + encodeURIComponent(state.activeAppointment.id) + '/clinical-note', {
+                apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/appointments/' + encodeURIComponent(state.activeAppointment.id) + '/clinical-note', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -531,7 +722,7 @@
                     return;
                 }
 
-                apiJson('/api/doctor/appointments/' + encodeURIComponent(state.activeAppointment.id) + '/follow-up', {
+                apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/appointments/' + encodeURIComponent(state.activeAppointment.id) + '/follow-up', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -591,7 +782,11 @@
             });
 
             if (state.doctorId) {
-                loadDoctorProfileById().finally(loadPortalData);
+                ensureDoctorContext().finally(function () {
+                    if (state.doctorId) {
+                        loadPortalData();
+                    }
+                });
             } else {
                 resolveDoctorProfileFromAccount().finally(function () {
                     if (state.doctorId) {
@@ -599,6 +794,9 @@
                     }
                 });
             }
+
+            profileEmailInput.value = user.email || '';
+            setPortraitPreview('');
         })();
     </script>
 </body>

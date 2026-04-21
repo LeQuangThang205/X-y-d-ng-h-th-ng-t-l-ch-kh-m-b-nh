@@ -1,6 +1,9 @@
 package com.example.webapp.controller;
 
+import com.example.webapp.entity.BenhNhan;
 import com.example.webapp.entity.NguoiDung;
+import com.example.webapp.service.BenhNhanService;
+import com.example.webapp.service.EmailService;
 import com.example.webapp.service.NguoiDungService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,12 @@ import java.util.Optional;
 public class XacThucController {
     @Autowired
     private NguoiDungService userService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private BenhNhanService patientService;
 
     @PostMapping("/register")
     public Map<String, Object> register(@RequestBody Map<String, String> req) {
@@ -30,9 +39,23 @@ public class XacThucController {
 
         try {
             NguoiDung user = userService.registerUser(username, password, role);
+            String fullName = req.getOrDefault("fullName", username);
+
+            if ("customer".equals(userService.normalizeRole(role))) {
+                BenhNhan patient = new BenhNhan();
+                patient.setTaiKhoan(username);
+                patient.setFullname(fullName);
+                patientService.savePatient(patient);
+            }
+
+            boolean emailSent = emailService.sendRegistrationSuccessEmail(username, fullName);
             res.put("success", true);
             res.put("user", user.getUsername());
             res.put("role", user.getRole());
+            res.put("emailSent", emailSent);
+            if (!emailSent) {
+                res.put("message", "Đã tạo tài khoản thành công nhưng không gửi được email xác nhận");
+            }
         } catch (Exception ex) {
             res.put("success", false);
             res.put("message", ex.getMessage());

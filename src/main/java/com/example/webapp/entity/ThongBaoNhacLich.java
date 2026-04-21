@@ -1,6 +1,8 @@
 package com.example.webapp.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -13,10 +15,12 @@ public class ThongBaoNhacLich {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "appointment_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private LichHen lichHen;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BenhNhan benhNhan;
 
     @Column(nullable = false, length = 1000)

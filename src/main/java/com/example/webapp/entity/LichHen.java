@@ -1,6 +1,9 @@
 package com.example.webapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,11 +19,18 @@ public class LichHen {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BenhNhan benhNhan;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BacSi bacSi;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by_doctor_id")
+    @JsonIgnore
+    private BacSi capNhatBoiBacSi;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "specialty_id", nullable = false)
@@ -65,10 +75,15 @@ public class LichHen {
     @Column(nullable = false)
     private LocalDateTime taoLuc;
 
+    private LocalDateTime capNhatLuc;
+
     @PrePersist
     public void prePersist() {
         if (taoLuc == null) {
             taoLuc = LocalDateTime.now();
+        }
+        if (capNhatLuc == null) {
+            capNhatLuc = taoLuc;
         }
     }
 
@@ -94,6 +109,14 @@ public class LichHen {
 
     public void setBacSi(BacSi bacSi) {
         this.bacSi = bacSi;
+    }
+
+    public BacSi getCapNhatBoiBacSi() {
+        return capNhatBoiBacSi;
+    }
+
+    public void setCapNhatBoiBacSi(BacSi capNhatBoiBacSi) {
+        this.capNhatBoiBacSi = capNhatBoiBacSi;
     }
 
     public ChuyenKhoa getChuyenKhoa() {
@@ -198,5 +221,13 @@ public class LichHen {
 
     public void setTaoLuc(LocalDateTime taoLuc) {
         this.taoLuc = taoLuc;
+    }
+
+    public LocalDateTime getCapNhatLuc() {
+        return capNhatLuc;
+    }
+
+    public void setCapNhatLuc(LocalDateTime capNhatLuc) {
+        this.capNhatLuc = capNhatLuc;
     }
 }

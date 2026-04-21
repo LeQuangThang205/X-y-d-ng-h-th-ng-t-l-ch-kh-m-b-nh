@@ -13,7 +13,6 @@
             <a href="/admin/trangquantri.html"><span class="icon">📊</span> Bảng điều khiển</a>
             <a href="/admin/khachhang.html"><span class="icon">👥</span> Quản lý khách hàng</a>
             <a href="/admin/taikhoan.html"><span class="icon">🔐</span> Quản lý tài khoản</a>
-            <a href="/admin/lichhen.html"><span class="icon">📅</span> Quản lý đặt lịch</a>
             <a href="/admin/bacsi.html" class="active"><span class="icon">🩺</span> Quản lý bác sĩ</a>
             <a href="/admin/khoa.html"><span class="icon">🏷️</span> Quản lý chuyên khoa</a>
             <a href="/admin/phongkham.html">Quản lý phòng khám</a>
@@ -29,30 +28,10 @@
             </div>
         </header>
         <div class="content">
-            <h1 class="page-title">Danh sách bác sĩ</h1>
+            <h1 class="page-title">Tạo lịch làm việc bác sĩ</h1>
 
             <div class="card mb-1">
-                <div class="card-header">Thêm bác sĩ</div>
-                <div class="card-body">
-                    <p class="text-muted" id="room-hint" style="margin-top:0;margin-bottom:10px;">Phòng khám được lấy từ dữ liệu hệ thống.</p>
-                    <form id="doctor-form">
-                        <div class="form-row">
-                            <div class="form-group"><label>Họ tên</label><input type="text" id="d-name" required /></div>
-                            <div class="form-group"><label>Chức danh</label><input type="text" id="d-title" /></div>
-                            <div class="form-group"><label>Email</label><input type="email" id="d-email" /></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Số điện thoại</label><input type="text" id="d-phone" /></div>
-                            <div class="form-group"><label>Chuyên khoa</label><select id="d-specialty" required></select></div>
-                            <div class="form-group"><label>Phòng khám</label><select id="d-room" required></select></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Thêm bác sĩ</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card mb-1">
-                <div class="card-header">Tạo lịch làm việc theo ca</div>
+                <div class="card-header">Tạo lịch làm việc theo ca (chỉ bác sĩ có tài khoản)</div>
                 <div class="card-body">
                     <form id="schedule-form" class="form-row">
                         <div class="form-group"><label>Bác sĩ</label><select id="s-doctor" required></select></div>
@@ -68,17 +47,7 @@
                         <div class="form-group"><label>Phí khám</label><input type="number" id="s-fee" min="0" step="1000" /></div>
                         <div class="form-group" style="align-self:end;"><button type="submit" class="btn btn-outline">Tạo lịch</button></div>
                     </form>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-wrap">
-                        <table>
-                            <thead><tr><th>ID</th><th>Bác sĩ</th><th>Chuyên khoa</th><th>Phòng</th><th>Email</th></tr></thead>
-                            <tbody id="doctor-body"><tr><td colspan="5" class="text-muted">Đang tải...</td></tr></tbody>
-                        </table>
-                    </div>
+                    <p id="doctor-note" class="text-muted" style="margin-top:10px;margin-bottom:0;"></p>
                 </div>
             </div>
         </div>
@@ -89,12 +58,10 @@
             var user = requireAuth(['admin']);
             if (user) document.getElementById('user-name').textContent = user.name || user.email;
 
-            var specialtySelect = document.getElementById('d-specialty');
-            var roomSelect = document.getElementById('d-room');
             var doctorSelect = document.getElementById('s-doctor');
-            var doctorBody = document.getElementById('doctor-body');
-            var doctorForm = document.getElementById('doctor-form');
-            var roomHint = document.getElementById('room-hint');
+            var doctorNote = document.getElementById('doctor-note');
+            var scheduleForm = document.getElementById('schedule-form');
+            var scheduleSubmit = scheduleForm.querySelector('button[type="submit"]');
 
             function fillSelect(el, list, textFn) {
                 el.innerHTML = '';
@@ -107,80 +74,36 @@
             }
 
             function loadAll() {
-                return Promise.all([
-                    apiJson('/api/admin/specialties'),
-                    apiJson('/api/admin/rooms'),
-                    apiJson('/api/admin/doctors')
-                ]).then(function(results) {
-                    var specialties = results[0] || [];
-                    var rooms = results[1] || [];
-                    var doctors = results[2] || [];
+                return apiJson('/api/admin/doctors/orphaned', { method: 'DELETE' })
+                    .catch(function() {
+                        // Khong chan trang neu khong cleanup duoc.
+                    })
+                    .then(function() {
+                        return apiJson('/api/admin/doctors');
+                    })
+                    .then(function(doctors) {
+                        doctors = doctors || [];
+                        fillSelect(doctorSelect, doctors, function(d) { return (d.hoTen || 'Bac si') + ' - ' + (d.email || '-'); });
 
-                    fillSelect(specialtySelect, specialties, function(s) { return s.ten; });
-                    if (rooms.length) {
-                        fillSelect(roomSelect, rooms, function(r) { return r.ten; });
-                        roomSelect.disabled = false;
-                        if (roomHint) roomHint.textContent = 'Phòng khám được lấy từ dữ liệu hệ thống.';
-                        if (doctorForm) {
-                            var btn = doctorForm.querySelector('button[type="submit"]');
-                            if (btn) btn.disabled = false;
+                        if (!doctors.length) {
+                            doctorSelect.innerHTML = '<option value="">Chưa có bác sĩ có tài khoản</option>';
+                            doctorSelect.disabled = true;
+                            scheduleSubmit.disabled = true;
+                            doctorNote.textContent = 'Không có bác sĩ hợp lệ để tạo lịch. Vui lòng tạo tài khoản vai trò doctor trước ở trang Quản lý tài khoản.';
+                            return;
                         }
-                    } else {
-                        roomSelect.innerHTML = '<option value="">Chưa có phòng khám</option>';
-                        roomSelect.disabled = true;
-                        if (roomHint) roomHint.innerHTML = 'Chưa có phòng khám trong dữ liệu. Vui lòng tạo ở trang <a href="/admin/phongkham.html">Quản lý phòng khám</a>.';
-                        if (doctorForm) {
-                            var btn2 = doctorForm.querySelector('button[type="submit"]');
-                            if (btn2) btn2.disabled = true;
-                        }
-                    }
-                    fillSelect(doctorSelect, doctors, function(d) { return d.hoTen; });
 
-                    if (!doctors.length) {
-                        doctorBody.innerHTML = '<tr><td colspan="5" class="text-muted">Chưa có bác sĩ.</td></tr>';
-                        return;
-                    }
-
-                    doctorBody.innerHTML = doctors.map(function(d) {
-                        return '<tr>'
-                            + '<td>' + d.id + '</td>'
-                            + '<td>' + (d.hoTen || '-') + '</td>'
-                            + '<td>' + (d.chuyenKhoa ? d.chuyenKhoa.ten : '-') + '</td>'
-                            + '<td>' + (d.phongKham ? d.phongKham.ten : '-') + '</td>'
-                            + '<td>' + (d.email || '-') + '</td>'
-                            + '</tr>';
-                    }).join('');
-                }).catch(function(err) {
-                    doctorBody.innerHTML = '<tr><td colspan="5" class="text-danger">' + (err.message || 'Tải dữ liệu thất bại') + '</td></tr>';
-                });
+                        doctorSelect.disabled = false;
+                        scheduleSubmit.disabled = false;
+                        doctorNote.textContent = 'Danh sách bác sĩ được đồng bộ từ tài khoản role doctor.';
+                    })
+                    .catch(function(err) {
+                        doctorSelect.innerHTML = '<option value="">Tải dữ liệu thất bại</option>';
+                        doctorSelect.disabled = true;
+                        scheduleSubmit.disabled = true;
+                        doctorNote.textContent = err.message || 'Tải dữ liệu bác sĩ thất bại';
+                    });
             }
-
-            document.getElementById('doctor-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (!roomSelect.value) {
-                    alert('Vui lòng tạo phòng khám trước trong trang Quản lý phòng khám.');
-                    return;
-                }
-                var payload = {
-                    hoTen: document.getElementById('d-name').value.trim(),
-                    chucDanh: document.getElementById('d-title').value.trim(),
-                    email: document.getElementById('d-email').value.trim(),
-                    soDienThoai: document.getElementById('d-phone').value.trim(),
-                    chuyenKhoaId: specialtySelect.value,
-                    phongKhamId: roomSelect.value,
-                };
-
-                apiJson('/api/admin/doctors', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }).then(function() {
-                    document.getElementById('doctor-form').reset();
-                    return loadAll();
-                }).catch(function(err) {
-                    alert(err.message || 'Thêm bác sĩ thất bại');
-                });
-            });
 
             document.getElementById('schedule-form').addEventListener('submit', function(e) {
                 e.preventDefault();

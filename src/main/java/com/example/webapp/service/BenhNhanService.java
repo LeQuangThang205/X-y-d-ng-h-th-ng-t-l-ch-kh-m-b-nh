@@ -42,6 +42,7 @@ public class BenhNhanService {
         current.setCccd(patch.getCccd());
         current.setPhone(patch.getPhone());
         current.setAddress(patch.getAddress());
+        current.setAnhChanDung(patch.getAnhChanDung());
 
         if (patch.getTaiKhoan() != null && !patch.getTaiKhoan().isBlank()) {
             current.setTaiKhoan(patch.getTaiKhoan().trim());

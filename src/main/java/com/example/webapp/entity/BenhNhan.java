@@ -1,5 +1,6 @@
 package com.example.webapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -22,8 +23,17 @@ public class BenhNhan {
 
     private String address;
 
-    @Column(unique = true)
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String anhChanDung;
+
+    @Column(name = "tai_khoan", unique = true)
     private String taiKhoan;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tai_khoan", referencedColumnName = "username", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "fk_patients_user_account"))
+    private NguoiDung taiKhoanNguoiDung;
 
     // Getters and setters
     public Long getId() {
@@ -88,5 +98,21 @@ public class BenhNhan {
 
     public void setTaiKhoan(String taiKhoan) {
         this.taiKhoan = taiKhoan;
+    }
+
+    public String getAnhChanDung() {
+        return anhChanDung;
+    }
+
+    public void setAnhChanDung(String anhChanDung) {
+        this.anhChanDung = anhChanDung;
+    }
+
+    public NguoiDung getTaiKhoanNguoiDung() {
+        return taiKhoanNguoiDung;
+    }
+
+    public void setTaiKhoanNguoiDung(NguoiDung taiKhoanNguoiDung) {
+        this.taiKhoanNguoiDung = taiKhoanNguoiDung;
     }
 }
