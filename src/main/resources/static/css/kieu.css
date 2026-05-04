@@ -1304,48 +1304,68 @@ a:hover {
 .account-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     min-height: 36px;
-    padding: 0 12px;
+    padding: 0 14px 0 16px;
     border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    background: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.42);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     color: #0f172a;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 
 .account-toggle:hover,
 .account-dropdown.is-open .account-toggle {
     transform: translateY(-1px);
     border-color: #7dd3fc;
-    box-shadow: 0 10px 24px rgba(14, 165, 233, 0.18);
+    background: linear-gradient(180deg, #ffffff 0%, #eff8ff 100%);
+    box-shadow: 0 12px 28px rgba(14, 165, 233, 0.14);
 }
 
 .account-caret {
-    font-size: 0.7rem;
-    color: #475569;
-    transition: transform 0.18s ease;
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    border-right: 2px solid #475569;
+    border-bottom: 2px solid #475569;
+    transform: translateY(-1px) rotate(45deg);
+    transition: transform 0.18s ease, border-color 0.18s ease;
+    flex-shrink: 0;
 }
 
 .account-dropdown.is-open .account-caret {
-    transform: rotate(180deg);
+    transform: translateY(2px) rotate(-135deg);
+    border-color: #0f172a;
 }
 
 .account-panel {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 10px);
     right: 0;
-    min-width: 224px;
-    padding: 8px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
+    min-width: 240px;
+    padding: 10px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
     background: #ffffff;
-    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.17);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
     display: none;
     z-index: 45;
+}
+
+.account-panel::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: 24px;
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border-left: 1px solid rgba(148, 163, 184, 0.22);
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+    transform: rotate(45deg);
 }
 
 .account-dropdown.is-open .account-panel {
@@ -1359,11 +1379,11 @@ a:hover {
     align-items: center;
     border: none;
     background: transparent;
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: #334155;
-    border-radius: 10px;
-    padding: 10px 11px;
+    border-radius: 12px;
+    padding: 11px 12px;
     cursor: pointer;
     text-align: left;
 }
@@ -1371,7 +1391,7 @@ a:hover {
 .account-menu-link:hover,
 .account-menu-action:hover {
     color: #0f172a;
-    background: rgba(14, 165, 233, 0.12);
+    background: rgba(14, 165, 233, 0.1);
 }
 
 .account-menu-action.logout {

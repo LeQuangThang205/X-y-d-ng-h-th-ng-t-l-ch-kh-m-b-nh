@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên Hệ - TT Care+</title>
+    <link rel="stylesheet" href="/css/kieu.css">
+    <style>
+        .chat-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            margin-top: 20px;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #0c4a6e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.customer {
+            justify-content: flex-end;
+        }
+
+        .message.ai {
+            justify-content: flex-start;
+        }
+
+        .message.admin {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.customer .message-bubble {
+            background: #0d6efd;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai .message-bubble {
+            background: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.admin .message-bubble {
+            background: #fff3cd;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            padding: 0 8px;
+        }
+
+        .message.customer .message-time {
+            text-align: right;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .input-form {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 13px;
+            max-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .send-btn {
+            padding: 10px 16px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #0c4a6e;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #0d6efd;
+        }
+
+        .customer-info-toggle {
+            font-size: 12px;
+            color: #0d6efd;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-bottom: 10px;
+        }
+
+        .customer-info-form {
+            display: none;
+            background: #f0f8ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #0d6efd;
+        }
+
+        .customer-info-form.show {
+            display: block;
+        }
+
+        .customer-info-form input {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .chat-wrapper {
+                max-height: none;
+                height: auto;
+                min-height: 500px;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
+
+            .chat-header h2 {
+                font-size: 16px;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+        }
+
+        .loading-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: blink 1.4s infinite;
+        }
+
+        .loading-indicator:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-indicator:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0.5; }
+            40% { opacity: 1; }
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .page-title {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body class="customer-layout">
+    <header class="customer-header">
+        <a href="/customer/trangchu.html" class="brand"><img src="/images/logo1.jpg" alt="TT Care+" style="height:36px;vertical-align:middle;margin-right:8px">TT Care+</a>
+        <nav>
+            <a href="/customer/trangchu.html">Trang chủ</a>
+            <a href="/customer/khoa.html">Chuyên khoa</a>
+            <a href="/customer/bacsi.html">Bác sĩ</a>
+            <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
+            <a href="/customer/datlich.html">Đặt lịch</a>
+            <a href="/customer/lichcuatoi.html">Lịch khám</a>
+            <a href="/customer/lienhe.html" class="active">Liên hệ</a>
+        </nav>
+        <div class="header-actions">
+            <a href="/admin/dangnhap.html" class="btn btn-outline" id="header-auth-link">Đăng nhập</a>
+            <a href="/customer/datlich.html" class="btn btn-primary">Đặt lịch khám</a>
+        </div>
+    </header>
+
+    <div class="customer-content profile-page">
+        <div class="profile-layout">
+            <aside class="profile-sidebar">
+                <nav class="profile-menu">
+                    <a href="/customer/hoso.html">Thông tin cá nhân</a>
+                    <a href="/customer/lichcuatoi.html">Lịch khám</a>
+                    <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
+                    <a href="#">Đánh giá</a>
+                    <a href="#" onclick="logout(); return false;">Đăng xuất</a>
+                </nav>
+            </aside>
+
+            <main class="profile-main">
+                <h1 class="page-title">Liên Hệ Hỗ Trợ</h1>
+                
+                <div class="chat-wrapper">
+                    <div class="chat-header">
+                        <h2>
+                            💬 Hỗ Trợ Khách Hàng
+                            <span class="status-badge" id="statusBadge">AI trực tuyến</span>
+                        </h2>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages"></div>
+
+                    <div class="chat-input-area">
+                        <div class="customer-info-toggle" onclick="toggleCustomerInfo()">
+                            📋 Cập nhật thông tin
+                        </div>
+
+                        <div class="customer-info-form" id="customerInfoForm">
+                            <input type="text" id="customerName" placeholder="Tên của bạn" maxlength="100">
+                            <input type="tel" id="customerPhone" placeholder="Số điện thoại" maxlength="20">
+                            <button class="send-btn" style="width: 100%; margin-top: 6px;" onclick="saveCustomerInfo()">Lưu</button>
+                        </div>
+
+                        <div class="input-form">
+                            <div class="message-input">
+                                <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." />
+                                <button class="send-btn" onclick="sendMessage()">Gửi</button>
+                            </div>
+                        </div>
+
+                        <div class="info-text">
+                            Gõ "<strong>gặp admin</strong>" để được hỗ trợ trực tiếp 👨‍💼
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-main">
+            <div class="site-footer-col">
+                <a href="/customer/trangchu.html" class="site-footer-brand">
+                    <img src="/images/logo1.jpg" alt="TT Care+" class="site-footer-logo" />
+                    <span>TT Care+</span>
+                </a>
+                <p class="site-footer-desc">TT Care+ là nền tảng phòng khám giúp người bệnh đặt lịch nhanh, theo dõi hồ sơ và kết nối bác sĩ chuyên khoa minh bạch, thuận tiện mỗi ngày.</p>
+            </div>
+            <div class="site-footer-col">
+                <h4>Liên kết hữu ích</h4>
+                <ul class="site-footer-links">
+                    <li><a href="/customer/trangchu.html">Về chúng tôi</a></li>
+                    <li><a href="/customer/datlich.html">Dịch vụ</a></li>
+                    <li><a href="/customer/khoa.html">Chuyên khoa</a></li>
+                    <li><a href="/customer/lienhe.html">Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="site-footer-col">
+                <h4>Thông tin liên hệ</h4>
+                <ul class="site-footer-contact">
+                    <li>Địa chỉ: Yên Nghĩa, Hà Đông, Hà Nội</li>
+                    <li>Email: <a href="mailto:support@ttcare.vn">support@ttcare.vn</a></li>
+                    <li>Hotline: <a href="tel:0985081624">0985081624</a></li>
+                    <li>Giờ làm việc: 8h00 - 17h00 (Thứ 2-7)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="site-footer-bottom">
+            <div class="site-footer-bottom-inner">
+                <div class="site-footer-copy">© 2025 TT Care+. All rights reserved.</div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/xacthuc.js"></script>
+    <script>
+        let conversationId = localStorage.getItem('conversationId');
+        let customerName = localStorage.getItem('customerName') || '';
+        let customerPhone = localStorage.getItem('customerPhone') || '';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var user = getCurrentUser();
+            if (!user) {
+                window.location.href = "/admin/dangnhap.html";
+                return;
+            }
+            if (normalizeRole(user.role) !== 'customer') {
+                redirectByRole(user.role);
+                return;
+            }
+
+            initChat();
+
+            document.getElementById('messageInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        async function initChat() {
+            try {
+                const body = {};
+                if (conversationId) {
+                    body.conversationId = conversationId;
+                }
+
+                const res = await fetch('/api/chat/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await res.json();
+                conversationId = data.conversationId;
+                localStorage.setItem('conversationId', conversationId);
+
+                loadChatHistory();
+                pollForAdminMessages();
+            } catch (error) {
+                console.error('Lỗi khởi động chat:', error);
+            }
+        }
+
+        async function loadChatHistory() {
+            try {
+                const res = await fetch(`/api/chat/history/${conversationId}`);
+                const messages = await res.json();
+
+                const chatDiv = document.getElementById('chatMessages');
+                chatDiv.innerHTML = '';
+
+                messages.forEach(msg => {
+                    displayMessage(msg.senderType, msg.content, msg.senderName, new Date(msg.createdAt));
+                });
+
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            } catch (error) {
+                console.error('Lỗi tải lịch sử:', error);
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            displayMessage('CUSTOMER', message, customerName || 'Bạn', new Date());
+            input.value = '';
+
+            try {
+                const res = await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationId: conversationId,
+                        message: message,
+                        customerName: customerName,
+                        customerPhone: customerPhone
+                    })
+                });
+
+                const data = await res.json();
+
+                updateStatus(data.status);
+
+                if (data.status === 'WAITING_ADMIN') {
+                    displayMessage('AI', '⏳ Bạn đang chờ admin trả lời...', 'Hệ Thống', new Date());
+                } else if (data.aiMessage) {
+                    displayMessage('AI', data.aiMessage, 'AI Hỗ Trợ', new Date());
+                }
+            } catch (error) {
+                console.error('Lỗi gửi tin nhắn:', error);
+                displayMessage('AI', '❌ Có lỗi xảy ra!', 'Hệ Thống', new Date());
+            }
+        }
+
+        function displayMessage(senderType, content, senderName, timestamp) {
+            const chatDiv = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${senderType.toLowerCase()}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = content.replace(/\n/g, '<br>');
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = timestamp.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+            msgDiv.appendChild(bubble);
+            msgDiv.appendChild(timeDiv);
+            chatDiv.appendChild(msgDiv);
+
+            setTimeout(() => {
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }, 100);
+        }
+
+        function updateStatus(status) {
+            const badge = document.getElementById('statusBadge');
+            if (status === 'WAITING_ADMIN') {
+                badge.textContent = '👨‍💼 Admin đang xử lý';
+            } else if (status === 'CLOSED') {
+                badge.textContent = '✅ Đã đóng';
+            } else {
+                badge.textContent = '🤖 AI trực tuyến';
+            }
+        }
+
+        async function pollForAdminMessages() {
+            setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/chat/history/${conversationId}`);
+                    const messages = await res.json();
+
+                    const chatDiv = document.getElementById('chatMessages');
+                    const currentCount = chatDiv.querySelectorAll('.message').length;
+
+                    if (messages.length > currentCount) {
+                        const newMessages = messages.slice(currentCount);
+                        newMessages.forEach(msg => {
+                            displayMessage(msg.senderType, msg.content, msg.senderName, new Date(msg.createdAt));
+                        });
+                    }
+                } catch (error) {
+                    console.error('Lỗi poll:', error);
+                }
+            }, 2000);
+        }
+
+        function toggleCustomerInfo() {
+            const form = document.getElementById('customerInfoForm');
+            form.classList.toggle('show');
+
+            if (form.classList.contains('show')) {
+                document.getElementById('customerName').value = customerName;
+                document.getElementById('customerPhone').value = customerPhone;
+            }
+        }
+
+        function saveCustomerInfo() {
+            customerName = document.getElementById('customerName').value.trim();
+            customerPhone = document.getElementById('customerPhone').value.trim();
+
+            localStorage.setItem('customerName', customerName);
+            localStorage.setItem('customerPhone', customerPhone);
+
+            alert('✅ Thông tin đã lưu!');
+            document.getElementById('customerInfoForm').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

@@ -216,9 +216,9 @@ function redirectByRole(role) {
 
 function getRoleLabel(role) {
     var labels = {
-        admin: "Quan tri vien",
-        doctor: "Bac si",
-        customer: "Khach hang",
+        admin: "Quản trị viên",
+        doctor: "Bác sĩ",
+        customer: "Khách hàng",
     };
     return labels[normalizeRole(role)] || role;
 }
@@ -233,16 +233,16 @@ function buildCustomerAccountDropdown(user) {
     button.setAttribute("aria-expanded", "false");
     button.innerHTML =
         '<span class="account-name">' +
-        (user.name || user.email || "Tai khoan") +
-        '</span><span class="account-caret">▼</span>';
+        (user.name || user.email || "Tài khoản") +
+        '</span><span class="account-caret" aria-hidden="true"></span>';
 
     var panel = document.createElement("div");
     panel.className = "account-panel";
 
     var links = [
-        { href: "/customer/hoso.html", label: "Thong tin ca nhan" },
-        { href: "/customer/lichcuatoi.html", label: "Lich kham" },
-        { href: "/customer/tintuc-camnang.html", label: "Tin tuc & cam nang" },
+        { href: "/customer/hoso.html", label: "Thông tin cá nhân" },
+        { href: "/customer/lichcuatoi.html", label: "Lịch khám" },
+        { href: "/customer/tintuc-camnang.html", label: "Tin tức & cẩm nang" },
     ];
 
     links.forEach(function (item) {
@@ -256,7 +256,7 @@ function buildCustomerAccountDropdown(user) {
     var logoutBtn = document.createElement("button");
     logoutBtn.type = "button";
     logoutBtn.className = "account-menu-action logout";
-    logoutBtn.textContent = "Dang xuat";
+    logoutBtn.textContent = "Đăng xuất";
     logoutBtn.addEventListener("click", function () {
         logout();
     });
