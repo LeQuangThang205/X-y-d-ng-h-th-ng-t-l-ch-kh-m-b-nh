@@ -107,8 +107,8 @@
                 tenInput.focus();
             };
 
-            window.deleteSpecialty = function(id) {
-                if (!confirm('Bạn chắc chắn muốn xóa chuyên khoa này?')) return;
+            window.deleteSpecialty = async function(id) {
+                if (!(await uiConfirm('Bạn chắc chắn muốn xóa chuyên khoa này?', 'Xác nhận'))) return;
                 apiJson('/api/admin/specialties/' + id, { method: 'DELETE' })
                     .then(function() {
                         return load();

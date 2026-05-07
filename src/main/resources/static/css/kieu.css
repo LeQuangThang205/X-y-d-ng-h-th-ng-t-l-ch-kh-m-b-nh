@@ -1,9 +1,9 @@
-/* ===============================
-   Thiết kế giao diện bệnh viện
-   Dùng chung cho các trang public
+﻿/* ===============================
+   Thiáº¿t káº¿ giao diá»‡n bá»‡nh viá»‡n
+   DĂ¹ng chung cho cĂ¡c trang public
    =============================== */
 
-/* ===== Biến màu & Reset ===== */
+/* ===== Biáº¿n mĂ u & Reset ===== */
 :root {
     --primary: #0284c7;
     --primary-dark: #0369a1;
@@ -48,7 +48,7 @@ a:hover {
     color: var(--primary-dark);
 }
 
-/* ===== Header công khai ===== */
+/* ===== Header cĂ´ng khai ===== */
 .public-header {
     position: sticky;
     top: 0;
@@ -87,7 +87,7 @@ a:hover {
     gap: 8px;
 }
 
-/* ===== Nút dùng chung ===== */
+/* ===== NĂºt dĂ¹ng chung ===== */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -146,7 +146,7 @@ a:hover {
     border-radius: 10px;
 }
 
-/* ===== Trang đăng nhập / đăng ký ===== */
+/* ===== Trang Ä‘Äƒng nháº­p / Ä‘Äƒng kĂ½ ===== */
 .auth-page {
     display: flex;
     flex-direction: column;
@@ -174,7 +174,7 @@ a:hover {
     overflow: hidden;
 }
 
-/* Cột thông tin giới thiệu */
+/* Cá»™t thĂ´ng tin giá»›i thiá»‡u */
 .auth-hero {
     padding: 26px 28px;
     background: radial-gradient(circle at top left, #0f766e 0, #0f172a 40%, #020617 100%);
@@ -248,7 +248,7 @@ a:hover {
     color: rgba(148, 163, 184, 0.8);
 }
 
-/* Cột form đăng nhập/đăng ký */
+/* Cá»™t form Ä‘Äƒng nháº­p/Ä‘Äƒng kĂ½ */
 .auth-main {
     padding: 26px 28px;
     background: #f9fafb;
@@ -355,7 +355,7 @@ a:hover {
     color: var(--text-muted);
 }
 
-/* ===== Các trang customer (trang khách, đặt lịch, hồ sơ...) ===== */
+/* ===== CĂ¡c trang customer (trang khĂ¡ch, Ä‘áº·t lá»‹ch, há»“ sÆ¡...) ===== */
 .page-wrapper {
     padding: 24px 18px 32px;
 }
@@ -377,7 +377,7 @@ a:hover {
     color: var(--text-muted);
 }
 
-/* Thẻ card dung chung */
+/* Tháº» card dung chung */
 .card {
     background: var(--card);
     border-radius: 18px;
@@ -660,7 +660,7 @@ a:hover {
     font-size: 2rem;
 }
 
-/* Giới thiệu TT Care+ */
+/* Giá»›i thiá»‡u TT Care+ */
 .section-intro {
     padding-top: 26px;
 }
@@ -747,7 +747,7 @@ a:hover {
     color: #0ea5e9;
 }
 
-/* Banner trượt ảnh giữa header và hero */
+/* Banner trÆ°á»£t áº£nh giá»¯a header vĂ  hero */
 .promo-banner-section {
     padding: 10px 40px 6px;
 }
@@ -1435,6 +1435,17 @@ a:hover {
 .landing-page .hotline-inner,
 .landing-page .site-footer-main,
 .landing-page .site-footer-bottom {
+    /* keep footer visible even if fly-in JS not executed */
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.landing-page .section,
+.landing-page .dept-card,
+.landing-page .doctor-card,
+.landing-page .hero-inner,
+.landing-page .hotline-inner,
+.landing-page .site-footer-main {
     opacity: 0;
     transform: translateY(28px) scale(0.985);
 }
@@ -1875,6 +1886,7 @@ th, td {
     color: #e5e7eb;
     padding: 14px 16px;
     border-right: 1px solid rgba(148, 163, 184, 0.18);
+    min-height: 100vh;
 }
 
 .sidebar-header .logo {
@@ -2476,7 +2488,7 @@ th, td {
     color: #0f172a !important;
 }
 
-/* ===== Phần "Tại sao nên chọn TT Care+" ===== */
+/* ===== Pháº§n "Táº¡i sao nĂªn chá»n TT Care+" ===== */
 .why-choose-section {
     max-width: 1200px;
     margin-left: auto;
@@ -2558,6 +2570,101 @@ th, td {
 
     .why-choose-image-column img {
         max-width: 100%;
+    }
+}
+
+/* ===== App dialogs ===== */
+.app-dialog-root {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: none;
+}
+
+.app-dialog-root.is-visible {
+    display: block;
+}
+
+.app-dialog-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.58);
+    backdrop-filter: blur(8px);
+}
+
+.app-dialog {
+    position: relative;
+    width: min(92vw, 440px);
+    margin: 10vh auto 0;
+    border-radius: 20px;
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    overflow: hidden;
+}
+
+.app-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.app-dialog-title {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.app-dialog-close {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.app-dialog-body {
+    padding: 18px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #334155;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.app-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 18px 18px;
+}
+
+html.app-dialog-open,
+html.app-dialog-open body {
+    overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .app-dialog {
+        width: calc(100vw - 24px);
+        margin-top: 12vh;
+        border-radius: 18px;
+    }
+
+    .app-dialog-actions {
+        flex-direction: column-reverse;
+    }
+
+    .app-dialog-actions .btn {
+        width: 100%;
     }
 }
 
@@ -2693,3 +2800,4 @@ th, td {
         width: 146px;
     }
 }
+

@@ -588,7 +588,7 @@
                 return;
             }
 
-            if (!confirm('Bạn có chắc muốn đóng cuộc chat này?')) {
+            if (!(await uiConfirm('Bạn có chắc muốn đóng cuộc chat này?', 'Xác nhận'))) {
                 return;
             }
 

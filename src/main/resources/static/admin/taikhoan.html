@@ -480,22 +480,21 @@
                 });
 
                 Array.prototype.forEach.call(document.querySelectorAll('.btn-delete'), function(el) {
-                    el.addEventListener('click', function() {
+                    el.addEventListener('click', async function() {
                         var userId = el.getAttribute('data-id');
                         var username = el.getAttribute('data-username') || 'ID ' + userId;
-                        if (confirm('Bạn chắc chắn muốn xóa tài khoản "' + username + '" không?')) {
-                            apiJson('/api/admin/accounts/' + encodeURIComponent(userId), {
-                                method: 'DELETE'
-                            }).then(function(res) {
-                                if (!res.success) {
-                                    throw new Error(res.message || 'Xóa tài khoản thất bại');
-                                }
-                                alert('Đã xóa tài khoản thành công');
-                                return loadAccounts();
-                            }).catch(function(err) {
-                                alert(err.message || 'Xóa tài khoản thất bại');
-                            });
-                        }
+                        if (!(await uiConfirm('Bạn chắc chắn muốn xóa tài khoản "' + username + '" không?', 'Xác nhận'))) return;
+                        apiJson('/api/admin/accounts/' + encodeURIComponent(userId), {
+                            method: 'DELETE'
+                        }).then(function(res) {
+                            if (!res.success) {
+                                throw new Error(res.message || 'Xóa tài khoản thất bại');
+                            }
+                            alert('Đã xóa tài khoản thành công');
+                            return loadAccounts();
+                        }).catch(function(err) {
+                            alert(err.message || 'Xóa tài khoản thất bại');
+                        });
                     });
                 });
 

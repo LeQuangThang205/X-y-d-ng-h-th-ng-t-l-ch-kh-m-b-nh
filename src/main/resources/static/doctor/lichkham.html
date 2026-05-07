@@ -766,8 +766,8 @@
                 });
             });
 
-            document.getElementById('btn-close-shift').addEventListener('click', function () {
-                if (!window.confirm('Bạn chắc chắn muốn chốt ca hôm nay?')) return;
+            document.getElementById('btn-close-shift').addEventListener('click', async function () {
+                if (!(await uiConfirm('Bạn chắc chắn muốn chốt ca hôm nay?', 'Xác nhận'))) return;
 
                 apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/shift/close', {
                     method: 'PATCH'

@@ -96,9 +96,9 @@ function isProfileSetupRequiredForCurrentUser() {
     }
 }
 
-function logout() {
+async function logout() {
     var onCustomerPage = window.location.pathname.indexOf("/customer/") === 0;
-    if (onCustomerPage && !window.confirm("Bạn có chắc muốn đăng xuất ?")) {
+    if (onCustomerPage && !(await uiConfirm("Bạn có chắc muốn đăng xuất ?", "Xác nhận"))) {
         return;
     }
     localStorage.removeItem(STORAGE_KEY);
@@ -114,7 +114,7 @@ function requireAuth(allowedRoles) {
     if (allowedRoles && allowedRoles.length) {
         var normalizedAllowed = allowedRoles.map(normalizeRole);
         if (!normalizedAllowed.includes(user.role)) {
-            alert(ACCESS_DENIED_MESSAGE);
+            uiAlert(ACCESS_DENIED_MESSAGE, "Từ chối truy cập");
             redirectByRole(user.role);
             return null;
         }
@@ -192,7 +192,7 @@ function enforceRoleAccessForCurrentPath() {
     return syncCurrentUserRole(user).then(function (syncedUser) {
         var role = normalizeRole((syncedUser && syncedUser.role) || "");
         if (role !== requiredRole) {
-            alert(ACCESS_DENIED_MESSAGE);
+            uiAlert(ACCESS_DENIED_MESSAGE, "Từ chối truy cập");
             redirectByRole(role);
             return;
         }
@@ -367,6 +367,133 @@ function authLogin(username, password) {
     });
 }
 
+function ensureAppDialogRoot() {
+    if (typeof document === "undefined") return null;
+
+    var existing = document.getElementById("app-dialog-root");
+    if (existing) return existing;
+
+    var root = document.createElement("div");
+    root.id = "app-dialog-root";
+    root.className = "app-dialog-root";
+    root.innerHTML =
+        '<div class="app-dialog-backdrop" data-dialog-close></div>' +
+        '<div class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="app-dialog-title" aria-describedby="app-dialog-message">' +
+            '<div class="app-dialog-header">' +
+                '<div class="app-dialog-title" id="app-dialog-title">Thông báo</div>' +
+                '<button type="button" class="app-dialog-close" data-dialog-close aria-label="Đóng">×</button>' +
+            '</div>' +
+            '<div class="app-dialog-body" id="app-dialog-message"></div>' +
+            '<div class="app-dialog-actions">' +
+                '<button type="button" class="btn btn-outline app-dialog-cancel" hidden>Hủy</button>' +
+                '<button type="button" class="btn btn-primary app-dialog-confirm">OK</button>' +
+            '</div>' +
+        '</div>';
+
+    document.body.appendChild(root);
+    return root;
+}
+
+function showAppDialog(options) {
+    if (typeof document === "undefined") {
+        return Promise.resolve(true);
+    }
+
+    var root = ensureAppDialogRoot();
+    if (!root) return Promise.resolve(true);
+
+    var titleEl = root.querySelector("#app-dialog-title");
+    var messageEl = root.querySelector("#app-dialog-message");
+    var confirmBtn = root.querySelector(".app-dialog-confirm");
+    var cancelBtn = root.querySelector(".app-dialog-cancel");
+    var closeTargets = root.querySelectorAll("[data-dialog-close]");
+    var previousFocus = document.activeElement;
+    var opts = options || {};
+
+    titleEl.textContent = opts.title || "Thông báo";
+    messageEl.textContent = opts.message || "";
+    confirmBtn.textContent = opts.confirmText || "OK";
+
+    if (opts.showCancel) {
+        cancelBtn.hidden = false;
+        cancelBtn.textContent = opts.cancelText || "Hủy";
+    } else {
+        cancelBtn.hidden = true;
+    }
+
+    root.classList.add("is-visible");
+    document.documentElement.classList.add("app-dialog-open");
+
+    return new Promise(function (resolve) {
+        function cleanup(result) {
+            root.classList.remove("is-visible");
+            document.documentElement.classList.remove("app-dialog-open");
+            root.removeEventListener("click", onRootClick);
+            document.removeEventListener("keydown", onKeyDown);
+            confirmBtn.removeEventListener("click", onConfirm);
+            cancelBtn.removeEventListener("click", onCancel);
+            Array.prototype.forEach.call(closeTargets, function (node) {
+                node.removeEventListener("click", onCancel);
+            });
+            if (previousFocus && typeof previousFocus.focus === "function") {
+                previousFocus.focus();
+            }
+            resolve(result);
+        }
+
+        function onConfirm() {
+            cleanup(true);
+        }
+
+        function onCancel() {
+            cleanup(false);
+        }
+
+        function onRootClick(event) {
+            if (event.target && event.target.hasAttribute("data-dialog-close")) {
+                onCancel();
+            }
+        }
+
+        function onKeyDown(event) {
+            if (event.key === "Escape") {
+                onCancel();
+            }
+        }
+
+        confirmBtn.addEventListener("click", onConfirm);
+        cancelBtn.addEventListener("click", onCancel);
+        Array.prototype.forEach.call(closeTargets, function (node) {
+            node.addEventListener("click", onCancel);
+        });
+        root.addEventListener("click", onRootClick);
+        document.addEventListener("keydown", onKeyDown);
+
+        window.requestAnimationFrame(function () {
+            confirmBtn.focus();
+        });
+    });
+}
+
+function uiAlert(message, title) {
+    return showAppDialog({
+        title: title || "Thông báo",
+        message: String(message || ""),
+        confirmText: "Đã hiểu",
+        showCancel: false,
+    });
+}
+
+function uiConfirm(message, title) {
+    return showAppDialog({
+        title: title || "Xác nhận",
+        message: String(message || ""),
+        confirmText: "Đồng ý",
+        cancelText: "Hủy",
+        showCancel: true,
+    });
+}
+
 function setupAutoHideHeader() {
     var header = document.querySelector(".customer-header") || document.querySelector(".landing-header");
     if (!header) return;
@@ -525,5 +652,10 @@ setupHeaderAccountDropdown();
 if (typeof window !== "undefined") {
     window.addEventListener("load", setupHeaderAccountDropdown);
     window.addEventListener("load", setupFloatingContactRail);
+    window.uiAlert = uiAlert;
+    window.uiConfirm = uiConfirm;
+    window.alert = function (message) {
+        uiAlert(message, "Thông báo");
+    };
 }
 
