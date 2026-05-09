@@ -60,8 +60,16 @@
 
             var doctorSelect = document.getElementById('s-doctor');
             var doctorNote = document.getElementById('doctor-note');
+            var dateInput = document.getElementById('s-date');
             var scheduleForm = document.getElementById('schedule-form');
             var scheduleSubmit = scheduleForm.querySelector('button[type="submit"]');
+
+            function toLocalDateInputValue(date) {
+                var year = date.getFullYear();
+                var month = String(date.getMonth() + 1).padStart(2, '0');
+                var day = String(date.getDate()).padStart(2, '0');
+                return year + '-' + month + '-' + day;
+            }
 
             function fillSelect(el, list, textFn) {
                 el.innerHTML = '';
@@ -105,11 +113,24 @@
                     });
             }
 
+            dateInput.min = toLocalDateInputValue(new Date());
+
             document.getElementById('schedule-form').addEventListener('submit', function(e) {
                 e.preventDefault();
+                var selectedDate = dateInput.value;
+                if (!selectedDate) {
+                    uiAlert('Vui lòng chọn ngày làm việc.', 'Thông báo');
+                    return;
+                }
+
+                if (selectedDate < dateInput.min) {
+                    uiAlert('Không thể tạo lịch cho ngày trong quá khứ.', 'Thông báo');
+                    return;
+                }
+
                 var params = new URLSearchParams({
                     doctorId: doctorSelect.value,
-                    date: document.getElementById('s-date').value,
+                    date: selectedDate,
                     shift: document.getElementById('s-shift').value,
                 });
                 var fee = document.getElementById('s-fee').value;
@@ -119,10 +140,10 @@
                     method: 'POST'
                 }).then(function(res) {
                     if (!res.success) throw new Error(res.message || 'Tạo lịch thất bại');
-                    alert('Đã tạo lịch làm việc theo ca');
+                    uiAlert('Đã tạo lịch làm việc theo ca', 'Thông báo');
                     document.getElementById('schedule-form').reset();
                 }).catch(function(err) {
-                    alert(err.message || 'Tạo lịch thất bại');
+                    uiAlert(err.message || 'Tạo lịch thất bại', 'Thông báo');
                 });
             });
 

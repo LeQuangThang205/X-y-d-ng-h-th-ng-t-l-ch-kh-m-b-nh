@@ -108,13 +108,13 @@
             };
 
             window.deleteSpecialty = async function(id) {
-                if (!(await uiConfirm('Bạn chắc chắn muốn xóa chuyên khoa này?', 'Xác nhận'))) return;
+                if (!(await uiConfirm('Bạn có chắc chắn muốn xóa chuyên khoa này?', 'Xác nhận xóa'))) return;
                 apiJson('/api/admin/specialties/' + id, { method: 'DELETE' })
                     .then(function() {
                         return load();
                     })
                     .catch(function(err) {
-                        alert(err.message || 'Xóa chuyên khoa thất bại');
+                        uiAlert(err.message || 'Xóa chuyên khoa thất bại', 'Thông báo');
                     });
             };
 
@@ -137,7 +137,7 @@
                     cancelBtn.style.display = 'none';
                     return load();
                 }).catch(function(err) {
-                    alert(err.message || (isUpdate ? 'Cập nhật thất bại' : 'Thêm chuyên khoa thất bại'));
+                    uiAlert(err.message || (isUpdate ? 'Cập nhật thất bại' : 'Thêm chuyên khoa thất bại'), 'Thông báo');
                 });
             });
 

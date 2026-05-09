@@ -312,7 +312,7 @@
                 var roomId = roomSelect.value;
 
                 if ((role === 'customer' || role === 'doctor') && !fullName) {
-                    alert('Vui lòng nhập họ tên cho vai trò đã chọn');
+                    uiAlert('Vui lòng nhập họ tên cho vai trò đã chọn', 'Thông báo');
                     return;
                 }
 
@@ -345,12 +345,12 @@
                     if (!res.success) {
                         throw new Error(res.message || 'Tạo tài khoản thất bại');
                     }
-                    alert('Đã tạo tài khoản mới thành công');
+                    uiAlert('Đã tạo tài khoản mới thành công', 'Thông báo');
                     createForm.reset();
                     toggleRoleFields();
                     return loadAccounts();
                 }).catch(function(err) {
-                    alert(err.message || 'Tạo tài khoản thất bại');
+                    uiAlert(err.message || 'Tạo tài khoản thất bại', 'Thông báo');
                 });
             });
 
@@ -421,7 +421,7 @@
                 var password = editPassword.value.trim();
 
                 if (!username) {
-                    alert('Vui lòng nhập tài khoản');
+                    uiAlert('Vui lòng nhập tài khoản', 'Thông báo');
                     return;
                 }
 
@@ -438,11 +438,11 @@
                     if (!res.success) {
                         throw new Error(res.message || 'Cập nhật tài khoản thất bại');
                     }
-                    alert('Đã cập nhật tài khoản thành công');
+                    uiAlert('Đã cập nhật tài khoản thành công', 'Thông báo');
                     closeEditModal();
                     return loadAccounts();
                 }).catch(function(err) {
-                    alert(err.message || 'Cập nhật tài khoản thất bại');
+                    uiAlert(err.message || 'Cập nhật tài khoản thất bại', 'Thông báo');
                 });
             });
 
@@ -459,10 +459,10 @@
                             if (!res.success) {
                                 throw new Error(res.message || 'Cập nhật vai trò thất bại');
                             }
-                            alert('Đã cập nhật vai trò thành công. Trang sẽ tải lại để kiểm tra quyền.');
+                            uiAlert('Đã cập nhật vai trò thành công. Trang sẽ tải lại để kiểm tra quyền.', 'Thông báo');
                             window.location.reload();
                         }).catch(function(err) {
-                            alert(err.message || 'Cập nhật vai trò thất bại');
+                            uiAlert(err.message || 'Cập nhật vai trò thất bại', 'Thông báo');
                             renderRows(allAccounts);
                         });
                     });
@@ -483,17 +483,17 @@
                     el.addEventListener('click', async function() {
                         var userId = el.getAttribute('data-id');
                         var username = el.getAttribute('data-username') || 'ID ' + userId;
-                        if (!(await uiConfirm('Bạn chắc chắn muốn xóa tài khoản "' + username + '" không?', 'Xác nhận'))) return;
+                        if (!(await uiConfirm('Bạn có chắc chắn muốn xóa tài khoản "' + username + '" không?', 'Xác nhận xóa'))) return;
                         apiJson('/api/admin/accounts/' + encodeURIComponent(userId), {
                             method: 'DELETE'
                         }).then(function(res) {
                             if (!res.success) {
                                 throw new Error(res.message || 'Xóa tài khoản thất bại');
                             }
-                            alert('Đã xóa tài khoản thành công');
+                            uiAlert('Đã xóa tài khoản thành công', 'Thông báo');
                             return loadAccounts();
                         }).catch(function(err) {
-                            alert(err.message || 'Xóa tài khoản thất bại');
+                            uiAlert(err.message || 'Xóa tài khoản thất bại', 'Thông báo');
                         });
                     });
                 });
@@ -507,7 +507,7 @@
                                 modal.style.display = 'flex';
                             })
                             .catch(function(err) {
-                                alert(err.message || 'Không tải được thông tin cá nhân');
+                                uiAlert(err.message || 'Không tải được thông tin cá nhân', 'Thông báo');
                             });
                     });
                 });

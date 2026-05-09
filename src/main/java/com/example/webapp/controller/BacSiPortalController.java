@@ -120,14 +120,6 @@ public class BacSiPortalController {
         return res;
     }
 
-    @GetMapping("/{doctorId}/schedules")
-    public List<LichLamViec> doctorSchedules(
-            @PathVariable Long doctorId,
-            @RequestParam(required = false) String date) {
-        LocalDate target = (date == null || date.isBlank()) ? LocalDate.now() : LocalDate.parse(date);
-        return datLichKhamService.lichLamViecTrongNgayCuaBacSi(doctorId, target);
-    }
-
     @PatchMapping("/{doctorId}/appointments/{appointmentId}/status")
     public Map<String, Object> updateStatus(
             @PathVariable Long doctorId,
@@ -174,6 +166,16 @@ public class BacSiPortalController {
                         lichHen.getGioKham());
                 if (!emailSent) {
                     emailMessage = "Da cap nhat bo lo nhung gui email xin loi that bai";
+                }
+            } else if (status == TrangThaiLichHen.DA_HUY) {
+                emailSent = emailService.sendAppointmentCancelledEmail(
+                        toEmail,
+                        customerName,
+                        doctorName,
+                        lichHen.getNgayKham(),
+                        lichHen.getGioKham());
+                if (!emailSent) {
+                    emailMessage = "Da cap nhat huy lich nhung gui email thong bao that bai";
                 }
             }
 
@@ -231,29 +233,6 @@ public class BacSiPortalController {
                     req.getOrDefault("ghiChuTaiKham", ""));
             res.put("success", true);
             res.put("appointment", toAppointmentPayload(lichTaiKham));
-        } catch (Exception ex) {
-            res.put("success", false);
-            res.put("message", ex.getMessage());
-        }
-        return res;
-    }
-
-    @PostMapping("/{doctorId}/schedule/lock")
-    public Map<String, Object> lockDoctorSlots(
-            @PathVariable Long doctorId,
-            @RequestBody Map<String, Object> req) {
-        Map<String, Object> res = new HashMap<>();
-        try {
-            String dateText = String.valueOf(req.getOrDefault("date", LocalDate.now().toString()));
-            LocalDate date = LocalDate.parse(dateText);
-
-            @SuppressWarnings("unchecked")
-            List<Number> raw = (List<Number>) req.get("slotIds");
-            List<Long> slotIds = raw == null ? List.of() : raw.stream().map(Number::longValue).toList();
-
-            Map<String, Object> result = datLichKhamService.khoaKhungGioTamThoi(doctorId, date, slotIds);
-            res.put("success", true);
-            res.put("result", result);
         } catch (Exception ex) {
             res.put("success", false);
             res.put("message", ex.getMessage());

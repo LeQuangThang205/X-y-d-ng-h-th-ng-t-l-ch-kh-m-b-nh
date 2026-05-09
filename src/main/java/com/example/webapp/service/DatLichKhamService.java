@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -132,10 +133,6 @@ public class DatLichKhamService {
                         .thenComparing(LichHen::getGioKham, Comparator.nullsLast(Comparator.naturalOrder()))
                         .reversed())
                 .toList();
-    }
-
-    public List<LichLamViec> lichLamViecTrongNgayCuaBacSi(Long bacSiId, LocalDate ngay) {
-        return lichLamViecRepository.findByBacSiIdAndNgayOrderByGioBatDauAsc(bacSiId, ngay);
     }
 
     @Transactional
@@ -312,36 +309,6 @@ public class DatLichKhamService {
                 || tt == TrangThaiLichHen.DA_HUY;
     }
 
-    @Transactional
-    public Map<String, Object> khoaKhungGioTamThoi(Long bacSiId, LocalDate ngay, List<Long> slotIds) {
-        if (ngay == null) {
-            ngay = LocalDate.now();
-        }
-        if (slotIds == null || slotIds.isEmpty()) {
-            throw new IllegalArgumentException("Can chon it nhat 1 khung gio de khoa");
-        }
-
-        List<LichLamViec> slots = lichLamViecRepository.findByBacSiIdAndNgayAndIdIn(bacSiId, ngay, slotIds);
-        long locked = 0;
-        long skipped = 0;
-        for (LichLamViec slot : slots) {
-            if (slot.getTrangThai() == TrangThaiLichLamViec.TRONG) {
-                slot.setTrangThai(TrangThaiLichLamViec.KHOA);
-                locked++;
-            } else {
-                skipped++;
-            }
-        }
-        lichLamViecRepository.saveAll(slots);
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("ngay", ngay);
-        result.put("tongChon", slotIds.size());
-        result.put("daKhoa", locked);
-        result.put("boQua", skipped);
-        return result;
-    }
-
     public Map<String, Object> baoCaoCaNhanBacSi(Long bacSiId) {
         LocalDate homNay = LocalDate.now();
         long tongLichHomNay = lichHenRepository.countByBacSiIdAndNgayKham(bacSiId, homNay);
@@ -437,6 +404,11 @@ public class DatLichKhamService {
             BigDecimal giaKham) {
         BacSi bacSi = bacSiRepository.findById(bacSiId)
                 .orElseThrow(() -> new IllegalArgumentException("Khong tim thay bac si"));
+
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        if (ngay.isBefore(today)) {
+            throw new IllegalArgumentException("Không thể tạo lịch cho ngày trong quá khứ");
+        }
 
         if (gioKetThuc.isBefore(gioBatDau) || gioKetThuc.equals(gioBatDau)) {
             throw new IllegalArgumentException("Gio ket thuc phai lon hon gio bat dau");

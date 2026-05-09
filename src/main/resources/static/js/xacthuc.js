@@ -97,11 +97,17 @@ function isProfileSetupRequiredForCurrentUser() {
 }
 
 async function logout() {
-    var onCustomerPage = window.location.pathname.indexOf("/customer/") === 0;
-    if (onCustomerPage && !(await uiConfirm("Bạn có chắc muốn đăng xuất ?", "Xác nhận"))) {
+    var pathname = window.location.pathname;
+    var onCustomerPage = pathname.indexOf("/customer/") === 0;
+    var onAdminPage = pathname.indexOf("/admin/") === 0;
+    var onDoctorPage = pathname.indexOf("/doctor/") === 0;
+    
+    var shouldConfirm = onCustomerPage || onAdminPage || onDoctorPage;
+    if (shouldConfirm && !(await uiConfirm("Bạn có chắc muốn đăng xuất ?", "Xác nhận"))) {
         return;
     }
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("doctor_portal_doctorId");
     window.location.href = "/customer/trangchu.html";
 }
 

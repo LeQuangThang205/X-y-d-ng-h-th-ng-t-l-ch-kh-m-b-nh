@@ -525,7 +525,7 @@
             }
 
             if (!currentConversationId) {
-                alert('Vui lòng chọn một cuộc trò chuyện trước!');
+                uiAlert('Vui lòng chọn một cuộc trò chuyện trước!', 'Thông báo');
                 return;
             }
 
@@ -551,11 +551,11 @@
 
                 if (!res.ok) {
                     const data = await res.json();
-                    alert('❌ ' + (data.error || 'Gửi tin nhắn thất bại!'));
+                    uiAlert('❌ ' + (data.error || 'Gửi tin nhắn thất bại!'), 'Thông báo');
                 }
             } catch (error) {
                 console.error('Lỗi gửi tin nhắn:', error);
-                alert('❌ Lỗi gửi tin nhắn!');
+                uiAlert('❌ Lỗi gửi tin nhắn!', 'Thông báo');
             }
         }
 
@@ -573,10 +573,10 @@
 
                 const data = await res.json();
                 if (res.ok) {
-                    alert('✅ Bạn đã nhận cuộc chat này!');
+                    uiAlert('✅ Bạn đã nhận cuộc chat này!', 'Thông báo');
                     loadConversations();
                 } else {
-                    alert('❌ ' + (data.error || 'Có lỗi xảy ra!'));
+                    uiAlert('❌ ' + (data.error || 'Có lỗi xảy ra!'), 'Thông báo');
                 }
             } catch (error) {
                 console.error('Lỗi nhận chat:', error);
@@ -588,7 +588,7 @@
                 return;
             }
 
-            if (!(await uiConfirm('Bạn có chắc muốn đóng cuộc chat này?', 'Xác nhận'))) {
+            if (!(await uiConfirm('Bạn có chắc chắn muốn đóng cuộc chat này?', 'Xác nhận đóng chat'))) {
                 return;
             }
 
@@ -599,7 +599,7 @@
 
                 const data = await res.json();
                 if (res.ok) {
-                    alert('✅ Cuộc chat đã được đóng!');
+                    uiAlert('✅ Cuộc chat đã được đóng!', 'Thông báo');
                     currentConversationId = null;
                     document.getElementById('noSelection').style.display = 'flex';
                     document.getElementById('chatContainer').style.display = 'none';
@@ -610,7 +610,7 @@
                     document.getElementById('closeBtn').style.display = 'none';
                     loadConversations();
                 } else {
-                    alert('❌ ' + (data.error || 'Có lỗi xảy ra!'));
+                    uiAlert('❌ ' + (data.error || 'Có lỗi xảy ra!'), 'Thông báo');
                 }
             } catch (error) {
                 console.error('Lỗi đóng chat:', error);

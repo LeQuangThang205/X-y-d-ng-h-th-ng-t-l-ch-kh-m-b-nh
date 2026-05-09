@@ -23,21 +23,6 @@
         </header>
         <div class="content">
             <div class="card mb-1">
-                <div class="card-body">
-                    <form id="doctor-picker" class="form-row">
-                        <div class="form-group">
-                            <label>Mã bác sĩ</label>
-                            <input type="number" id="doctor-id" min="1" required>
-                        </div>
-                        <div class="form-group" style="align-self:end;">
-                            <button type="submit" class="btn btn-primary">Tải dữ liệu portal</button>
-                        </div>
-                    </form>
-                    <p class="text-muted">Hệ thống tự nhận diện bác sĩ theo tài khoản. Bạn chỉ cần nhập mã bác sĩ nếu cần cập nhật thủ công.</p>
-                </div>
-            </div>
-
-            <div class="card mb-1">
                 <div class="card-header">Cập nhật hồ sơ bác sĩ</div>
                 <div class="card-body">
                     <form id="doctor-profile-form">
@@ -130,23 +115,6 @@
 
                     <section class="portal-pane" id="pane-report">
                         <div class="doctor-stats" id="report-stats"></div>
-                        <div class="card" style="margin-top: 10px;">
-                            <div class="card-header">Tạm khóa khung giờ (đề xuất)</div>
-                            <div class="card-body">
-                                <div class="doctor-schedule-toolbar">
-                                    <div class="form-group">
-                                        <label>Ngày</label>
-                                        <input type="date" id="schedule-date">
-                                    </div>
-                                    <button type="button" class="btn btn-outline" id="btn-load-slots">Tải khung giờ</button>
-                                    <button type="button" class="btn btn-primary" id="btn-lock-slots">Gửi yêu cầu khóa</button>
-                                </div>
-                                <div id="slot-lock-message" class="text-muted"></div>
-                                <div class="doctor-schedule-list" id="doctor-slots">
-                                    <div class="text-muted">Chưa tải khung giờ.</div>
-                                </div>
-                            </div>
-                        </div>
                     </section>
                 </div>
             </div>
@@ -224,14 +192,10 @@
             };
 
             var greeting = document.getElementById('doctor-greeting');
-            var inputDoctorId = document.getElementById('doctor-id');
             var todayBody = document.getElementById('today-appointments');
             var historyBody = document.getElementById('history-appointments');
             var todayStats = document.getElementById('today-stats');
             var reportStats = document.getElementById('report-stats');
-            var slotList = document.getElementById('doctor-slots');
-            var slotMessage = document.getElementById('slot-lock-message');
-            var scheduleDateInput = document.getElementById('schedule-date');
             var visitModal = document.getElementById('doctor-visit-modal');
             var profileForm = document.getElementById('doctor-profile-form');
             var profileFullNameInput = document.getElementById('doctor-full-name');
@@ -284,14 +248,9 @@
 
             setGreeting(user.name || user.fullname, user.email);
 
-            state.doctorId = user.doctorId || localStorage.getItem('doctor_portal_doctorId') || '';
-            if (state.doctorId) {
-                inputDoctorId.value = state.doctorId;
-            }
+            state.doctorId = user.doctorId || '';
 
             var todayText = new Date().toISOString().slice(0, 10);
-            scheduleDateInput.value = todayText;
-            state.scheduleDate = todayText;
 
             function toCurrency(value) {
                 return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value || 0));
@@ -326,14 +285,16 @@
                 var actions = [];
 
                 if (status === 'CHO_XAC_NHAN') {
-                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_XAC_NHAN">Xác nhận lịch hẹn</button>');
-                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO">Bỏ lỡ</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_XAC_NHAN" data-confirm-message="Bạn có chắc chắn muốn xác nhận lịch hẹn này?">Xác nhận lịch hẹn</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO" data-confirm-message="Bạn có chắc chắn muốn đánh dấu lịch hẹn này là bỏ lỡ?">Bỏ lỡ</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_HUY" data-confirm-message="Bạn có chắc chắn muốn hủy lịch hẹn này?">Hủy lịch hẹn</button>');
                 } else if (status === 'DA_XAC_NHAN') {
-                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_KHAM">Đã khám xong</button>');
-                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO">Bỏ lỡ</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_KHAM" data-confirm-message="Bạn có chắc chắn muốn chuyển lịch hẹn này sang đã khám xong?">Đã khám xong</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO" data-confirm-message="Bạn có chắc chắn muốn đánh dấu lịch hẹn này là bỏ lỡ?">Bỏ lỡ</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_HUY" data-confirm-message="Bạn có chắc chắn muốn hủy lịch hẹn này?">Hủy lịch hẹn</button>');
                 } else if (status === 'DANG_KHAM') {
-                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_KHAM">Đã khám xong</button>');
-                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO">Bỏ lỡ</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="DA_KHAM" data-confirm-message="Bạn có chắc chắn muốn chuyển lịch hẹn này sang đã khám xong?">Đã khám xong</button>');
+                    actions.push('<button type="button" class="btn-sm btn-outline" data-status="BO_LO" data-confirm-message="Bạn có chắc chắn muốn đánh dấu lịch hẹn này là bỏ lỡ?">Bỏ lỡ</button>');
                 }
 
                 if (!actions.length) {
@@ -417,25 +378,6 @@
                 ].join('');
             }
 
-            function renderSchedules(list) {
-                state.schedules = list || [];
-                if (!state.schedules.length) {
-                    slotList.innerHTML = '<div class="text-muted">Không có khung giờ trong ngày đã chọn.</div>';
-                    return;
-                }
-
-                slotList.innerHTML = state.schedules.map(function (slot) {
-                    var disabled = slot.trangThai !== 'TRONG' ? 'disabled' : '';
-                    return '<label class="doctor-slot-item">'
-                        + '<span class="left">'
-                        + '<input type="checkbox" data-slot-check value="' + slot.id + '" ' + disabled + '>'
-                        + '<span>' + slot.gioBatDau + ' - ' + slot.gioKetThuc + '</span>'
-                        + '</span>'
-                        + '<span class="' + (slot.trangThai === 'TRONG' ? 'badge badge-success' : 'badge badge-warning') + '">' + slot.trangThai + '</span>'
-                        + '</label>';
-                }).join('');
-            }
-
             function openVisitModal(appointment) {
                 state.activeAppointment = appointment;
 
@@ -454,9 +396,17 @@
 
             function loadDoctorProfileById() {
                 if (!state.doctorId) return Promise.resolve(false);
+                var currentAccount = (user.username || user.email || '').trim().toLowerCase();
                 return apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/profile')
                     .then(function (profile) {
                         if (!profile) return false;
+                        if (currentAccount && profile.email && String(profile.email).trim().toLowerCase() !== currentAccount) {
+                            state.doctorId = '';
+                            user.doctorId = '';
+                            localStorage.removeItem('doctor_portal_doctorId');
+                            setCurrentUser(user);
+                            return false;
+                        }
                         var name = profile.fullName || profile.email;
                         setGreeting(name, profile.email);
                         applyDoctorProfile(profile);
@@ -464,7 +414,6 @@
                         user.doctorId = state.doctorId;
                         user.name = name || user.name;
                         user.fullname = profile.fullName || user.fullname;
-                        inputDoctorId.value = state.doctorId || '';
                         if (state.doctorId) {
                             localStorage.setItem('doctor_portal_doctorId', String(state.doctorId));
                         }
@@ -474,7 +423,6 @@
                     .catch(function () {
                         state.doctorId = '';
                         user.doctorId = '';
-                        inputDoctorId.value = '';
                         localStorage.removeItem('doctor_portal_doctorId');
                         setCurrentUser(user);
                         return false;
@@ -497,7 +445,6 @@
                         if (profile.doctorId) {
                             state.doctorId = profile.doctorId;
                             user.doctorId = profile.doctorId;
-                            inputDoctorId.value = profile.doctorId;
                             localStorage.setItem('doctor_portal_doctorId', String(profile.doctorId));
                         }
 
@@ -551,39 +498,10 @@
                     });
             }
 
-            function loadSchedules() {
-                var date = scheduleDateInput.value || todayText;
-                state.scheduleDate = date;
-                return apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/schedules?date=' + encodeURIComponent(date))
-                    .then(renderSchedules)
-                    .catch(function (err) {
-                        slotList.innerHTML = '<div class="text-danger">' + (err.message || 'Tải khung giờ thất bại') + '</div>';
-                    });
-            }
-
             function loadPortalData() {
                 if (!state.doctorId) return;
-                Promise.all([loadToday(), loadHistory(), loadReport(), loadSchedules()]);
+                Promise.all([loadToday(), loadHistory(), loadReport()]);
             }
-
-            document.getElementById('doctor-picker').addEventListener('submit', function (e) {
-                e.preventDefault();
-                var value = String(inputDoctorId.value || '').trim();
-                if (!value) return;
-
-                state.doctorId = value;
-                user.doctorId = value;
-                setCurrentUser(user);
-                localStorage.setItem('doctor_portal_doctorId', value);
-                ensureDoctorContext().then(function (ok) {
-                    if (!ok) {
-                        throw new Error('Khong tim thay bac si theo ma vua nhap hoac tai khoan dang nhap.');
-                    }
-                    loadPortalData();
-                }).catch(function (err) {
-                    alert(err.message || 'Khong tim thay bac si');
-                });
-            });
 
             document.getElementById('portal-tabs').addEventListener('click', function (e) {
                 var target = e.target;
@@ -602,7 +520,7 @@
                 var file = e.target.files && e.target.files[0];
                 if (!file) return;
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('Anh vuot qua 2MB. Vui long chon anh nho hon.');
+                    uiAlert('Anh vuot qua 2MB. Vui long chon anh nho hon.', 'Thông báo');
                     e.target.value = '';
                     return;
                 }
@@ -610,7 +528,7 @@
                 fileToDataUrl(file)
                     .then(setPortraitPreview)
                     .catch(function (err) {
-                        alert(err.message || 'Khong the tai anh chan dung');
+                        uiAlert(err.message || 'Khong the tai anh chan dung', 'Thông báo');
                     });
             });
 
@@ -618,7 +536,7 @@
                 e.preventDefault();
                 var fullName = String(profileFullNameInput.value || '').trim();
                 if (!fullName) {
-                    alert('Ho ten bac si khong duoc de trong.');
+                    uiAlert('Ho ten bac si khong duoc de trong.', 'Thông báo');
                     return;
                 }
 
@@ -648,17 +566,16 @@
                     user.doctorId = res.doctorId || state.doctorId;
                     if (user.doctorId) {
                         state.doctorId = user.doctorId;
-                        inputDoctorId.value = user.doctorId;
                         localStorage.setItem('doctor_portal_doctorId', String(user.doctorId));
                     }
                     setCurrentUser(user);
-                    alert('Da cap nhat ho so bac si thanh cong.');
+                    uiAlert('Da cap nhat ho so bac si thanh cong.', 'Thông báo');
                 }).catch(function (err) {
-                    alert(err.message || 'Cap nhat ho so that bai');
+                    uiAlert(err.message || 'Cap nhat ho so that bai', 'Thông báo');
                 });
             });
 
-            todayBody.addEventListener('click', function (e) {
+            todayBody.addEventListener('click', async function (e) {
                 var row = e.target.closest('tr[data-id]');
                 if (!row) return;
                 var id = Number(row.getAttribute('data-id'));
@@ -667,6 +584,10 @@
 
                 if (e.target.matches('[data-status]')) {
                     var nextStatus = e.target.getAttribute('data-status');
+                    var confirmMessage = e.target.getAttribute('data-confirm-message');
+                    if (confirmMessage && !(await uiConfirm(confirmMessage, 'Xác nhận'))) {
+                        return;
+                    }
                     apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/appointments/' + encodeURIComponent(id) + '/status', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
@@ -675,7 +596,7 @@
                         if (!res.success) throw new Error(res.message || 'Cập nhật trạng thái thất bại');
                         return loadToday().then(loadReport);
                     }).catch(function (err) {
-                        alert(err.message || 'Cập nhật trạng thái thất bại');
+                        uiAlert(err.message || 'Cập nhật trạng thái thất bại', 'Thông báo');
                     });
                     return;
                 }
@@ -705,10 +626,10 @@
                     body: JSON.stringify(payload)
                 }).then(function (res) {
                     if (!res.success) throw new Error(res.message || 'Lưu kết luận thất bại');
-                    alert('Đã lưu kết luận và toa thuốc vào hồ sơ bệnh án.');
+                    uiAlert('Đã lưu kết luận và toa thuốc vào hồ sơ bệnh án.', 'Thông báo');
                     return Promise.all([loadToday(), loadHistory(), loadReport()]);
                 }).catch(function (err) {
-                    alert(err.message || 'Lưu kết luận thất bại');
+                    uiAlert(err.message || 'Lưu kết luận thất bại', 'Thông báo');
                 });
             });
 
@@ -718,7 +639,7 @@
                 var date = document.getElementById('followup-date').value;
                 var time = document.getElementById('followup-time').value;
                 if (!date || !time) {
-                    alert('Vui lòng nhập ngày và giờ tái khám.');
+                    uiAlert('Vui lòng nhập ngày và giờ tái khám.', 'Thông báo');
                     return;
                 }
 
@@ -732,52 +653,25 @@
                     })
                 }).then(function (res) {
                     if (!res.success) throw new Error(res.message || 'Tạo lịch tái khám thất bại');
-                    alert('Đã tạo lịch tái khám thành công.');
-                    return Promise.all([loadToday(), loadHistory(), loadReport(), loadSchedules()]);
+                    uiAlert('Đã tạo lịch tái khám thành công.', 'Thông báo');
+                    return Promise.all([loadToday(), loadHistory(), loadReport()]);
                 }).catch(function (err) {
-                    alert(err.message || 'Tạo lịch tái khám thất bại');
-                });
-            });
-
-            document.getElementById('btn-load-slots').addEventListener('click', function () {
-                loadSchedules();
-            });
-
-            document.getElementById('btn-lock-slots').addEventListener('click', function () {
-                var checked = Array.prototype.slice.call(document.querySelectorAll('[data-slot-check]:checked'))
-                    .map(function (el) { return Number(el.value); });
-
-                if (!checked.length) {
-                    slotMessage.textContent = 'Vui lòng chọn ít nhất 1 khung giờ trống để khóa.';
-                    return;
-                }
-
-                apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/schedule/lock', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ date: state.scheduleDate, slotIds: checked })
-                }).then(function (res) {
-                    if (!res.success) throw new Error(res.message || 'Gửi yêu cầu khóa thất bại');
-                    var data = res.result || {};
-                    slotMessage.textContent = 'Đã khóa: ' + (data.daKhoa || 0) + ', bỏ qua: ' + (data.boQua || 0) + '.';
-                    return loadSchedules();
-                }).catch(function (err) {
-                    slotMessage.textContent = err.message || 'Khóa khung giờ thất bại';
+                    uiAlert(err.message || 'Tạo lịch tái khám thất bại', 'Thông báo');
                 });
             });
 
             document.getElementById('btn-close-shift').addEventListener('click', async function () {
-                if (!(await uiConfirm('Bạn chắc chắn muốn chốt ca hôm nay?', 'Xác nhận'))) return;
+                if (!(await uiConfirm('Bạn có chắc chắn muốn chốt ca hôm nay?', 'Xác nhận chốt ca'))) return;
 
                 apiJson('/api/doctor/' + encodeURIComponent(state.doctorId) + '/shift/close', {
                     method: 'PATCH'
                 }).then(function (res) {
                     if (!res.success) throw new Error(res.message || 'Chốt ca thất bại');
                     var data = res.result || {};
-                    alert('Đã chốt ca. Chuyển BỎ LỠ: ' + (data.chuyenBoLo || 0));
+                    uiAlert('Đã chốt ca. Chuyển BỎ LỠ: ' + (data.chuyenBoLo || 0), 'Thông báo');
                     return Promise.all([loadToday(), loadHistory(), loadReport()]);
                 }).catch(function (err) {
-                    alert(err.message || 'Chốt ca thất bại');
+                    uiAlert(err.message || 'Chốt ca thất bại', 'Thông báo');
                 });
             });
 

@@ -115,21 +115,21 @@
                     var role = "customer";
 
                     if (password !== confirm) {
-                        alert("Mật khẩu xác nhận không khớp");
+                        uiAlert("Mật khẩu xác nhận không khớp", "Thông báo");
                         return;
                     }
 
                     try {
                         var reg = await authRegister(email, password, role, { fullName: fullname });
                         if (!reg.success) {
-                            alert(reg.message || "Đăng ký thất bại");
+                            uiAlert(reg.message || "Đăng ký thất bại", "Thông báo");
                             return;
                         }
 
-                        alert("Đăng ký thành công. Vui lòng đăng nhập để tiếp tục.");
+                        uiAlert("Đăng ký thành công. Vui lòng đăng nhập để tiếp tục.", "Thông báo");
                         window.location.href = '/admin/dangnhap.html';
                     } catch (err) {
-                        alert(err.message || "Đăng ký thất bại");
+                        uiAlert(err.message || "Đăng ký thất bại", "Thông báo");
                     }
                 });
 

@@ -204,12 +204,13 @@
           .addEventListener("submit", function (e) {
             e.preventDefault();
             if (!user) {
-              alert("Vui long dang nhap de dat lich.");
+              uiAlert("Vui long dang nhap de dat lich.", "Thông báo");
               window.location.href = "/admin/dangnhap.html";
               return;
             }
-            alert(
-              'Đặt lịch thành công! Lịch hẹn đang chờ xác nhận. Bạn có thể xem tại "Lịch của tôi".'
+            uiAlert(
+              'Đặt lịch thành công! Lịch hẹn đang chờ xác nhận. Bạn có thể xem tại "Lịch của tôi".',
+              'Thông báo'
             );
             window.location.href = "/customer/lichcuatoi.html";
           });

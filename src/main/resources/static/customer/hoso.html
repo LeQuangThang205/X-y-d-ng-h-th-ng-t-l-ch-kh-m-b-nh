@@ -278,7 +278,7 @@
             var file = e.target.files && e.target.files[0];
             if (!file) return;
             if (file.size > 2 * 1024 * 1024) {
-              alert("Ảnh vượt quá 2MB. Vui lòng chọn ảnh nhỏ hơn.");
+              uiAlert("Ảnh vượt quá 2MB. Vui lòng chọn ảnh nhỏ hơn.", "Thông báo");
               e.target.value = "";
               return;
             }
@@ -286,7 +286,7 @@
               var dataUrl = await fileToDataUrl(file);
               setPortraitPreview(dataUrl);
             } catch (err) {
-              alert(err.message || "Không thể tải ảnh chân dung");
+              uiAlert(err.message || "Không thể tải ảnh chân dung", "Thông báo");
             }
           });
 
@@ -307,7 +307,7 @@
                 if (!payload.address) missing.push("Địa chỉ");
 
                 if (missing.length) {
-                  alert("Vui lòng nhập đầy đủ thông tin: " + missing.join(", "));
+                  uiAlert("Vui lòng nhập đầy đủ thông tin: " + missing.join(", "), "Thông báo");
                   return;
                 }
               }
@@ -338,7 +338,7 @@
               clearProfileSetupRequirement(account || user.username || user.email);
 
               if (setupMode) {
-                alert("Hoàn tất thông tin cá nhân thành công.");
+                uiAlert("Hoàn tất thông tin cá nhân thành công.", "Thông báo");
                 setupMode = false;
                 pageTitle.textContent = "Thông tin cá nhân";
                 pageSubtitle.textContent =
@@ -346,9 +346,9 @@
                 return;
               }
 
-              alert("Đã lưu thông tin cơ bản vào hệ thống.");
+              uiAlert("Đã lưu thông tin cơ bản vào hệ thống.", "Thông báo");
             } catch (err) {
-              alert(err.message || "Lưu hồ sơ thất bại");
+              uiAlert(err.message || "Lưu hồ sơ thất bại", "Thông báo");
             }
           });
 

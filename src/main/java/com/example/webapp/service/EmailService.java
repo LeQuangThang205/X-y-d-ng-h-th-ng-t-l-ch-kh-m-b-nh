@@ -169,6 +169,37 @@ public class EmailService {
         }
     }
 
+    public boolean sendAppointmentCancelledEmail(
+            String toEmail,
+            String customerName,
+            String doctorName,
+            LocalDate appointmentDate,
+            LocalTime appointmentTime) {
+        if (toEmail == null || !toEmail.contains("@")) {
+            logger.warn("Skip sending cancelled email because recipient is not a valid email: {}", toEmail);
+            return false;
+        }
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setReplyTo(replyToEmail);
+            message.setTo(toEmail);
+            message.setSubject("Lịch hẹn đã bị hủy - TT Care+");
+            message.setText(
+                    buildAppointmentCancelledEmailBody(customerName, doctorName, appointmentDate, appointmentTime));
+            mailSender.send(message);
+            logger.info("Appointment cancelled email sent successfully to: {}", toEmail);
+            return true;
+        } catch (MailException e) {
+            logger.error("SMTP send failed for {}. Message: {}", toEmail, e.getMessage(), e);
+            return false;
+        } catch (Exception e) {
+            logger.error("Unexpected error when sending appointment cancelled email to {}", toEmail, e);
+            return false;
+        }
+    }
+
     private String buildRegistrationEmailBody(String customerName) {
         String displayName = customerName != null && !customerName.trim().isEmpty() ? customerName : "khách hàng";
 
@@ -179,7 +210,7 @@ public class EmailService {
                 "- Đăng nhập để quản lý thông tin cá nhân.\n" +
                 "- Đặt lịch khám bệnh nhanh chóng và thuận tiện.\n" +
                 "- Theo dõi lịch sử khám và kết quả xét nghiệm.\n\n" +
-                "Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại: 0123 456 789 hoặc email: support@ttcare.vn.\n\n"
+                "Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại: 0985081624 hoặc email: support@ttcare.vn.\n\n"
                 +
                 "Cảm ơn bạn đã tin tưởng và lựa chọn dịch vụ của chúng tôi.\n\n" +
                 "Trân trọng,\n" +
@@ -242,6 +273,23 @@ public class EmailService {
                 + displayTime + ".\n"
                 + "TT Care+ thành thật xin lỗi nếu có bất kỳ bất tiện nào và luôn sẵn sàng hỗ trợ bạn đặt lại lịch.\n"
                 + "Vui lòng đăng nhập hệ thống để chọn khung giờ phù hợp hơn.\n\n"
+                + "Trân trọng,\n"
+                + "TT Care+";
+    }
+
+    private String buildAppointmentCancelledEmailBody(
+            String customerName,
+            String doctorName,
+            LocalDate appointmentDate,
+            LocalTime appointmentTime) {
+        String displayCustomer = customerName != null && !customerName.trim().isEmpty() ? customerName : "khách hàng";
+        String displayDoctor = doctorName != null && !doctorName.trim().isEmpty() ? doctorName : "bác sĩ";
+        String displayDate = appointmentDate != null ? appointmentDate.toString() : "(chưa cập nhật)";
+        String displayTime = appointmentTime != null ? appointmentTime.toString() : "(chưa cập nhật)";
+
+        return "Xin chào " + displayCustomer + ",\n\n"
+                + "Lịch hẹn với " + displayDoctor + " vào " + displayDate + " lúc " + displayTime + " đã được hủy.\n"
+                + "Nếu bạn cần đặt lại lịch, vui lòng đăng nhập hệ thống hoặc liên hệ bộ phận hỗ trợ để được hướng dẫn.\n\n"
                 + "Trân trọng,\n"
                 + "TT Care+";
     }

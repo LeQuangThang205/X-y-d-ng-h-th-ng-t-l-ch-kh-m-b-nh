@@ -370,19 +370,19 @@
 
         specialtySelect.addEventListener("change", function () {
           loadDoctors().catch(function (err) {
-            alert(err.message || "Khong the tai danh sach bac si");
+            uiAlert(err.message || "Khong the tai danh sach bac si", "Thông báo");
           });
         });
 
         doctorSelect.addEventListener("change", function () {
           loadSlots().catch(function (err) {
-            alert(err.message || "Khong the tai khung gio");
+            uiAlert(err.message || "Khong the tai khung gio", "Thông báo");
           });
         });
 
         dateInput.addEventListener("change", function () {
           loadSlots().catch(function (err) {
-            alert(err.message || "Khong the tai khung gio");
+            uiAlert(err.message || "Khong the tai khung gio", "Thông báo");
           });
         });
 
@@ -391,7 +391,7 @@
           try {
             var patientId = await ensurePatientProfile();
             if (!timeSelect.value) {
-              alert("Vui long chon khung gio hop le trong danh sach.");
+              uiAlert("Vui long chon khung gio hop le trong danh sach.", "Thông báo");
               return;
             }
             var res = await apiJson("/api/patient/appointments", {
@@ -405,19 +405,19 @@
             });
 
             if (!res.success) {
-              alert(res.message || "Dat lich that bai");
+              uiAlert(res.message || "Dat lich that bai", "Thông báo");
               return;
             }
 
-            alert("Dat lich thanh cong");
+            uiAlert("Dat lich thanh cong", "Thông báo");
             window.location.href = "/customer/lichcuatoi.html";
           } catch (err) {
-            alert(err.message || "Dat lich that bai");
+            uiAlert(err.message || "Dat lich that bai", "Thông báo");
           }
         });
 
         loadSpecialties().catch(function (err) {
-          alert(err.message || "Khong the tai danh sach chuyen khoa");
+          uiAlert(err.message || "Khong the tai danh sach chuyen khoa", "Thông báo");
         });
 
         loadPatientProfileByAccount().catch(function () {

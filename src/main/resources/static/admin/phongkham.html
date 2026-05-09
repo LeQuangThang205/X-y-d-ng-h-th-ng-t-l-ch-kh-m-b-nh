@@ -117,7 +117,7 @@
                     roomForm.reset();
                     return loadRooms();
                 }).catch(function(err) {
-                    alert(err.message || 'Thêm phòng khám thất bại');
+                    uiAlert(err.message || 'Thêm phòng khám thất bại', 'Thông báo');
                 });
             });
 
