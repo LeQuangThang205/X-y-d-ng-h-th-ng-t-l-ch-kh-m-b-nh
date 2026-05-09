@@ -1,61 +1,47 @@
-# TT Care+ - Hệ thống đặt lịch khám bệnh trực tuyến
+# PHÒNG KHÁM PHENIKAAMEC — Hệ thống đặt lịch khám (Java + Spring Boot)
 
-**TT Care+** là nền tảng web hiện đại dành cho bệnh viện, cho phép bệnh nhân đặt lịch khám trực tuyến một cách nhanh chóng và thuận tiện, đồng thời cung cấp bảng điều khiển quản lý toàn diện cho nhân viên bệnh viện.
+Ứng dụng web nội bộ cho đặt lịch khám, quản lý bệnh nhân, quản trị viên và bác sĩ.
+Phiên bản hiện tại: Java 17, Spring Boot 3.2.0.
 
-## 📋 Mục lục
+## Mục lục
 
-- [Tổng quan dự án](#tổng-quan-dự-án)
-- [Tính năng chính](#tính-năng-chính)
-- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
-- [Hướng dẫn cài đặt](#hướng-dẫn-cài-đặt)
-- [Hướng dẫn sử dụng](#hướng-dẫn-sử-dụng)
-- [Các thực thể dữ liệu](#các-thực-thể-dữ-liệu)
-- [API chính](#api-chính)
-- [Hướng dẫn phát triển](#hướng-dẫn-phát-triển)
-
----
-
-## 🎯 Tổng quan dự án
-
-**TT Care+** là một hệ thống quản lý lịch khám bệnh toàn diện với 3 nhóm người dùng chính:
-
-### 👥 Nhóm người dùng
-
-1. **Khách hàng (Bệnh nhân)**
-   - Đặt lịch khám bệnh trực tuyến
-   - Quản lý thông tin cá nhân
-   - Xem lịch khám của mình
-   - Xem danh sách bác sĩ và chuyên khoa
-   - Nhận thông báo nhắc lịch
-
-2. **Bác sĩ**
-   - Xem lịch khám được phân công
-   - Quản lý thời gian làm việc
-
-3. **Quản trị viên / Nhân viên lễ tân**
-   - Quản lý toàn bộ lịch khám hẹn
-   - Quản lý thông tin bệnh nhân
-   - Quản lý danh sách bác sĩ
-   - Quản lý chuyên khoa và phòng khám
-   - Xem báo cáo và thống kê
-
-### 🎨 Thiết kế giao diện
-
-- **Landing page**: Giới thiệu bệnh viện, quảng bá dịch vụ
-- **Giao diện khách hàng**: Thân thiện, dễ sử dụng, responsive
-- **Dashboard quản trị**: Chuyên nghiệp, hiện đại, đầy đủ chức năng
+- Tổng quan
+- Trạng thái hiện tại & thay đổi gần đây
+- Công nghệ
+- Cấu trúc chính
+- Chạy ứng dụng (cài đặt & khắc phục nhanh)
+- API & kiểm thử nhanh
+- Tệp/điểm quan trọng
+- Ghi chú cho báo cáo
 
 ---
 
-## ✨ Tính năng chính
+## Tổng quan
 
-### 🔐 Xác thực & Phân quyền
+Hệ thống phục vụ 3 vai trò chính: `CUSTOMER` (bệnh nhân), `DOCTOR` (bác sĩ), `ADMIN` (quản trị/tiếp tân). Ứng dụng kết hợp backend Spring Boot và frontend tĩnh (HTML/CSS/Vanilla JS) đặt trong `src/main/resources/static`.
 
-- Đăng nhập/Đăng ký cho khách hàng
-- Phân biệt vai trò: Khách hàng, Bác sĩ, Quản trị viên
-- Quản lý phiên đăng nhập an toàn (localStorage)
-- Nhắc lịch tự động qua email/SMS
+Tính năng căn bản: đăng ký/đăng nhập, phân quyền theo vai trò, đặt lịch, quản lý bác sĩ/chuyên khoa, dashboard quản trị, báo cáo thống kê.
+
+Giao diện là các trang HTML tĩnh, đã được chỉnh sửa để khắc phục lỗi mã hóa (chuẩn hoá UTF-8) và thống nhất thương hiệu `PHÒNG KHÁM PHENIKAAMEC`. Logo mặc định: `/images/logo.png`.
+
+---
+
+## Trạng thái hiện tại & thay đổi gần đây
+
+- Đã sửa lỗi encoding (tất cả tài nguyên tĩnh chuyển sang UTF-8), sửa các HTML/JS bị lỗi ký tự.
+- Di chuyển trang đăng nhập/đăng ký vào thư mục quản trị: `src/main/resources/static/admin/` (`/admin/dangnhap.html`, `/admin/dangky.html`).
+- Frontend xác thực được tích hợp với API backend: `POST /api/auth/login` và `POST /api/auth/register`.
+- File client auth chính: `src/main/resources/static/js/xacthuc.js` (chứa `authLogin()`, `authRegister()`, `setCurrentUser()`, `redirectByRole()`, `requireAuth()`).
+- Thương hiệu đã đổi tên hiển thị trên các trang tĩnh sang **PHÒNG KHÁM PHENIKAAMEC**; logo đặt tại `/images/logo.png`.
+
+Các mục công việc còn lại: chạy toàn bộ kiểm thử luồng đăng nhập/đăng ký với DB, seed dữ liệu test (user/admin/bác sĩ), kiểm tra chạy ổn định (port 8080).
+
+## Công nghệ
+
+- Java 17, Spring Boot 3.2.0
+- Spring Data JPA, MySQL
+- Maven
+- Frontend: HTML5, CSS, Vanilla JS (no SPA framework)
 
 ### 📅 Quản lý lịch khám
 
@@ -96,23 +82,14 @@
 
 ---
 
-## 🛠️ Công nghệ sử dụng
+## Cấu trúc chính (tóm tắt)
 
-### Backend
-
-- **Java 17** - Ngôn ngữ lập trình
-- **Spring Boot 3.2.0** - Framework web chính
-- **Spring Data JPA** - ORM (Object-Relational Mapping)
-- **Spring Security** - Bảo mật, mã hóa
-- **MySQL 8.0.33** - Cơ sở dữ liệu
-- **Maven** - Quản lý dependency
-
-### Frontend
-
-- **HTML5** - Cấu trúc trang
-- **CSS3** (Responsive, Flexbox, Grid) - Styling
-- **JavaScript (ES6+)** - Logic tương tác (không sử dụng framework nặng)
-- **Vanilla JS** - Quản lý dropdown, modal, animation
+- `src/main/java/com/example/webapp/` — mã nguồn Java (controllers, entities, repositories, services)
+- `src/main/resources/static/` — tài nguyên tĩnh (html, css, js, images)
+  - `static/admin/` — trang quản trị (đăng nhập, dashboard)
+  - `static/customer/` — trang khách hàng (trang chủ canonical: `/customer/trangchu.html`)
+- `src/main/resources/application.properties` — cấu hình (port, DB, encoding)
+- `pom.xml` — dependency và build
 
 ### Đặc điểm Frontend
 
@@ -122,93 +99,7 @@
 
 ---
 
-## 📁 Cấu trúc thư mục
-
-```
-TT Care+ (java-web-project)
-│
-├── src/main/
-│   ├── java/com/example/webapp/
-│   │   ├── UngDungWeb.java                 # Main class (Spring Boot)
-│   │   │
-│   │   ├── controller/                      # Điều khiển HTTP requests
-│   │   │   ├── TrangChuController.java     # Trang chủ
-│   │   │   ├── XacThucController.java      # Đăng nhập/Đăng ký
-│   │   │   ├── BenhNhanPortalController.java # Portal bệnh nhân
-│   │   │   ├── BenhNhanController.java     # API bệnh nhân
-│   │   │   ├── BacSiPortalController.java  # Portal bác sĩ
-│   │   │   ├── HomeController.java         # Dashboard trang chủ
-│   │   │   └── QuanTriPortalController.java # Dashboard quản trị
-│   │   │
-│   │   ├── entity/                          # Model dữ liệu (JPA)
-│   │   │   ├── NguoiDung.java              # Người dùng (User)
-│   │   │   ├── BenhNhan.java               # Bệnh nhân
-│   │   │   ├── BacSi.java                  # Bác sĩ
-│   │   │   ├── ChuyenKhoa.java             # Chuyên khoa
-│   │   │   ├── PhongKham.java              # Phòng khám
-│   │   │   ├── LichHen.java                # Lịch hẹn khám
-│   │   │   ├── LichLamViec.java            # Lịch làm việc bác sĩ
-│   │   │   ├── ThongBaoNhacLich.java       # Thông báo nhắc lịch
-│   │   │   ├── TrangThaiLichHen.java       # Trạng thái lịch hẹn (enum)
-│   │   │   └── TrangThaiLichLamViec.java   # Trạng thái lịch làm (enum)
-│   │   │
-│   │   ├── repository/                      # Data Access Layer
-│   │   │   ├── NguoiDungRepository.java
-│   │   │   ├── BenhNhanRepository.java
-│   │   │   ├── BacSiRepository.java
-│   │   │   ├── ChuyenKhoaRepository.java
-│   │   │   ├── PhongKhamRepository.java
-│   │   │   ├── LichHenRepository.java
-│   │   │   ├── LichLamViecRepository.java
-│   │   │   ├── ThongBaoNhacLichRepository.java
-│   │   │   └── ...
-│   │   │
-│   │   ├── service/                         # Business Logic Layer (Service)
-│   │   │   ├── NguoiDungService.java       # Quản lý người dùng
-│   │   │   ├── BenhNhanService.java        # Quản lý bệnh nhân
-│   │   │   ├── DatLichKhamService.java     # Logic đặt lịch khám
-│   │   │   ├── EmailService.java           # Gửi email thông báo
-│   │   │   └── ...
-│   │   │
-│   │   └── config/                          # Cấu hình Spring
-│   │       ├── SecurityConfig.java
-│   │       ├── CorsConfig.java
-│   │       └── ...
-│   │
-│   └── resources/
-│       ├── application.properties           # Cấu hình ứng dụng
-│       └── static/                          # Frontend tĩnh
-│           ├── css/
-│           │   └── kieu.css                # CSS chính (1500+ lines)
-│           ├── js/
-│           │   ├── xacthuc.js              # Logic xác thực & dropdown
-│           │   └── ungdung.js              # Logic chung ứng dụng
-│           ├── images/                     # Ảnh banner, logo
-│           ├── admin/                      # Trang quản trị
-│           │   ├── trangquantri.html       # Dashboard chính
-│           │   ├── bach.html               # Quản lý bác sĩ
-│           │   ├── khoa.html               # Quản lý chuyên khoa
-│           │   ├── lichhen.html            # Quản lý lịch hẹn
-│           │   ├── phongkham.html          # Quản lý phòng khám
-│           │   ├── khachhang.html          # Quản lý khách hàng
-│           │   ├── baocao.html             # Báo cáo thống kê
-│           │   ├── taikhoan.html           # Quản lý tài khoản
-│           │   ├── dangnhap.html           # Đăng nhập/Đăng ký
-│           │   └── dangky-nhanvien.html    # Đăng ký nhân viên
-│           └── customer/                   # Trang khách hàng (bệnh nhân)
-│               ├── trangchu.html           # Trang chủ công khai
-│               ├── tintuc-camnang.html     # Tin tức & cẩm nang
-│               ├── khoa.html               # Danh sách chuyên khoa
-│               ├── bacsi.html              # Danh sách bác sĩ
-│               ├── datlich.html            # Form đặt lịch
-│               ├── hoso.html               # Hồ sơ cá nhân
-│               └── lichcuatoi.html         # Lịch khám của tôi
-│
-├── pom.xml                                  # Maven dependencies
-├── README.md                                # Tài liệu này
-└── target/                                  # Build output
-
-```
+(Xem trong repo để biết danh sách đầy đủ file; phần quan trọng: `controller`, `entity`, `repository`, `service`, và `static/`.)
 
 ---
 
@@ -277,104 +168,73 @@ spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 ```
 
-### Bước 4: Build dự án
+## Chạy ứng dụng — nhanh & khắc phục lỗi thường gặp (dùng cho báo cáo)
 
-```bash
-# Sử dụng Maven
-mvn clean install
+1. Cài đặt yêu cầu: Java 17, Maven, MySQL.
 
-# Hoặc IDE tự động build
+2. Chuẩn bị DB (ví dụ nhanh):
+
+```sql
+CREATE DATABASE phenikaamec_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### Bước 5: Chạy ứng dụng
+3. Cấu hình `src/main/resources/application.properties` với thông tin DB và port.
 
-**Cách 1: Từ IDE**
-
-- Mở dự án trong IntelliJ IDEA / VS Code
-- Tìm lớp `UngDungWeb.java` (có annotation `@SpringBootApplication`)
-- Click nút Run (hoặc Shift + F10)
-
-**Cách 2: Từ Terminal**
+4. Các lệnh build/run:
 
 ```bash
+mvn clean install
 mvn spring-boot:run
 ```
 
-**Cách 3: Chạy JAR đã build**
+5. Nếu gặp lỗi "Port 8080 is already in use" (Windows):
 
-```bash
-java -jar target/java-web-project-1.0.0.jar
+```powershell
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
+# Hoặc tạm đổi port trong application.properties: server.port=8081
 ```
 
-### Bước 6: Truy cập ứng dụng
+6. Trang truy cập chính (canonical):
 
-Mở trình duyệt và truy cập:
+- Trang khách (công khai): http://localhost:8080/customer/trangchu.html
+- Đăng nhập/Quản trị: http://localhost:8080/admin/dangnhap.html
 
-- **Trang chủ**: [http://localhost:8080/customer/trangchu.html](http://localhost:8080/customer/trangchu.html)
-- **Đăng nhập**: [http://localhost:8080/admin/dangnhap.html](http://localhost:8080/admin/dangnhap.html)
-- **Dashboard quản trị**: [http://localhost:8080/admin/trangquantri.html](http://localhost:8080/admin/trangquantri.html)
+7. Lưu ý về mã hóa: toàn bộ tài nguyên tĩnh đã chuyển về UTF-8 để tránh lỗi font/hiển thị.
 
----
+## API & kiểm thử nhanh (dùng cho báo cáo)
 
-## 📖 Hướng dẫn sử dụng
+- Xác thực:
+  - `POST /api/auth/register` — body JSON: `{ "username":"...", "password":"..." }`
+  - `POST /api/auth/login` — body JSON: `{ "username":"...", "password":"..." }`
 
-### 👤 Cho Khách hàng (Bệnh nhân)
+Ví dụ kiểm thử nhanh với curl:
 
-1. **Truy cập trang chủ**: [http://localhost:8080/customer/trangchu.html](http://localhost:8080/customer/trangchu.html)
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"username":"test","password":"pass"}' http://localhost:8080/api/auth/login
+```
 
-2. **Đăng ký tài khoản**:
-   - Click nút "Đăng ký" trên header
-   - Điền email/SĐT, mật khẩu, xác nhận mật khẩu
-   - Click "Đăng ký"
+- Frontend client auth helper: `src/main/resources/static/js/xacthuc.js` — file này lưu user vào `localStorage`, xử lý redirect theo role (`redirectByRole()`), và dùng `/admin/dangnhap.html` làm trang login chuyển hướng.
 
-3. **Đặt lịch khám**:
-   - Đăng nhập vào tài khoản
-   - Click "Đặt lịch khám"
-   - Chọn chuyên khoa → bác sĩ → dịch vụ → ngày → khung giờ
-   - Điền triệu chứng (tùy chọn)
-   - Click "Xác nhận đặt lịch"
+## Các tệp/điểm quan trọng (báo cáo)
 
-4. **Quản lý hồ sơ cá nhân**:
-   - Vào "Thông tin cá nhân"
-   - Cập nhật: Họ tên, Tuổi, Giới tính, CCCD, SĐT, Địa chỉ
-   - Click "Lưu thông tin"
+- Backend main: `src/main/java/com/example/webapp/UngDungWeb.java`
+- Auth controller: `src/main/java/com/example/webapp/controller/XacThucController.java`
+- Home redirect: `src/main/java/com/example/webapp/controller/HomeController.java` (root -> `/customer/trangchu.html`)
+- Client auth: `src/main/resources/static/js/xacthuc.js`
+- Admin login page: `src/main/resources/static/admin/dangnhap.html`
+- Styles: `src/main/resources/static/css/kieu.css`
+- Logo: `src/main/resources/static/images/logo.png`
 
-5. **Xem lịch khám**:
-   - Vào "Lịch khám của tôi"
-   - Xem trạng thái: Chờ xác nhận, Đã xác nhận, Đã khám
+## Ghi chú cho báo cáo
 
-6. **Xem tin tức & cẩm nang**:
-   - Click "Tin tức & cẩm nang" trên menu
-   - Đọc bài viết, hướng dẫn
-
-### 👨‍💼 Cho Quản trị viên / Nhân viên lễ tân
-
-1. **Đăng nhập**:
-   - Truy cập [http://localhost:8080/admin/dangnhap.html](http://localhost:8080/admin/dangnhap.html)
-   - Đăng nhập bằng tài khoản admin (bạn cần tạo trong DB)
-
-2. **Dashboard chính**:
-   - Thống kê: Tổng khách hàng, Lịch khám hôm nay, Lịch khám tháng
-   - Navigation sidebar: Truy cập các module quản lý
-
-3. **Quản lý lịch khám** (Lịch hẹn):
-   - Xem danh sách lịch khám chưa xác nhận
-   - Click vào lịch để xem chi tiết
-   - Xác nhận hoặc hủy lịch
-
-4. **Quản lý bác sĩ**:
-   - Thêm bác sĩ mới, chỉnh sửa thông tin
-   - Phân công chuyên khoa
-
-5. **Quản lý chuyên khoa**:
-   - Thêm/Sửa/Xóa chuyên khoa
-   - Quản lý danh sách dịch vụ
-
-6. **Báo cáo thống kê**:
-   - Xem số lượng lịch khám theo tháng
-   - Thống kê theo chuyên khoa, bác sĩ
+- Trạng thái: hệ thống đã phục hồi nhiều trang tĩnh, sửa lỗi encoding, di chuyển auth vào `/admin/`, tích hợp frontend với API xác thực.
+- Công việc ưu tiên tiếp theo: xử lý port conflict khi chạy local, seed dữ liệu test (user/admin/bác sĩ), thực hiện kiểm thử end-to-end cho luồng đăng ký/đăng nhập/đặt lịch.
+- Nếu cần, tôi có thể tiếp tục: (1) chạy ứng dụng local, (2) seed DB mẫu, (3) kiểm thử API và chụp kết quả cho báo cáo.
 
 ---
+
+Nếu bạn muốn, tôi sẽ chạy thêm một bản `README` ngắn bằng tiếng Anh hoặc tạo file báo cáo PDF tóm tắt thay cho slide trình bày.
 
 ## 🗂️ Các thực thể dữ liệu
 
@@ -712,6 +572,4 @@ Bạn có thể thêm:
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - # [Spring Web MVC](https://docs.spring.io/spring-framework/reference/web/webmvc.html)
 
-# X-y-d-ng-h-th-ng-t-l-ch-kh-m-b-nh
-
-> > > > > > > 7dfe002d19905a7cbe5b3372c8d213efd3d7b2b9
+# BOOKING HOPITAL
