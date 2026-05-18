@@ -348,7 +348,7 @@ public class QuanTriPortalController {
                 updated = nguoiDungService.updateUsername(userId, newUsername.trim());
             }
             if (newPassword != null && !newPassword.trim().isEmpty()) {
-                updated.setPassword(newPassword.trim());
+                updated = nguoiDungService.updatePassword(userId, newPassword);
             }
 
             updated = nguoiDungService.saveUser(updated);

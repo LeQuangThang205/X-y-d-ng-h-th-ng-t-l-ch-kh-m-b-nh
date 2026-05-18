@@ -106,8 +106,7 @@ async function logout() {
     if (shouldConfirm && !(await uiConfirm("Bạn có chắc muốn đăng xuất ?", "Xác nhận"))) {
         return;
     }
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem("doctor_portal_doctorId");
+    clearSessionData();
     window.location.href = "/customer/trangchu.html";
 }
 
@@ -229,6 +228,201 @@ function getRoleLabel(role) {
     return labels[normalizeRole(role)] || role;
 }
 
+function clearSessionData() {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("doctor_portal_doctorId");
+    localStorage.removeItem(PROFILE_REQUIRED_KEY);
+}
+
+function createDialogField(labelText, inputId, type, placeholder) {
+    var group = document.createElement("div");
+    group.className = "form-group";
+
+    var label = document.createElement("label");
+    label.setAttribute("for", inputId);
+    label.textContent = labelText;
+
+    var input = document.createElement("input");
+    input.type = type || "text";
+    input.id = inputId;
+    input.placeholder = placeholder || "";
+
+    group.appendChild(label);
+    group.appendChild(input);
+    return { group: group, input: input };
+}
+
+function ensureChangePasswordDialog() {
+    if (typeof document === "undefined") return null;
+
+    var existing = document.getElementById("change-password-dialog");
+    if (existing) return existing;
+
+    var root = document.createElement("div");
+    root.id = "change-password-dialog";
+    root.className = "app-dialog-root";
+    root.innerHTML = ''
+        + '<div class="app-dialog-backdrop" data-dialog-close="true"></div>'
+        + '<div class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="change-password-title">'
+        + '  <div class="app-dialog-header">'
+        + '    <div class="app-dialog-title" id="change-password-title">Đổi mật khẩu</div>'
+        + '    <button type="button" class="app-dialog-close" data-dialog-close aria-label="Đóng">&times;</button>'
+        + '  </div>'
+        + '  <form id="change-password-form">'
+        + '    <div class="app-dialog-body">'
+        + '      <p class="change-password-hint">Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ và số.</p>'
+        + '      <div class="change-password-fields" id="change-password-fields"></div>'
+        + '      <div class="change-password-status" id="change-password-status" aria-live="polite"></div>'
+        + '    </div>'
+        + '    <div class="app-dialog-actions">'
+        + '      <button type="button" class="btn btn-outline" data-dialog-close>Hủy</button>'
+        + '      <button type="submit" class="btn btn-primary" id="change-password-submit">Lưu mật khẩu mới</button>'
+        + '    </div>'
+        + '  </form>'
+        + '</div>';
+
+    var fieldsHost = root.querySelector("#change-password-fields");
+    fieldsHost.appendChild(createDialogField("Mật khẩu hiện tại *", "change-password-current", "password", "Nhập mật khẩu hiện tại").group);
+    fieldsHost.appendChild(createDialogField("Mật khẩu mới *", "change-password-new", "password", "Nhập mật khẩu mới").group);
+    fieldsHost.appendChild(createDialogField("Xác nhận mật khẩu mới *", "change-password-confirm", "password", "Nhập lại mật khẩu mới").group);
+
+    document.body.appendChild(root);
+    return root;
+}
+
+function openChangePasswordDialog() {
+    var user = getCurrentUser();
+    if (!user || !user.username) {
+        window.location.href = "/admin/dangnhap.html";
+        return Promise.resolve(false);
+    }
+
+    var root = ensureChangePasswordDialog();
+    if (!root) return Promise.resolve(false);
+
+    var form = root.querySelector("#change-password-form");
+    var currentInput = root.querySelector("#change-password-current");
+    var newInput = root.querySelector("#change-password-new");
+    var confirmInput = root.querySelector("#change-password-confirm");
+    var statusEl = root.querySelector("#change-password-status");
+    var submitBtn = root.querySelector("#change-password-submit");
+    var closeTargets = root.querySelectorAll("[data-dialog-close]");
+    var previousFocus = document.activeElement;
+
+    function setStatus(message, isError) {
+        statusEl.textContent = message || "";
+        statusEl.className = isError ? "change-password-status is-error" : "change-password-status";
+    }
+
+    function closeDialog() {
+        root.classList.remove("is-visible");
+        document.documentElement.classList.remove("app-dialog-open");
+        root.removeEventListener("click", onRootClick);
+        document.removeEventListener("keydown", onKeyDown);
+        form.removeEventListener("submit", onSubmit);
+        Array.prototype.forEach.call(closeTargets, function (node) {
+            node.removeEventListener("click", onClose);
+        });
+        if (previousFocus && typeof previousFocus.focus === "function") {
+            previousFocus.focus();
+        }
+    }
+
+    function onClose() {
+        closeDialog();
+    }
+
+    function onRootClick(event) {
+        if (event.target && event.target.hasAttribute("data-dialog-close")) {
+            closeDialog();
+        }
+    }
+
+    function onKeyDown(event) {
+        if (event.key === "Escape") {
+            closeDialog();
+        }
+    }
+
+    async function onSubmit(event) {
+        event.preventDefault();
+        setStatus("", false);
+
+        var currentPassword = currentInput.value;
+        var newPassword = newInput.value;
+        var confirmPassword = confirmInput.value;
+
+        if (!currentPassword) {
+            setStatus("Vui lòng nhập mật khẩu hiện tại.", true);
+            currentInput.focus();
+            return;
+        }
+        if (!newPassword || newPassword.length < 8) {
+            setStatus("Mật khẩu mới phải có ít nhất 8 ký tự.", true);
+            newInput.focus();
+            return;
+        }
+        if (!/[A-Za-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+            setStatus("Mật khẩu mới phải chứa ít nhất 1 chữ cái và 1 chữ số.", true);
+            newInput.focus();
+            return;
+        }
+        if (newPassword === currentPassword) {
+            setStatus("Mật khẩu mới phải khác mật khẩu hiện tại.", true);
+            newInput.focus();
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setStatus("Xác nhận mật khẩu mới không khớp.", true);
+            confirmInput.focus();
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Đang lưu...";
+        try {
+            var res = await apiJson("/api/auth/change-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: user.username,
+                    currentPassword: currentPassword,
+                    newPassword: newPassword,
+                }),
+            });
+
+            if (!res || !res.success) {
+                throw new Error((res && res.message) || "Đổi mật khẩu thất bại");
+            }
+
+            closeDialog();
+            await uiAlert("Đã đổi mật khẩu thành công. Vui lòng đăng nhập lại.", "Thông báo");
+            clearSessionData();
+            window.location.href = "/admin/dangnhap.html";
+        } catch (err) {
+            setStatus(err.message || "Đổi mật khẩu thất bại", true);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Lưu mật khẩu mới";
+        }
+    }
+
+    root.classList.add("is-visible");
+    document.documentElement.classList.add("app-dialog-open");
+    Array.prototype.forEach.call(closeTargets, function (node) {
+        node.addEventListener("click", onClose);
+    });
+    root.addEventListener("click", onRootClick);
+    document.addEventListener("keydown", onKeyDown);
+    form.addEventListener("submit", onSubmit);
+    setStatus("", false);
+    window.requestAnimationFrame(function () {
+        currentInput.focus();
+    });
+
+    return Promise.resolve(true);
+}
+
 function buildCustomerAccountDropdown(user) {
     var wrap = document.createElement("div");
     wrap.className = "account-dropdown";
@@ -248,6 +442,7 @@ function buildCustomerAccountDropdown(user) {
     var links = [
         { href: "/customer/hoso.html", label: "Thông tin cá nhân" },
         { href: "/customer/lichcuatoi.html", label: "Lịch khám" },
+        { href: "/customer/ketluan.html", label: "Kết luận" },
         { href: "/customer/tintuc-camnang.html", label: "Tin tức & cẩm nang" },
     ];
 
@@ -258,6 +453,17 @@ function buildCustomerAccountDropdown(user) {
         a.textContent = item.label;
         panel.appendChild(a);
     });
+
+    var changePasswordBtn = document.createElement("button");
+    changePasswordBtn.type = "button";
+    changePasswordBtn.className = "account-menu-action";
+    changePasswordBtn.textContent = "Đổi mật khẩu";
+    changePasswordBtn.addEventListener("click", function () {
+        wrap.classList.remove("is-open");
+        button.setAttribute("aria-expanded", "false");
+        openChangePasswordDialog();
+    });
+    panel.appendChild(changePasswordBtn);
 
     var logoutBtn = document.createElement("button");
     logoutBtn.type = "button";

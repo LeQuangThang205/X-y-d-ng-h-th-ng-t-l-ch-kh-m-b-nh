@@ -94,6 +94,43 @@ public class NguoiDungService {
     }
 
     @Transactional
+    public NguoiDung updatePassword(long userId, String newPassword) {
+        validatePasswordPolicy(newPassword);
+        NguoiDung user = findUserById(userId);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public NguoiDung changePassword(String username, String currentPassword, String newPassword) {
+        String normalizedUsername = username == null ? null : username.trim();
+        if (normalizedUsername == null || normalizedUsername.isBlank()) {
+            throw new IllegalArgumentException("Username khong duoc de trong");
+        }
+
+        NguoiDung user = userRepository.findByUsername(normalizedUsername)
+                .or(() -> userRepository.findByUsernameIgnoreCase(normalizedUsername))
+                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay tai khoan"));
+
+        if (currentPassword == null || currentPassword.isEmpty()) {
+            throw new IllegalArgumentException("Vui long nhap mat khau hien tai");
+        }
+        if (!checkPassword(user, currentPassword)) {
+            throw new IllegalArgumentException("Mat khau hien tai khong chinh xac");
+        }
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new IllegalArgumentException("Vui long nhap mat khau moi");
+        }
+        if (currentPassword.equals(newPassword)) {
+            throw new IllegalArgumentException("Mat khau moi phai khac mat khau hien tai");
+        }
+
+        validatePasswordPolicy(newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
+    @Transactional
     public void deleteUser(long userId) {
         NguoiDung user = findUserById(userId);
         String username = user.getUsername();
@@ -166,6 +203,23 @@ public class NguoiDungService {
 
     public boolean checkPassword(NguoiDung user, String rawPassword) {
         return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    private void validatePasswordPolicy(String password) {
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Mat khau khong duoc de trong");
+        }
+
+        String value = password;
+        if (value.length() < 8) {
+            throw new IllegalArgumentException("Mat khau moi phai co it nhat 8 ky tu");
+        }
+        if (!value.matches(".*[A-Za-z].*")) {
+            throw new IllegalArgumentException("Mat khau moi phai chua it nhat 1 chu cai");
+        }
+        if (!value.matches(".*[0-9].*")) {
+            throw new IllegalArgumentException("Mat khau moi phai chua it nhat 1 chu so");
+        }
     }
 
     public String normalizeRole(String role) {

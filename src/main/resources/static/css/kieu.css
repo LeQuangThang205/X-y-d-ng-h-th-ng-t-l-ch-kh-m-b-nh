@@ -1379,8 +1379,12 @@ a:hover {
     align-items: center;
     border: none;
     background: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+    font: inherit;
     font-size: 0.9rem;
     font-weight: 500;
+    line-height: 1.25;
     color: #334155;
     border-radius: 12px;
     padding: 11px 12px;
@@ -2106,32 +2110,104 @@ th, td {
     position: relative;
     z-index: 1;
     background: #ffffff;
-    border-radius: 16px;
-    padding: 16px 18px 14px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.7);
+    border-radius: 24px;
+    padding: 22px 22px 18px;
+    width: min(94vw, 1080px);
+    max-height: min(88vh, 900px);
+    overflow: auto;
+    box-shadow: 0 30px 90px rgba(15, 23, 42, 0.28);
+    border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.95);
 }
 
 .modal-close {
-    border: none;
-    background: transparent;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    color: #475569;
     font-size: 1.4rem;
     cursor: pointer;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(226, 232, 240, 0.95);
+}
+
+.conclusion-detail-grid {
+    display: grid;
+    gap: 14px;
+    padding: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+.conclusion-detail-item {
+    padding: 14px 16px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+}
+
+.conclusion-detail-item.is-full {
+    grid-column: 1 / -1;
+}
+
+.conclusion-detail-label {
+    margin-bottom: 6px;
+    color: #5b6b84;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.conclusion-detail-value {
+    color: #0f172a;
+    font-size: 0.97rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+@media (max-width: 900px) {
+    .modal-content {
+        width: min(94vw, 720px);
+        padding: 18px 18px 16px;
+    }
+
+    .conclusion-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal-content {
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        border-radius: 20px;
+    }
+
+    .modal-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
 }
 
 /* ===== Doctor portal ===== */
@@ -2638,6 +2714,29 @@ th, td {
     color: #334155;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+.change-password-hint {
+    margin: 0 0 14px;
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.change-password-fields {
+    display: grid;
+    gap: 12px;
+}
+
+.change-password-status {
+    min-height: 1.25rem;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #0f172a;
+}
+
+.change-password-status.is-error {
+    color: #b91c1c;
 }
 
 .app-dialog-actions {

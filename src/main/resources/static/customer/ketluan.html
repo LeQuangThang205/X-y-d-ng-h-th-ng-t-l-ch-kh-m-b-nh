@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kết luận khám - TT Care+</title>
+  <link rel="stylesheet" href="/css/kieu.css" />
+</head>
+<body class="customer-layout">
+  <header class="customer-header">
+    <a href="/customer/trangchu.html" class="brand"><img src="/images/logo1.jpg" alt="TT Care+" style="height:36px;vertical-align:middle;margin-right:8px">TT Care+</a>
+    <nav>
+      <a href="/customer/trangchu.html">Trang chủ</a>
+      <a href="/customer/khoa.html">Chuyên khoa</a>
+      <a href="/customer/bacsi.html">Bác sĩ</a>
+      <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
+      <a href="/customer/datlich.html">Đặt lịch</a>
+      <a href="/customer/lichcuatoi.html">Lịch khám</a>
+      <a href="/customer/lienhe.html">Liên hệ</a>
+    </nav>
+    <div class="header-actions">
+      <a href="/admin/dangnhap.html" class="btn btn-outline" id="header-auth-link">Đăng nhập</a>
+      <a href="/customer/datlich.html" class="btn btn-primary">Đặt lịch khám</a>
+    </div>
+  </header>
+
+  <div class="customer-content profile-page">
+    <div class="profile-layout">
+      <aside class="profile-sidebar">
+        <nav class="profile-menu">
+          <a href="/customer/hoso.html">Thông tin cá nhân</a>
+          <a href="/customer/lichcuatoi.html">Lịch khám</a>
+          <a href="/customer/ketluan.html" class="active">Kết luận khám</a>
+          <a href="/customer/tintuc-camnang.html">Tin tức & cẩm nang</a>
+          <a href="#" onclick="logout(); return false;">Đăng xuất</a>
+        </nav>
+      </aside>
+
+      <main class="profile-main">
+        <h1 class="page-title">Kết luận & toa thuốc</h1>
+
+        <div class="card">
+          <div class="card-header">Danh sách kết luận khám</div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table id="results-table">
+                <thead>
+                  <tr>
+                    <th>Mã lịch</th>
+                    <th>Bác sĩ</th>
+                    <th>Ngày giờ</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="4" class="text-muted">Đang tải dữ liệu...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-muted mt-1">Trang này hiển thị các kết luận/đơn thuốc mà bác sĩ đã lưu vào hồ sơ sau khi khám. Nếu bạn cần, hãy liên hệ phòng khám để được hỗ trợ.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="conclusion-detail-modal" class="modal" hidden aria-hidden="true">
+    <div class="modal-overlay" data-close-detail-modal></div>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="conclusion-detail-title">
+      <div class="modal-header">
+        <h3 id="conclusion-detail-title" style="margin:0">Chi tiết kết luận khám</h3>
+        <button type="button" class="modal-close" data-close-detail-modal aria-label="Đóng">&times;</button>
+      </div>
+      <div class="conclusion-detail-grid" id="conclusion-detail-grid"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" data-close-detail-modal>Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="site-footer-main">
+      <div class="site-footer-col">
+        <a href="/customer/trangchu.html" class="site-footer-brand">
+          <img src="/images/logo1.jpg" alt="TT Care+" class="site-footer-logo" />
+          <span>TT Care+</span>
+        </a>
+        <p class="site-footer-desc">TT Care+ là nền tảng phòng khám giúp người bệnh đặt lịch nhanh, theo dõi hồ sơ và kết nối bác sĩ chuyên khoa minh bạch, thuận tiện mỗi ngày.</p>
+      </div>
+      <div class="site-footer-col">
+        <h4>Liên kết hữu ích</h4>
+        <ul class="site-footer-links">
+          <li><a href="/customer/datlich.html">Đặt lịch</a></li>
+          <li><a href="/customer/hoso.html">Hồ sơ cá nhân</a></li>
+          <li><a href="/customer/lichcuatoi.html">Lịch khám</a></li>
+        </ul>
+      </div>
+      <div class="site-footer-col">
+        <h4>Liên hệ</h4>
+        <ul class="site-footer-contact">
+          <li>Email: <a href="mailto:support@example.com">support@example.com</a></li>
+          <li>Hotline: <a href="tel:19001234">1900 1234</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/xacthuc.js"></script>
+  <script>
+    (function () {
+      var user = getCurrentUser();
+      if (!user) {
+        window.location.href = '/admin/dangnhap.html';
+        return;
+      }
+      if (normalizeRole(user.role) !== 'customer') {
+        redirectByRole(user.role);
+        return;
+      }
+
+      var tbody = document.querySelector('#results-table tbody');
+      var detailModal = document.getElementById('conclusion-detail-modal');
+      var detailGrid = document.getElementById('conclusion-detail-grid');
+      var currentAppointments = [];
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatText(value) {
+        var text = value == null ? '' : String(value).trim();
+        return text ? escapeHtml(text).replace(/\n/g, '<br>') : '-';
+      }
+
+      function formatDateTime(item) {
+        return (item.ngayKham || '') + ' ' + (item.gioKham || '');
+      }
+
+      function formatStatus(value) {
+        var raw = (value == null ? '' : String(value)).trim();
+        if (!raw) return '-';
+        return escapeHtml(raw.replace(/_/g, ' ').toLowerCase()).replace(/\b\w/g, function (c) {
+          return c.toUpperCase();
+        });
+      }
+
+      function openDetailModal(item) {
+        if (!item) return;
+
+        var rows = [
+          { label: 'Mã lịch', value: '#LH' + escapeHtml(item.id), full: false },
+          { label: 'Bác sĩ', value: item.bacSi ? escapeHtml(item.bacSi.hoTen || '-') : '-', full: false },
+          { label: 'Bệnh nhân', value: item.benhNhan ? escapeHtml(item.benhNhan.fullname || '-') : '-', full: false },
+          { label: 'Ngày giờ khám', value: escapeHtml(formatDateTime(item)), full: false },
+          { label: 'Trạng thái', value: formatStatus(item.trangThai), full: false },
+          { label: 'Triệu chứng', value: formatText(item.trieuChung), full: true },
+          { label: 'Chẩn đoán', value: formatText(item.chanDoan), full: true },
+          { label: 'Hướng điều trị', value: formatText(item.huongDieuTri), full: true },
+          { label: 'Đơn thuốc', value: formatText(item.donThuoc), full: true },
+          { label: 'Ghi chú tái khám', value: formatText(item.ghiChuTaiKham), full: true },
+        ];
+
+        detailGrid.innerHTML = rows.map(function (row) {
+          return '<div class="conclusion-detail-item' + (row.full ? ' is-full' : '') + '">'
+            + '<div class="conclusion-detail-label">' + row.label + '</div>'
+            + '<div class="conclusion-detail-value">' + row.value + '</div>'
+            + '</div>';
+        }).join('');
+
+        detailModal.hidden = false;
+        detailModal.setAttribute('aria-hidden', 'false');
+        document.documentElement.classList.add('app-dialog-open');
+      }
+
+      function closeDetailModal() {
+        detailModal.hidden = true;
+        detailModal.setAttribute('aria-hidden', 'true');
+        document.documentElement.classList.remove('app-dialog-open');
+      }
+
+      function renderResults(list) {
+        currentAppointments = (list || []).filter(function (a) {
+          return (a.chanDoan && String(a.chanDoan).trim())
+            || (a.huongDieuTri && String(a.huongDieuTri).trim())
+            || (a.donThuoc && String(a.donThuoc).trim())
+            || (a.ghiChuTaiKham && String(a.ghiChuTaiKham).trim());
+        });
+
+        if (!currentAppointments.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="text-muted">Chưa có kết luận khám nào.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = currentAppointments.map(function (item, index) {
+          return '<tr>'
+            + '<td>#LH' + escapeHtml(item.id) + '</td>'
+            + '<td>' + (item.bacSi ? escapeHtml(item.bacSi.hoTen || '-') : '-') + '</td>'
+            + '<td>' + escapeHtml(formatDateTime(item)) + '</td>'
+            + '<td><button type="button" class="btn btn-outline btn-sm view-detail-btn" data-index="' + index + '">Xem chi tiết</button></td>'
+            + '</tr>';
+        }).join('');
+      }
+
+      tbody.addEventListener('click', function (event) {
+        var button = event.target.closest('.view-detail-btn');
+        if (!button) return;
+        var index = Number(button.getAttribute('data-index'));
+        if (!Number.isFinite(index) || !currentAppointments[index]) return;
+        openDetailModal(currentAppointments[index]);
+      });
+
+      detailModal.addEventListener('click', function (event) {
+        if (event.target && event.target.hasAttribute('data-close-detail-modal')) {
+          closeDetailModal();
+        }
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !detailModal.hidden) {
+          closeDetailModal();
+        }
+      });
+
+      function loadAppointments() {
+        if (!user.patientId) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-muted">Chưa tìm thấy hồ sơ bệnh nhân. Vui lòng hoàn thiện thông tin trước.</td></tr>';
+          return;
+        }
+        apiJson('/api/patient/' + encodeURIComponent(user.patientId) + '/appointments')
+          .then(function (list) {
+            renderResults(list);
+          })
+          .catch(function (err) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-danger">' + (err.message || 'Tải dữ liệu thất bại') + '</td></tr>';
+          });
+      }
+
+      loadAppointments();
+    })();
+  </script>
+</body>
+</html>

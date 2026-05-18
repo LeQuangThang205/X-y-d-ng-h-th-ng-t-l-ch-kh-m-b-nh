@@ -81,6 +81,26 @@ public class XacThucController {
         return res;
     }
 
+    @PostMapping("/change-password")
+    public Map<String, Object> changePassword(@RequestBody Map<String, String> req) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            String username = req.get("username");
+            String currentPassword = req.get("currentPassword");
+            String newPassword = req.get("newPassword");
+
+            NguoiDung updated = userService.changePassword(username, currentPassword, newPassword);
+            res.put("success", true);
+            res.put("user", updated.getUsername());
+            res.put("role", userService.normalizeRole(updated.getRole()));
+            res.put("message", "Đã đổi mật khẩu thành công");
+        } catch (Exception ex) {
+            res.put("success", false);
+            res.put("message", ex.getMessage());
+        }
+        return res;
+    }
+
     @GetMapping("/me")
     public Map<String, Object> me(@RequestParam String username) {
         Map<String, Object> res = new HashMap<>();
